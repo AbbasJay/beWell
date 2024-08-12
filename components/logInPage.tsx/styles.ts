@@ -2,16 +2,25 @@ import styled from "styled-components/native";
 import { TextInput, Button, Text } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
 
-export const Container = styled.View`
+export const Container = styled.View<{ colours: { background: string } }>`
   flex: 1;
   justify-content: flex-start;
   width: 100%;
   padding: 20px;
+  background-color: ${(props) => props.colours.background};
 `;
 
 export const Logo = styled.View`
   padding: 20px 0;
   align-items: center;
+`;
+
+export const StyledText = styled.Text<{
+  colours: { text: string };
+  fontSize: string;
+}>`
+  color: ${(props) => props.colours.text};
+  font-size: ${(props) => props.fontSize};
 `;
 
 export const Body = styled.View`
@@ -24,8 +33,8 @@ export const ThemeToggle = styled.Pressable`
   margin-bottom: 20px;
 `;
 
-export const ThemeToggleText = styled.Text`
-  color: ${(props) => props.theme.text};
+export const ThemeToggleText = styled.Text<{ colours: { text: string } }>`
+  color: ${(props) => props.colours.text};
   font-size: 16px;
 `;
 
@@ -41,11 +50,11 @@ export const RememberMeContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-  color: ${(props) => props.theme.text};
 `;
 
-export const LinkText = styled.Text`
+export const LinkText = styled.Text<{ colours: { text: string } }>`
   margin-right: 10px;
+  color: ${(props) => props.colours.text};
 `;
 
 export const StyledLink = styled(TouchableOpacity)`
@@ -63,7 +72,11 @@ export const StyledButton = styled(Button)`
   padding: 8px 0;
   justify-content: center;
   border-radius: 8px;
-  ${(props) => props.disabled && `opacity: 0.6;`}
+  ${(props) => props.disabled && `background-color: gray`};
+`;
+
+export const OptionContainer = styled.View`
+  align-items: center;
 `;
 
 export const IconContainer = styled.View`
@@ -78,6 +91,7 @@ export const Footer = styled.View`
   align-items: center;
 `;
 
-export const FooterText = styled.Text`
+export const FooterText = styled.Text<{ colours: { text: string } }>`
   text-align: center;
+  color: ${(props) => props.colours.text};
 `;

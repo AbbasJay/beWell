@@ -26,20 +26,16 @@ export const LoginPage = () => {
   };
 
   return (
-    <CSS.Container
-      style={{
-        backgroundColor: colors.background,
-      }}
-    >
+    <CSS.Container colours={colors}>
       <CSS.Logo>
-        <Text style={{ color: colors.text }} variant="displayLarge">
+        <CSS.StyledText fontSize="40px" colours={colors}>
           LOGO
-        </Text>
+        </CSS.StyledText>
       </CSS.Logo>
 
       <CSS.Body>
         <CSS.ThemeToggle onPress={toggleTheme}>
-          <CSS.ThemeToggleText style={{ color: colors.text }}>
+          <CSS.ThemeToggleText colours={colors}>
             Toggle Theme (Current: {theme})
           </CSS.ThemeToggleText>
         </CSS.ThemeToggle>
@@ -71,15 +67,11 @@ export const LoginPage = () => {
         />
 
         <CSS.RememberMeContainer>
-          <CSS.LinkText style={{ color: colors.text }}>
-            Remember Me
-          </CSS.LinkText>
+          <CSS.LinkText colours={colors}>Remember Me</CSS.LinkText>
           <CSS.StyledLink
             onPress={() => Linking.openURL("https://www.google.com")}
           >
-            <CSS.LinkText style={{ color: colors.text }}>
-              Forgot Password?
-            </CSS.LinkText>
+            <CSS.LinkText colours={colors}>Forgot Password?</CSS.LinkText>
           </CSS.StyledLink>
         </CSS.RememberMeContainer>
 
@@ -95,15 +87,11 @@ export const LoginPage = () => {
           </CSS.StyledButton>
         </CSS.ButtonContainer>
 
-        <Text
-          style={{
-            color: colors.text,
-            textAlign: "center",
-          }}
-          variant="titleLarge"
-        >
-          OR
-        </Text>
+        <CSS.OptionContainer>
+          <CSS.StyledText fontSize="16px" colours={colors}>
+            OR
+          </CSS.StyledText>
+        </CSS.OptionContainer>
 
         <CSS.IconContainer>
           <Icon color="black" source="google" size={20} />
@@ -113,11 +101,7 @@ export const LoginPage = () => {
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText
-          style={{
-            color: colors.text,
-          }}
-        >
+        <CSS.FooterText colours={colors}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>
