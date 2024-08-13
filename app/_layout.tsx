@@ -7,7 +7,9 @@ export default function RootLayout() {
     <ThemeProvider>
       <PaperProvider>
         <Stack>
-          <Stack.Screen name="index" />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="logInPage" options={{ headerShown: false }} />
+          <Stack.Screen name="signUpPage" options={{ headerShown: false }} />
         </Stack>
       </PaperProvider>
     </ThemeProvider>

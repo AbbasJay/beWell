@@ -1,21 +1,27 @@
 import { useState } from "react";
-import { Linking } from "react-native";
-import { Icon, TextInput, Text } from "react-native-paper";
+import { Icon, TextInput } from "react-native-paper";
+import { useRouter } from "expo-router";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
 
-export const LoginPage = () => {
+const Login = () => {
+  const router = useRouter();
+
+  const [userName, setUserName] = useState("");
   const [emailText, setEmailText] = useState("");
-  const [passwordText, setPasswordText] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState("checked");
 
   const { theme, setTheme } = useTheme();
   const colors = useThemeColor();
 
-  const isButtonDisabled = !Boolean(emailText && passwordText);
+  const isButtonDisabled = !Boolean(
+    userName && emailText && password && confirmPassword
+  );
 
   const onButtonToggle = () => {
     setStatus(status === "checked" ? "unchecked" : "checked");
@@ -27,11 +33,9 @@ export const LoginPage = () => {
 
   return (
     <CSS.Container colours={colors}>
-      <CSS.Logo>
-        <CSS.StyledText fontSize="40px" colours={colors}>
-          LOGO
-        </CSS.StyledText>
-      </CSS.Logo>
+      <CSS.StyledText fontSize="40px" colours={colors}>
+        Sign Up
+      </CSS.StyledText>
 
       <CSS.Body>
         <CSS.ThemeToggle onPress={toggleTheme}>
@@ -39,6 +43,19 @@ export const LoginPage = () => {
             Toggle Theme (Current: {theme})
           </CSS.ThemeToggleText>
         </CSS.ThemeToggle>
+
+        <CSS.StyledTextInput
+          outlineStyle={{
+            borderRadius: 12,
+          }}
+          textColor={colors.text}
+          mode="outlined"
+          value={userName}
+          placeholder="Full Name"
+          placeholderTextColor={colors.text}
+          onChangeText={(text: string) => setUserName(text)}
+          left={<TextInput.Icon color={colors.text} icon="account" />}
+        />
 
         <CSS.StyledTextInput
           outlineStyle={{
@@ -59,21 +76,25 @@ export const LoginPage = () => {
           }}
           textColor={colors.text}
           mode="outlined"
-          value={passwordText}
+          value={password}
           placeholder="Password"
           placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setPasswordText(text)}
+          onChangeText={(text: string) => setPassword(text)}
           left={<TextInput.Icon color={colors.text} icon="lock" />}
         />
 
-        <CSS.RememberMeContainer>
-          <CSS.LinkText colours={colors}>Remember Me</CSS.LinkText>
-          <CSS.StyledLink
-            onPress={() => Linking.openURL("https://www.google.com")}
-          >
-            <CSS.LinkText colours={colors}>Forgot Password?</CSS.LinkText>
-          </CSS.StyledLink>
-        </CSS.RememberMeContainer>
+        <CSS.StyledTextInput
+          outlineStyle={{
+            borderRadius: 12,
+          }}
+          textColor={colors.text}
+          mode="outlined"
+          value={confirmPassword}
+          placeholder="Confirm Password"
+          placeholderTextColor={colors.text}
+          onChangeText={(text: string) => setConfirmPassword(text)}
+          left={<TextInput.Icon color={colors.text} icon="lock" />}
+        />
 
         <CSS.ButtonContainer>
           <CSS.StyledButton
@@ -81,23 +102,12 @@ export const LoginPage = () => {
             buttonColor={colors.secondary}
             mode="contained"
             uppercase
+            onPress={() => router.push("/signUpPage")}
             disabled={isButtonDisabled}
           >
             Sign Up
           </CSS.StyledButton>
         </CSS.ButtonContainer>
-
-        <CSS.OptionContainer>
-          <CSS.StyledText fontSize="16px" colours={colors}>
-            OR
-          </CSS.StyledText>
-        </CSS.OptionContainer>
-
-        <CSS.IconContainer>
-          <Icon color="black" source="google" size={20} />
-          <Icon color="black" source="instagram" size={20} />
-          <Icon color="black" source="apple" size={20} />
-        </CSS.IconContainer>
       </CSS.Body>
 
       <CSS.Footer>
@@ -108,3 +118,5 @@ export const LoginPage = () => {
     </CSS.Container>
   );
 };
+
+export default Login;

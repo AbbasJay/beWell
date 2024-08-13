@@ -64,7 +64,7 @@ export const StyledLink = styled(TouchableOpacity)`
 `;
 
 export const ButtonContainer = styled.View`
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
 `;
 
