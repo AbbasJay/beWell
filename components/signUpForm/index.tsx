@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Icon, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
+import { TextInput } from "react-native-paper";
+import { useForm, Controller, useWatch } from "react-hook-form";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
@@ -8,12 +9,23 @@ import { useTheme } from "@/hooks/themeContext";
 import * as CSS from "./styles";
 
 const Login = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      userName: "",
+      emailText: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
   const router = useRouter();
+  const formValues = useWatch({ control });
 
-  const [userName, setUserName] = useState("");
-  const [emailText, setEmailText] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { userName, emailText, password, confirmPassword } = formValues;
+
   const [status, setStatus] = useState("checked");
 
   const { theme, setTheme } = useTheme();
@@ -44,56 +56,93 @@ const Login = () => {
           </CSS.ThemeToggleText>
         </CSS.ThemeToggle>
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
+        <Controller
+          control={control}
+          rules={{
+            required: true,
           }}
-          textColor={colors.text}
-          mode="outlined"
-          value={userName}
-          placeholder="Full Name"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setUserName(text)}
-          left={<TextInput.Icon color={colors.text} icon="account" />}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{
+                borderRadius: 12,
+              }}
+              onBlur={onBlur}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Full Name"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              left={<TextInput.Icon color={colors.text} icon="account" />}
+            />
+          )}
+          name="userName"
         />
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
+        <Controller
+          control={control}
+          rules={{
+            required: true,
           }}
-          textColor={colors.text}
-          mode="outlined"
-          value={emailText}
-          placeholder="Email"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setEmailText(text)}
-          left={<TextInput.Icon color={colors.text} icon="email" />}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{
+                borderRadius: 12,
+              }}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Email"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              left={<TextInput.Icon color={colors.text} icon="email" />}
+            />
+          )}
+          name="emailText"
         />
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
+        <Controller
+          control={control}
+          rules={{
+            required: true,
           }}
-          textColor={colors.text}
-          mode="outlined"
-          value={password}
-          placeholder="Password"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setPassword(text)}
-          left={<TextInput.Icon color={colors.text} icon="lock" />}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{
+                borderRadius: 12,
+              }}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Password"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              left={<TextInput.Icon color={colors.text} icon="lock" />}
+            />
+          )}
+          name="password"
         />
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
+        <Controller
+          control={control}
+          rules={{
+            required: true,
           }}
-          textColor={colors.text}
-          mode="outlined"
-          value={confirmPassword}
-          placeholder="Confirm Password"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setConfirmPassword(text)}
-          left={<TextInput.Icon color={colors.text} icon="lock" />}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{
+                borderRadius: 12,
+              }}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Confirm Password"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              left={<TextInput.Icon color={colors.text} icon="lock" />}
+            />
+          )}
+          name="confirmPassword"
         />
 
         <CSS.ButtonContainer>

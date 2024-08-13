@@ -1,24 +1,31 @@
 import { useState } from "react";
 import { Linking } from "react-native";
+import { useRouter } from "expo-router";
 import { Icon, TextInput } from "react-native-paper";
+import { useForm, Controller } from "react-hook-form";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
-import { useRouter } from "expo-router";
 
 const LoginForm = () => {
   const router = useRouter();
+  const { control, handleSubmit, watch } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const [emailText, setEmailText] = useState("");
-  const [passwordText, setPasswordText] = useState("");
   const [status, setStatus] = useState("checked");
 
   const { theme, setTheme } = useTheme();
   const colors = useThemeColor();
 
-  const isButtonDisabled = !Boolean(emailText && passwordText);
+  const email = watch("email");
+  const password = watch("password");
+  const isButtonDisabled = !Boolean(email && password);
 
   const onButtonToggle = () => {
     setStatus(status === "checked" ? "unchecked" : "checked");
@@ -26,6 +33,11 @@ const LoginForm = () => {
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    // Handle login logic here
   };
 
   return (
@@ -43,30 +55,43 @@ const LoginForm = () => {
           </CSS.ThemeToggleText>
         </CSS.ThemeToggle>
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
-          }}
-          textColor={colors.text}
-          mode="outlined"
-          value={emailText}
-          placeholder="Email"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setEmailText(text)}
-          left={<TextInput.Icon color={colors.text} icon="email" />}
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{ borderRadius: 12 }}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Email"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              left={<TextInput.Icon color={colors.text} icon="email" />}
+            />
+          )}
+          name="email"
         />
 
-        <CSS.StyledTextInput
-          outlineStyle={{
-            borderRadius: 12,
-          }}
-          textColor={colors.text}
-          mode="outlined"
-          value={passwordText}
-          placeholder="Password"
-          placeholderTextColor={colors.text}
-          onChangeText={(text: string) => setPasswordText(text)}
-          left={<TextInput.Icon color={colors.text} icon="lock" />}
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CSS.StyledTextInput
+              outlineStyle={{ borderRadius: 12 }}
+              textColor={colors.text}
+              mode="outlined"
+              value={value}
+              placeholder="Password"
+              placeholderTextColor={colors.text}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              secureTextEntry
+              left={<TextInput.Icon color={colors.text} icon="lock" />}
+            />
+          )}
+          name="password"
         />
 
         <CSS.RememberMeContainer>
@@ -85,6 +110,7 @@ const LoginForm = () => {
             mode="contained"
             uppercase
             disabled={isButtonDisabled}
+            onPress={handleSubmit(onSubmit)}
           >
             Log In
           </CSS.StyledButton>
