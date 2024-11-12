@@ -10,6 +10,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="logInPage" options={{ headerShown: false }} />
           <Stack.Screen name="signUpPage" options={{ headerShown: false }} />
+          <Stack.Screen name="homePage" options={{ headerShown: false }} />
         </Stack>
       </PaperProvider>
     </ThemeProvider>

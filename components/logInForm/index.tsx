@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Linking } from "react-native";
+import { Linking, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Icon, TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
+import * as SecureStore from "expo-secure-store";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
+import { API_URL } from "@/env";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -35,9 +37,37 @@ const LoginForm = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-    // Handle login logic here
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        const token = responseData.token;
+
+        if (Platform.OS === "web") {
+          localStorage.setItem("userToken", token);
+        } else {
+          await SecureStore.setItemAsync("userToken", token);
+        }
+
+        console.log("Login successful");
+        router.push("/homePage");
+      } else {
+        console.error("Login failed:", response.statusText);
+        // Handle login failure
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      // Handle error
+    }
   };
 
   return (
