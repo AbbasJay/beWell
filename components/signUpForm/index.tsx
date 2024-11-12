@@ -7,15 +7,16 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
+import { API_URL } from "@/env";
 
-const Login = () => {
+const SignUp = () => {
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      userName: "",
+      name: "",
       emailText: "",
       password: "",
       confirmPassword: "",
@@ -24,7 +25,7 @@ const Login = () => {
   const router = useRouter();
   const formValues = useWatch({ control });
 
-  const { userName, emailText, password, confirmPassword } = formValues;
+  const { name, emailText, password, confirmPassword } = formValues;
 
   const [status, setStatus] = useState("checked");
 
@@ -32,7 +33,7 @@ const Login = () => {
   const colors = useThemeColor();
 
   const isButtonDisabled = !Boolean(
-    userName && emailText && password && confirmPassword
+    name && emailText && password && confirmPassword
   );
 
   const onButtonToggle = () => {
@@ -41,6 +42,34 @@ const Login = () => {
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetch(`${API_URL}/api/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.userName,
+          email: data.emailText,
+          password: data.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to register");
+      }
+
+      if (response.ok) {
+        console.log("Signup successful");
+        router.push("/homePage");
+      } else {
+        console.log("Signup failed");
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+    }
   };
 
   return (
@@ -76,7 +105,7 @@ const Login = () => {
               left={<TextInput.Icon color={colors.text} icon="account" />}
             />
           )}
-          name="userName"
+          name="name"
         />
 
         <Controller
@@ -151,12 +180,22 @@ const Login = () => {
             buttonColor={colors.secondary}
             mode="contained"
             uppercase
-            onPress={() => router.push("/signUpPage")}
+            onPress={handleSubmit(onSubmit)}
             disabled={isButtonDisabled}
           >
             Sign Up
           </CSS.StyledButton>
         </CSS.ButtonContainer>
+
+        <CSS.StyledButton
+          textColor={colors.text}
+          buttonColor={colors.secondary}
+          mode="contained"
+          uppercase
+          onPress={() => router.push("/logInPage")}
+        >
+          Back to Login
+        </CSS.StyledButton>
       </CSS.Body>
 
       <CSS.Footer>
@@ -168,4 +207,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
