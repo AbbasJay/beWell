@@ -42,8 +42,6 @@ export default function HomePage() {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          mode: "cors",
-          credentials: "include",
         });
 
         if (!response.ok) {
