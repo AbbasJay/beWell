@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Dimensions, FlatList, Platform } from "react-native";
-import { Container, Card, Title, FlatListContainer } from "./homePageStyles";
+import { Container, Card, Title, FlatListContainer } from "./homeStyles";
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 
@@ -51,7 +51,6 @@ export default function HomePage() {
         }
 
         const json = await response.json();
-        console.log(json);
         setData(json);
       } catch (error) {
         console.error("Error fetching data:", error);

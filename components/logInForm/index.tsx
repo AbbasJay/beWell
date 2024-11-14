@@ -58,8 +58,7 @@ const LoginForm = () => {
           await SecureStore.setItemAsync("userToken", token);
         }
 
-        console.log("Login successful");
-        router.push("/homePage");
+        router.push("/home");
       } else {
         console.error("Login failed:", response.statusText);
         // Handle login failure
@@ -158,7 +157,7 @@ const LoginForm = () => {
             buttonColor={colors.secondary}
             mode="contained"
             uppercase
-            onPress={() => router.push("/signUpPage")}
+            onPress={() => router.push("/signUp")}
           >
             Sign Up
           </CSS.StyledButton>

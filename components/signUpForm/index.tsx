@@ -62,8 +62,7 @@ const SignUp = () => {
       }
 
       if (response.ok) {
-        console.log("Signup successful");
-        router.push("/homePage");
+        router.push("/home");
       } else {
         console.log("Signup failed");
       }
@@ -192,7 +191,7 @@ const SignUp = () => {
           buttonColor={colors.secondary}
           mode="contained"
           uppercase
-          onPress={() => router.push("/logInPage")}
+          onPress={() => router.push("/logIn")}
         >
           Back to Login
         </CSS.StyledButton>

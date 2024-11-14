@@ -8,9 +8,9 @@ export default function RootLayout() {
       <PaperProvider>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="logInPage" options={{ headerShown: false }} />
-          <Stack.Screen name="signUpPage" options={{ headerShown: false }} />
-          <Stack.Screen name="homePage" options={{ headerShown: false }} />
+          <Stack.Screen name="logIn" options={{ headerShown: false }} />
+          <Stack.Screen name="signUp" options={{ headerShown: false }} />
+          <Stack.Screen name="home" options={{ headerShown: false }} />
         </Stack>
       </PaperProvider>
     </ThemeProvider>
