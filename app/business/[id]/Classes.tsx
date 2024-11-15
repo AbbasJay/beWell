@@ -81,7 +81,9 @@ export default function Business() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      style={{ backgroundColor: "#F4DCC3", paddingLeft: 10, paddingRight: 10 }}
+    >
       <CSS.BusinessDetails>
         <CSS.Title>{business.name}</CSS.Title>
 

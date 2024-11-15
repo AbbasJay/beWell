@@ -6,13 +6,23 @@ const Index = () => {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F4DCC3",
+      }}
+    >
       <Text>Welcome to the Home Page</Text>
       <Button
         title="Go to Login"
         onPress={() => router.push("/home")} // TODO: should be '/logIn', for now to bypass login page we are going '/home'
       />
-      <Button title="go to components" onPress={() => router.push("/components")} />
+      <Button
+        title="go to components"
+        onPress={() => router.push("/components")}
+      />
     </View>
   );
 };

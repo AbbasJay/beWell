@@ -37,7 +37,7 @@ export default function HomePage() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: "#F4DCC3" }}>
       <Container>
         <FlatListContainer>
           <FlatList
