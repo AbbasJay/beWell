@@ -7,7 +7,10 @@ const Index = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>Welcome to the Home Page</Text>
-      <Button title="Go to Login" onPress={() => router.push("/logIn")} />
+      <Button
+        title="Go to Login"
+        onPress={() => router.push("/business/18/classes")}
+      />
     </View>
   );
 };

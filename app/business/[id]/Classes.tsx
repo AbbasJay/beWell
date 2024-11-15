@@ -6,7 +6,6 @@ import {
   View,
   Modal,
   Text,
-  Button,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Class } from "@/app/contexts/ClassesContext";
@@ -14,16 +13,7 @@ import { ClassesCard } from "@/app/ui/classes-card";
 import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
-import {
-  BusinessDetails,
-  Title,
-  DetailText,
-  BoldText,
-  ReadMoreText,
-  ClassesTitle,
-  ModalLayout,
-  ModalContainer,
-} from "./styles";
+import * as CSS from "./styles";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
@@ -36,7 +26,7 @@ export default function Business() {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   if (!business) {
-    return <DetailText>No business data available</DetailText>;
+    return <CSS.DetailText>No business data available</CSS.DetailText>;
   }
 
   useEffect(() => {
@@ -92,29 +82,29 @@ export default function Business() {
 
   return (
     <ScrollView>
-      <BusinessDetails>
-        <Title>{business.name}</Title>
+      <CSS.BusinessDetails>
+        <CSS.Title>{business.name}</CSS.Title>
 
-        <DetailText>
-          <BoldText>Address:</BoldText> {business.address}
-        </DetailText>
+        <CSS.DetailText>
+          <CSS.BoldText>Address:</CSS.BoldText> {business.address}
+        </CSS.DetailText>
 
-        <DetailText>
-          <BoldText>Phone:</BoldText> {business.phoneNumber}
-        </DetailText>
+        <CSS.DetailText>
+          <CSS.BoldText>Phone:</CSS.BoldText> {business.phoneNumber}
+        </CSS.DetailText>
 
-        <DetailText>
-          <BoldText>Email:</BoldText> {business.email}
-        </DetailText>
+        <CSS.DetailText>
+          <CSS.BoldText>Email:</CSS.BoldText> {business.email}
+        </CSS.DetailText>
 
-        <DetailText>
-          <BoldText>Type:</BoldText> {business.type}
-        </DetailText>
+        <CSS.DetailText>
+          <CSS.BoldText>Type:</CSS.BoldText> {business.type}
+        </CSS.DetailText>
 
-        <DetailText>
-          <BoldText>Hours:</BoldText> {business.hours}
-        </DetailText>
-      </BusinessDetails>
+        <CSS.DetailText>
+          <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
+        </CSS.DetailText>
+      </CSS.BusinessDetails>
 
       {classes.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
@@ -128,61 +118,54 @@ export default function Business() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0,0,0,0.5)",
-          }}
-        >
-          <ModalContainer>
-            <ModalLayout>
+        <CSS.ModalBackground>
+          <CSS.ModalContainer>
+            <CSS.CloseButton onPress={() => setModalVisible(false)}>
+              <CSS.CloseButtonText>×</CSS.CloseButtonText>
+            </CSS.CloseButton>
+            <CSS.ModalLayout>
               {showConfirmation ? (
-                <>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    Confirmed
-                  </Text>
-                  <Button
-                    title="Close"
-                    onPress={() => setModalVisible(false)}
-                  />
-                </>
+                <CSS.ConfirmedText>Booking Confirmed</CSS.ConfirmedText>
               ) : (
-                <>
-                  {selectedClass && (
-                    <View>
-                      <ClassesTitle>
-                        <BoldText>{selectedClass.name}</BoldText>
-                      </ClassesTitle>
+                selectedClass && (
+                  <View>
+                    <CSS.ClassesTitle>
+                      <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
+                    </CSS.ClassesTitle>
 
-                      <DetailText>
-                        <BoldText>Description:</BoldText>{" "}
-                        {selectedClass.description}
-                      </DetailText>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Description: </CSS.BoldText>
+                      {selectedClass.description}
+                    </CSS.DetailText>
 
-                      <DetailText>
-                        <BoldText>Instructor:</BoldText>{" "}
-                        {selectedClass.instructor}
-                      </DetailText>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Instructor: </CSS.BoldText>
+                      {selectedClass.instructor}
+                    </CSS.DetailText>
 
-                      <DetailText>
-                        <BoldText>Address:</BoldText>
-                        {` ${business.address}, ${selectedClass.location}`}
-                      </DetailText>
-                    </View>
-                  )}
-                  <Button title="Confirm" onPress={handleConfirm} />
-                </>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Address: </CSS.BoldText>
+                      {` ${business.address}, ${selectedClass.location}`}
+                    </CSS.DetailText>
+                  </View>
+                )
               )}
-            </ModalLayout>
-          </ModalContainer>
-        </View>
+            </CSS.ModalLayout>
+            <CSS.ButtonContainer>
+              <CSS.FullWidthButton
+                onPress={
+                  showConfirmation
+                    ? () => setModalVisible(false)
+                    : handleConfirm
+                }
+              >
+                <CSS.ButtonText>
+                  {showConfirmation ? "Close" : "Confirm"}
+                </CSS.ButtonText>
+              </CSS.FullWidthButton>
+            </CSS.ButtonContainer>
+          </CSS.ModalContainer>
+        </CSS.ModalBackground>
       </Modal>
     </ScrollView>
   );
