@@ -1,5 +1,6 @@
-import { View, Text, Button } from "react-native";
+import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
+import Button from "./ui/button/button";
 
 const Index = () => {
   const router = useRouter();
