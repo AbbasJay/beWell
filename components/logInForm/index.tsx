@@ -59,7 +59,7 @@ const LoginForm = () => {
         }
 
         console.log("Login successful");
-        router.push("/homePage");
+        router.push("/mapPage");
       } else {
         console.error("Login failed:", response.statusText);
         // Handle login failure
