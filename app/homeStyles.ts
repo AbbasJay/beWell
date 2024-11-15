@@ -10,6 +10,11 @@ export const FlatListContainer = styled.View`
 `;
 
 export const Card = styled.View`
+  shadow-color: #c7c7c7;
+  shadow-offset: 0px 0px;
+  shadow-opacity: 0.5;
+  shadow-radius: 5px;
+  elevation: 5;
   background-color: white;
   border-radius: 16px;
   padding: 16px;

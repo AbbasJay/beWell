@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Button from "./ui/button/button";
+import { Colors } from "@/constants/Colors";
 
 const Index = () => {
   const router = useRouter();
@@ -11,7 +12,7 @@ const Index = () => {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#F4DCC3",
+        backgroundColor: Colors.light.secondary,
       }}
     >
       <Text>Welcome to the Home Page</Text>

@@ -66,6 +66,7 @@ export const ButtonContainer = styled.View`
   width: 100%;
   position: absolute;
   bottom: 0;
+  padding: 10px;
 `;
 
 export const FullWidthButton = styled.TouchableOpacity`

@@ -15,6 +15,7 @@ import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
+import { Colors } from "@/constants/Colors";
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
@@ -82,7 +83,11 @@ export default function Business() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: "#F4DCC3", paddingLeft: 10, paddingRight: 10 }}
+      style={{
+        backgroundColor: Colors.light.secondary,
+        paddingLeft: 10,
+        paddingRight: 10,
+      }}
     >
       <CSS.BusinessDetails>
         <CSS.Title>{business.name}</CSS.Title>

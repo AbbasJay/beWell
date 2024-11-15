@@ -4,14 +4,15 @@ import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { BusinessProvider } from "./contexts/BusinessContext";
 import { SafeAreaView, View } from "react-native";
+import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 
 export default function RootLayout() {
   return (
     // <SafeAreaView>
     <ThemeProvider>
       <PaperProvider>
-        <View style={{ flex: 1, paddingTop: 50, backgroundColor: "#F4DCC3" }}>
-          <BusinessProvider>
+        <BusinessProvider>
+          <BeWellBackground>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="logIn" options={{ headerShown: false }} />
@@ -22,8 +23,8 @@ export default function RootLayout() {
                 options={{ headerShown: false }}
               />
             </Stack>
-          </BusinessProvider>
-        </View>
+          </BeWellBackground>
+        </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
     // </SafeAreaView>
