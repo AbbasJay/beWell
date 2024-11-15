@@ -3,9 +3,11 @@ import { ThemeProvider } from "@/hooks/themeContext";
 import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { BusinessProvider } from "./contexts/BusinessContext";
+import { SafeAreaView } from "react-native";
 
 export default function RootLayout() {
   return (
+    // <SafeAreaView>
     <ThemeProvider>
       <PaperProvider>
         <BusinessProvider>
@@ -22,5 +24,6 @@ export default function RootLayout() {
         </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
+    // </SafeAreaView>
   );
 }

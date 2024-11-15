@@ -9,17 +9,23 @@ import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-type Business = {
+export type Business = {
+  id?: number;
   userId: number;
   name: string;
   address: string;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  zipCode: string | null;
   phoneNumber: string;
   email: string;
   type: string;
-  id?: number | undefined;
-  description?: string | null | undefined;
-  hours?: string | null | undefined;
-  createdAt?: Date | undefined;
+  description?: string | null;
+  hours?: string | null;
+  createdAt?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 type BusinessContextType = {

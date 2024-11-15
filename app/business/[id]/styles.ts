@@ -18,7 +18,6 @@ export const ClassesTitle = styled(Text)`
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 12px;
-  margin-left: 10px;
 `;
 
 export const DetailText = styled(Text)`
@@ -34,4 +33,19 @@ export const ReadMoreText = styled(Text)`
   margin-top: -4px;
   margin-bottom: 4px;
   color: #999999;
+`;
+export const ModalContainer = styled(View)`
+  height: 95%;
+  width: 100%;
+  padding: 20px;
+  background-color: white;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+`;
+
+export const ModalLayout = styled(View)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 `;

@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  Modal,
+  Text,
+  Button,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { Class, useClassesContext } from "@/app/contexts/ClassesContext";
+import { Class } from "@/app/contexts/ClassesContext";
 import { ClassesCard } from "@/app/ui/classes-card";
 import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
@@ -13,6 +21,8 @@ import {
   BoldText,
   ReadMoreText,
   ClassesTitle,
+  ModalLayout,
+  ModalContainer,
 } from "./styles";
 
 export default function Business() {
@@ -21,6 +31,9 @@ export default function Business() {
   const business = businesses.find((b) => b.id === Number(id));
   const [classes, setClasses] = useState<Class[]>([]);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   if (!business) {
     return <DetailText>No business data available</DetailText>;
@@ -67,6 +80,16 @@ export default function Business() {
   const isDescriptionLong =
     business.description && business.description.length > descriptionLimit;
 
+  const handleClassPress = (item: Class) => {
+    setSelectedClass(item);
+    setShowConfirmation(false);
+    setModalVisible(true);
+  };
+
+  const handleConfirm = () => {
+    setShowConfirmation(true);
+  };
+
   return (
     <ScrollView>
       <BusinessDetails>
@@ -91,31 +114,76 @@ export default function Business() {
         <DetailText>
           <BoldText>Hours:</BoldText> {business.hours}
         </DetailText>
-
-        <View>
-          <DetailText>
-            <BoldText>Description:</BoldText>{" "}
-            {showFullDescription || !isDescriptionLong
-              ? business.description
-              : `${business.description?.slice(0, descriptionLimit)}...`}
-          </DetailText>
-          {isDescriptionLong && (
-            <TouchableOpacity
-              onPress={() => setShowFullDescription(!showFullDescription)}
-            >
-              <ReadMoreText>
-                {showFullDescription ? "Read less" : "Read more"}
-              </ReadMoreText>
-            </TouchableOpacity>
-          )}
-        </View>
       </BusinessDetails>
 
-      <ClassesTitle>Classes</ClassesTitle>
-
       {classes.map((item) => (
-        <ClassesCard key={item.id} item={item} />
+        <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
+          <ClassesCard item={item} />
+        </TouchableOpacity>
       ))}
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <ModalContainer>
+            <ModalLayout>
+              {showConfirmation ? (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    Confirmed
+                  </Text>
+                  <Button
+                    title="Close"
+                    onPress={() => setModalVisible(false)}
+                  />
+                </>
+              ) : (
+                <>
+                  {selectedClass && (
+                    <View>
+                      <ClassesTitle>
+                        <BoldText>{selectedClass.name}</BoldText>
+                      </ClassesTitle>
+
+                      <DetailText>
+                        <BoldText>Description:</BoldText>{" "}
+                        {selectedClass.description}
+                      </DetailText>
+
+                      <DetailText>
+                        <BoldText>Instructor:</BoldText>{" "}
+                        {selectedClass.instructor}
+                      </DetailText>
+
+                      <DetailText>
+                        <BoldText>Address:</BoldText>
+                        {` ${business.address}, ${selectedClass.location}`}
+                      </DetailText>
+                    </View>
+                  )}
+                  <Button title="Confirm" onPress={handleConfirm} />
+                </>
+              )}
+            </ModalLayout>
+          </ModalContainer>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Dimensions, FlatList, ScrollView } from "react-native";
 import { Container, Card, Title, FlatListContainer } from "./homeStyles";
-import { useBusinessContext } from "./contexts/BusinessContext";
+import { Business, useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
 
 const { width: viewportWidth } = Dimensions.get("window");
@@ -9,7 +9,7 @@ const { width: viewportWidth } = Dimensions.get("window");
 export default function HomePage() {
   const { businesses } = useBusinessContext();
 
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
 
     return (
@@ -21,7 +21,7 @@ export default function HomePage() {
           <Title>{item.name}</Title>
           <Text>
             <Text style={{ fontWeight: "bold" }}>Address: </Text>
-            {item.address}
+            {`${item.address}, ${item.city}, ${item.state}, ${item.zipCode}`}
           </Text>
           <Text>
             <Text style={{ fontWeight: "bold" }}>Phone: </Text>
