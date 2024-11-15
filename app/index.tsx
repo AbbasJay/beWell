@@ -11,6 +11,7 @@ const Index = () => {
         title="Go to Login"
         onPress={() => router.push("/home")} // TODO: should be '/logIn', for now to bypass login page we are going '/home'
       />
+      <Button title="go to components" onPress={() => router.push("/components")} />
     </View>
   );
 };
