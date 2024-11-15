@@ -10,7 +10,14 @@ interface ButtonProps {
   fullWidth?: boolean;
 }
 
-export default function Button({ title, onPress, iconLeft, iconRight, variant = "primary", fullWidth = true }: ButtonProps) {
+export default function Button({
+  title,
+  onPress,
+  iconLeft,
+  iconRight,
+  variant = "primary",
+  fullWidth = false,
+}: ButtonProps) {
   return (
     <Container onPress={onPress} fullWidth={fullWidth}>
       <StyledText>{title}</StyledText>

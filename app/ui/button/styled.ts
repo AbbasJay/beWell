@@ -12,7 +12,7 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
   background-color: #4681f4;
   padding: 14px 20px;
   border-radius: 5px;
-  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  width: ${(props) => (props.fullWidth ? "100%" : "fit-content")};
 `;
 
 export const StyledText = styled(Text)`
