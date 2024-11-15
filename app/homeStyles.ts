@@ -3,7 +3,7 @@ import { Dimensions } from "react-native";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity`
   flex: 1;
   padding-top: 20px;
   padding-bottom: 20px;
