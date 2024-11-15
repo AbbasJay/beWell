@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import styled from "styled-components/native";
-import Button from "./ui/classes-card/button/button";
+import Button from "./ui/button/button";
 
 export default function Components() {
   return (

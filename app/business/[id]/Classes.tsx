@@ -7,6 +7,7 @@ import {
   Modal,
   Text,
 } from "react-native";
+import Button from "@/app/ui/button/button";
 import { useLocalSearchParams } from "expo-router";
 import { Class } from "@/app/contexts/ClassesContext";
 import { ClassesCard } from "@/app/ui/classes-card";
@@ -14,7 +15,6 @@ import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
-
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
@@ -154,17 +154,16 @@ export default function Business() {
               )}
             </CSS.ModalLayout>
             <CSS.ButtonContainer>
-              <CSS.FullWidthButton
+              <View style={{ margin: 10 }}>
+                <Button 
+                title={showConfirmation ? "Close" : "Confirm"} 
                 onPress={
                   showConfirmation
-                    ? () => setModalVisible(false)
-                    : handleConfirm
+                  ? () => setModalVisible(false)
+                  : handleConfirm
                 }
-              >
-                <CSS.ButtonText>
-                  {showConfirmation ? "Close" : "Confirm"}
-                </CSS.ButtonText>
-              </CSS.FullWidthButton>
+                />
+                </View>
             </CSS.ButtonContainer>
           </CSS.ModalContainer>
         </CSS.ModalBackground>
