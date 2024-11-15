@@ -9,7 +9,7 @@ const Index = () => {
       <Text>Welcome to the Home Page</Text>
       <Button
         title="Go to Login"
-        onPress={() => router.push("/business/18/classes")}
+        onPress={() => router.push("/home")} // TODO: should be '/logIn', for now to bypass login page we are going '/home'
       />
     </View>
   );

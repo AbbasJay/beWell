@@ -7,7 +7,7 @@ export const ModalBackground = styled.View`
 `;
 
 export const ConfirmedText = styled.Text`
-  font-size: 18px;
+  font-size: 30px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 20px;
@@ -87,10 +87,10 @@ export const ButtonText = styled.Text`
 
 export const CloseButton = styled.TouchableOpacity`
   position: absolute;
-  top: 10px;
-  right: 10px;
+  padding: 15px;
+  right: 1px;
+  top: -10px;
   z-index: 1;
-  padding: 10px;
 `;
 
 export const CloseButtonText = styled.Text`

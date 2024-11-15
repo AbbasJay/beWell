@@ -121,7 +121,7 @@ export default function Business() {
         <CSS.ModalBackground>
           <CSS.ModalContainer>
             <CSS.CloseButton onPress={() => setModalVisible(false)}>
-              <CSS.CloseButtonText>×</CSS.CloseButtonText>
+              <CSS.CloseButtonText>{"x"}</CSS.CloseButtonText>
             </CSS.CloseButton>
             <CSS.ModalLayout>
               {showConfirmation ? (
