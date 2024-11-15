@@ -1,6 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
-import styled from "styled-components/native";
+import { Container, StyledText } from "./styled";
 
 interface ButtonProps {
   variant?: "primary" | "secondary";
@@ -17,18 +16,3 @@ export default function Button({ title, onPress, iconLeft, iconRight, variant = 
     </Container>
   );
 }
-
-const Container = styled(TouchableOpacity)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #4681f4;
-  padding: 14px 20px;
-  border-radius: 5px;
-`;
-
-const StyledText = styled(Text)`
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-`;
