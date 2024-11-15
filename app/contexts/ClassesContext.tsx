@@ -53,7 +53,7 @@ export const ClassesProvider = ({
         if (!token) {
           throw new Error("No authentication token found");
         }
-        console.log("businessId", businessId);
+
         const response = await fetch(`${API_URL}/api/classes/${businessId}`, {
           method: "GET",
           headers: {

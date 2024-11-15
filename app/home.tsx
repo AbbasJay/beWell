@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Dimensions, FlatList } from "react-native";
+import { View, Text, Dimensions, FlatList, ScrollView } from "react-native";
 import { Container, Card, Title, FlatListContainer } from "./homeStyles";
 import { useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
@@ -37,19 +37,21 @@ export default function HomePage() {
   };
 
   return (
-    <Container>
-      <FlatListContainer>
-        <FlatList
-          data={businesses}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id?.toString() || ""}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToAlignment="center"
-          decelerationRate="fast"
-          snapToInterval={viewportWidth * 0.6 + 50}
-        />
-      </FlatListContainer>
-    </Container>
+    <ScrollView>
+      <Container>
+        <FlatListContainer>
+          <FlatList
+            data={businesses}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id?.toString() || ""}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToAlignment="center"
+            decelerationRate="fast"
+            snapToInterval={viewportWidth * 0.6 + 50}
+          />
+        </FlatListContainer>
+      </Container>
+    </ScrollView>
   );
 }

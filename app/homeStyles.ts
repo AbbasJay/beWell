@@ -1,7 +1,4 @@
 import styled from "styled-components/native";
-import { Dimensions } from "react-native";
-
-const { width: viewportWidth } = Dimensions.get("window");
 
 export const Container = styled.TouchableOpacity`
   flex: 1;
@@ -19,7 +16,7 @@ export const Card = styled.View`
   padding: 16px;
   margin-left: 25px;
   margin-right: 25px;
-  width: ${viewportWidth * 0.6}px;
+  width: 300px;
   height: 200px;
 `;
 

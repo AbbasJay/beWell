@@ -1,10 +1,12 @@
 import styled from "styled-components/native";
 import { View, Text } from "react-native";
 
-export const Container = styled(View)``;
+export const Container = styled(View)`
+  flex: 1;
+  overflow: scroll;
+`;
 
 export const Card = styled(View)`
-  display: flex;
   flex-direction: row;
   background-color: #fff;
   padding: 10px;
@@ -26,4 +28,8 @@ export const CardInfo = styled(View)``;
 export const CardText = styled(Text)`
   font-size: 16px;
   color: #333;
+`;
+
+export const CardTitle = styled(Text)`
+  font-weight: bold;
 `;
