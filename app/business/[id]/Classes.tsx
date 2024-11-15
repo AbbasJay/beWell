@@ -154,16 +154,14 @@ export default function Business() {
               )}
             </CSS.ModalLayout>
             <CSS.ButtonContainer>
-              <View style={{ margin: 10 }}>
                 <Button 
-                title={showConfirmation ? "Close" : "Confirm"} 
-                onPress={
-                  showConfirmation
-                  ? () => setModalVisible(false)
-                  : handleConfirm
-                }
+                  title={showConfirmation ? "Close" : "Confirm"} 
+                  onPress={
+                    showConfirmation
+                    ? () => setModalVisible(false)
+                    : handleConfirm
+                  }
                 />
-                </View>
             </CSS.ButtonContainer>
           </CSS.ModalContainer>
         </CSS.ModalBackground>

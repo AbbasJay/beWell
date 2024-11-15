@@ -7,11 +7,12 @@ interface ButtonProps {
   onPress: () => void;
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
+  fullWidth?: boolean;
 }
 
-export default function Button({ title, onPress, iconLeft, iconRight, variant = "primary" }: ButtonProps) {
+export default function Button({ title, onPress, iconLeft, iconRight, variant = "primary", fullWidth = true }: ButtonProps) {
   return (
-    <Container onPress={onPress}>
+    <Container onPress={onPress} fullWidth={fullWidth}>
       <StyledText>{title}</StyledText>
     </Container>
   );
