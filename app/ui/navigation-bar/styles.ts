@@ -51,4 +51,3 @@ export const RightItem = styled.TouchableOpacity`
 
 export const RightItemText = styled.Text`
 `;
-

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import * as CSS from "./styles";
 import { useNavigation } from "@react-navigation/native";
 
@@ -9,17 +9,21 @@ interface NavigationItem {
 }
 
 interface NavigationBarProps {
-  title?: string;
-  subtitle?: string;
-  left?: NavigationItem[];
-  right?: NavigationItem[];
+    title?: string;
+    subtitle?: string;
+    left?: NavigationItem[];
+    right?: NavigationItem[];
 }
 
-
-export const NavigationBar = ({ title, subtitle, left, right }: NavigationBarProps) => {
+export const NavigationBar: React.FC<NavigationBarProps> = ({ 
+    title, 
+    subtitle, 
+    left, 
+    right
+}) => {
     const navigation = useNavigation();
 
-    const renderItem = (item?: NavigationItem, isRight = false) => {
+    const renderItem = useCallback((item?: NavigationItem, isRight = false) => {
         if (!item) return null;
     
         const handlePress = () => {
@@ -30,18 +34,19 @@ export const NavigationBar = ({ title, subtitle, left, right }: NavigationBarPro
             }
         };
         
-        return isRight ? (
-            <CSS.RightItem key={item.label} onPress={handlePress}>
+        const ItemComponent = isRight ? CSS.RightItem : CSS.LeftItem;
+        const TextComponent = isRight ? CSS.RightItemText : CSS.LeftItemText;
+        
+        return (
+            <ItemComponent 
+                key={item.label} 
+                onPress={handlePress}
+            >
                 {item.icon}
-                {item.label && <CSS.RightItemText>{item.label}</CSS.RightItemText>}
-            </CSS.RightItem>
-        ) : (
-            <CSS.LeftItem key={item.label} onPress={handlePress}>
-                {item.icon}
-                {item.label && <CSS.LeftItemText>{item.label}</CSS.LeftItemText>}
-            </CSS.LeftItem>
+                {item.label && <TextComponent>{item.label}</TextComponent>}
+            </ItemComponent>
         );
-    };
+    }, [navigation]);
 
     return (
         <CSS.Container>
@@ -50,8 +55,16 @@ export const NavigationBar = ({ title, subtitle, left, right }: NavigationBarPro
             </CSS.LeftContainer>
 
             <CSS.TitleContainer>
-                <CSS.Title>{title}</CSS.Title>
-                <CSS.Subtitle>{subtitle}</CSS.Subtitle>
+                {title && (
+                    <CSS.Title numberOfLines={1}>
+                        {title}
+                    </CSS.Title>
+                )}
+                {subtitle && (
+                    <CSS.Subtitle numberOfLines={1}>
+                        {subtitle}
+                    </CSS.Subtitle>
+                )}
             </CSS.TitleContainer>
 
             <CSS.RightContainer>
