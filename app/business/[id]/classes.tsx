@@ -17,6 +17,7 @@ import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
 import { Colors } from "@/constants/Colors";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
@@ -27,9 +28,13 @@ export default function Business() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const { refreshNotifications } = useNotificationsContext();
+  const { sendNotification } = useNotifications();
+
   if (!business) {
     return <CSS.DetailText>No business data available</CSS.DetailText>;
   }
+
   useEffect(() => {
     const fetchClasses = async () => {
       try {
@@ -62,19 +67,23 @@ export default function Business() {
     };
     fetchClasses();
   }, [business.id]);
+
   const descriptionLimit = 200;
   const isDescriptionLong =
     business.description && business.description.length > descriptionLimit;
+
   const handleClassPress = (item: Class) => {
     setSelectedClass(item);
     setShowConfirmation(false);
     setModalVisible(true);
   };
+
   const handleConfirm = () => {
     setShowConfirmation(true);
 
     if (selectedClass) {
-      useNotifications(selectedClass);
+      sendNotification(selectedClass, business.id || 0);
+      refreshNotifications();
     }
   };
 
@@ -99,11 +108,15 @@ export default function Business() {
         </CSS.DetailText>
       </CSS.BusinessDetails>
 
-      {classes.map((item) => (
-        <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
-          <ClassesCard item={item} />
-        </TouchableOpacity>
-      ))}
+      {classes.length > 0 &&
+        classes.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => handleClassPress(item)}
+          >
+            <ClassesCard item={item} />
+          </TouchableOpacity>
+        ))}
 
       <Modal
         animationType="fade"
