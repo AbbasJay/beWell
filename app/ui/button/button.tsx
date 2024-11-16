@@ -15,8 +15,13 @@ interface ButtonProps {
 
 const handlePress = async (onPress: () => void, disabled: boolean) => {
   if (disabled) return;
-  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  onPress?.();
+  try {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress?.();
+  } catch (error) {
+    console.error('Haptics error:', error);
+    onPress?.();
+  }
 };
 
 export default function Button({
