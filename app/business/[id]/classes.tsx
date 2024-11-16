@@ -17,6 +17,8 @@ import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
 import { Colors } from "@/constants/Colors";
 import { BusinessCard } from "@/app/ui/business-card/business-card";
+import { useNotifications } from "@/hooks/useNotifications";
+
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
@@ -71,7 +73,12 @@ export default function Business() {
   };
   const handleConfirm = () => {
     setShowConfirmation(true);
+
+    if (selectedClass) {
+      useNotifications(selectedClass);
+    }
   };
+
   return (
     <ScrollView style={{ paddingHorizontal: 10 }}>
       <BusinessCard item={business} fullWidth />
@@ -93,11 +100,14 @@ export default function Business() {
           <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
         </CSS.DetailText>
       </CSS.BusinessDetails> */}
+      {/* </CSS.BusinessDetails> */}
+
       {classes.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
           <ClassesCard item={item} />
         </TouchableOpacity>
       ))}
+
       <Modal
         animationType="fade"
         transparent={true}
