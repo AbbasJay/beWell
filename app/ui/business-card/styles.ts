@@ -1,28 +1,74 @@
 import { Colors } from "@/constants/Colors";
 import { styled } from "styled-components/native";
+import { Image} from "react-native";
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity<{ fullWidth?: boolean }>`
   background-color: #FFFFFF;
   padding: 10px 12px;
   border-radius: 18px;
+  width: ${({ fullWidth }) => fullWidth ? '100%' : '300px'};
 `;
 
-export const Card = styled.View`
-
+export const CardTitle = styled.Text`
+  font-size: 20px;
+  font-weight: 700;
 `;
 
-export const CardTitle = styled.Text``;
+export const CardAddress = styled.Text`
+  color: ${Colors.dark.secondary};
+  font-weight: 800;
+`;
 
-export const CardText = styled.Text``;
+export const CardDescription = styled.Text`
+  color: ${Colors.light.text};
+`;
 
-export const SampleImage = styled.Image`
-  height: 140px;
-  background-color: #000000;
+export const CardPhoneNumber = styled.Text``;
+
+export const SampleImage = styled(Image)`
+  width: 100%;
+  height: 200px;
   border-radius: 18px;
+  margin-bottom: 14px;
+  resize-mode: cover;
+  object-fit: cover;
+`;
+
+export const CardType = styled.Text`
+  color: ${Colors.dark.secondary};
+  font-weight: 800;
+`;
+
+export const CardHours = styled.Text`
+  color: ${Colors.dark.secondary};
+  font-weight: 800;
+  background-color: #FFFFFF;
+  padding: 8px 16px;
+  border-radius: 10px;
+`;
+
+export const TopWrapper = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: absolute;
+  width: 100%;
+  z-index: 100;
+  top: 20px;
+  left: 16px;
+`;
+
+export const BookmarkIcon = styled.TouchableOpacity`
+  width: 24px;
+  height: 24px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  margin-right: 16px;
 `;
 
 export const ContentWrapper = styled.View`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 4px;
 `;
