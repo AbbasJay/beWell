@@ -10,12 +10,12 @@ type BusinessCardProps = {
 
 export const BusinessCard = ({ item, onPress, fullWidth }: BusinessCardProps) => {
   return (
-    <View style={{ paddingHorizontal: 8 }}>
+    <CSS.Wrapper>
       <CSS.Container onPress={onPress} fullWidth={fullWidth}>
-        <CSS.TopWrapper>
+        <CSS.ImageWrapper>
           <CSS.CardHours>{item.hours}</CSS.CardHours>
           <CSS.BookmarkIcon />
-        </CSS.TopWrapper>
+        </CSS.ImageWrapper>
         <CSS.SampleImage
           source={require('@/assets/images/image 84.png')}
           resizeMode="cover"
@@ -28,6 +28,6 @@ export const BusinessCard = ({ item, onPress, fullWidth }: BusinessCardProps) =>
           <CSS.CardType>{item.type}</CSS.CardType>
         </CSS.ContentWrapper>
       </CSS.Container>
-    </View>
+    </CSS.Wrapper>
   );
 };

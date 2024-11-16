@@ -82,26 +82,7 @@ export default function Business() {
   return (
     <ScrollView style={{ paddingHorizontal: 10 }}>
       <BusinessCard item={business} fullWidth />
-      {/* <CSS.BusinessDetails>
-        <CSS.Title>{business.name}</CSS.Title>
-        <CSS.DetailText>
-          <CSS.BoldText>Address:</CSS.BoldText> {business.address}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Phone:</CSS.BoldText> {business.phoneNumber}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Email:</CSS.BoldText> {business.email}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Type:</CSS.BoldText> {business.type}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
-        </CSS.DetailText>
-      </CSS.BusinessDetails> */}
-      {/* </CSS.BusinessDetails> */}
-
+ 
       {classes.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
           <ClassesCard item={item} />

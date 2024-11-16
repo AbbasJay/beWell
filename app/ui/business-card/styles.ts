@@ -2,6 +2,10 @@ import { Image } from "react-native";
 import { styled } from "styled-components/native";
 import { Colors } from "@/constants/Colors";
 
+export const Wrapper = styled.View`
+  padding: 0px 8px;
+`;
+
 export const Container = styled.TouchableOpacity<{ fullWidth?: boolean }>`
   background-color: #FFFFFF;
   padding: 10px 12px;
@@ -9,7 +13,7 @@ export const Container = styled.TouchableOpacity<{ fullWidth?: boolean }>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : '300px'};
 `;
 
-export const TopWrapper = styled.View`
+export const ImageWrapper = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
