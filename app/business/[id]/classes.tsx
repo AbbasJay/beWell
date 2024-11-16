@@ -16,6 +16,7 @@ import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
 import { Colors } from "@/constants/Colors";
+import { BusinessCard } from "@/app/ui/business-card/business-card";
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
@@ -73,7 +74,8 @@ export default function Business() {
   };
   return (
     <ScrollView style={{ paddingHorizontal: 10 }}>
-      <CSS.BusinessDetails>
+      <BusinessCard item={business} fullWidth />
+      {/* <CSS.BusinessDetails>
         <CSS.Title>{business.name}</CSS.Title>
         <CSS.DetailText>
           <CSS.BoldText>Address:</CSS.BoldText> {business.address}
@@ -90,7 +92,7 @@ export default function Business() {
         <CSS.DetailText>
           <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
         </CSS.DetailText>
-      </CSS.BusinessDetails>
+      </CSS.BusinessDetails> */}
       {classes.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
           <ClassesCard item={item} />
