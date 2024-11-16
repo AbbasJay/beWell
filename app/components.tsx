@@ -9,6 +9,8 @@ export default function Components() {
         <SectionTitle>Buttons</SectionTitle>
         <SectionContent>
           <Button title="Button" onPress={() => {}} />
+          <Button title="Button" onPress={() => {}} variant="secondary" />
+          <Button title="Button" onPress={() => {}} variant="tertiary" />
         </SectionContent>
       </Section>
     </Container>
@@ -17,7 +19,6 @@ export default function Components() {
 
 const Container = styled(View)`
   flex: 1;
-  padding: 20px;
 `;
 
 const Section = styled(View)`
@@ -36,5 +37,8 @@ const SectionTitle = styled(Text)`
 `;
 
 
-const SectionContent = styled(View)``;
+const SectionContent = styled(View)`
+display: flex;
+gap: 20px;
+`;
 
