@@ -34,7 +34,10 @@ export default function Components() {
             email: "example@example.com",
             type: "Restaurant",
             description: "Strength, Conditioning",
-          }} />
+            hours: "Mon-Fri",
+          }} onPress={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
         </SectionContent>
       </Section>
     </Container>
