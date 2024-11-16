@@ -27,6 +27,7 @@ export default function Business() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+
   if (!business) {
     return <CSS.DetailText>No business data available</CSS.DetailText>;
   }
@@ -74,7 +75,7 @@ export default function Business() {
     setShowConfirmation(true);
 
     if (selectedClass) {
-      useNotifications(selectedClass);
+      useNotifications(selectedClass, business.id || 0, "POST");
     }
   };
 
@@ -99,11 +100,15 @@ export default function Business() {
         </CSS.DetailText>
       </CSS.BusinessDetails>
 
-      {classes.map((item) => (
-        <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
-          <ClassesCard item={item} />
-        </TouchableOpacity>
-      ))}
+      {classes.length > 0 &&
+        classes.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => handleClassPress(item)}
+          >
+            <ClassesCard item={item} />
+          </TouchableOpacity>
+        ))}
 
       <Modal
         animationType="fade"
