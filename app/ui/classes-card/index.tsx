@@ -1,6 +1,6 @@
 import { Class } from "@/app/contexts/ClassesContext";
-import * as CSS from "./styles";
 import BeWellIcons from "@/assets/icons/icons";
+import * as CSS from "./styles";
 
 export const ClassesCard = ({ item }: { item: Class }) => {
   const formattedStartDate = new Intl.DateTimeFormat("en-UK", {

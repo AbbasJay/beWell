@@ -1,10 +1,14 @@
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
 export const BeWellTabBar = () => {
   const [activeTab, setActiveTab] = useState("Home");
+
+  useEffect(() => {
+    console.log("activeTab", activeTab);
+  }, [activeTab]);
 
   return (
     <View>
