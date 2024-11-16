@@ -1,29 +1,14 @@
 "use client";
 
 import { Colors } from "@/constants/Colors";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
 export const BeWellTabBar = () => {
+  const { unreadNotificationsCount } = useNotificationsContext();
   const [activeTab, setActiveTab] = useState("Home");
-  const [notifications, setNotifications] = useState([]);
-  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-
-  useEffect(() => {
-    const getNotifications = async () => {
-      const data = await useNotifications(undefined, 0, "GET");
-      setNotifications(data);
-      console.log("notifications", notifications);
-
-      const unreadCount = data.filter(
-        (notification: any) => !notification.read
-      ).length;
-      setUnreadNotificationsCount(unreadCount);
-    };
-    getNotifications();
-  }, [activeTab]);
 
   return (
     <View>

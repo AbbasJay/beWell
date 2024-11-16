@@ -1,28 +1,13 @@
+import { useState, useCallback } from "react";
 import { Class } from "@/app/contexts/ClassesContext";
 import { API_URL } from "@/env";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
-export const useNotifications = async (
-  classes?: Class,
-  userId?: number,
-  method?: string
-) => {
-  let result;
+export const useNotifications = () => {
+  const [notifications, setNotifications] = useState([]);
 
-  if (method === "GET") {
-    result = await getNotifications();
-  } else if (method === "POST") {
-    result = await sendNotification();
-  } else if (method === "PUT") {
-    result = await updateNotification();
-  } else if (method === "DELETE") {
-    result = await deleteNotification();
-  }
-
-  return result;
-
-  async function getNotifications() {
+  const fetchNotifications = useCallback(async () => {
     try {
       let token;
       if (Platform.OS === "web") {
@@ -49,13 +34,13 @@ export const useNotifications = async (
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data;
+      setNotifications(data);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
-  }
+  }, []);
 
-  async function sendNotification() {
+  const sendNotification = async (classData: Class, businessId: number) => {
     try {
       let token;
       if (Platform.OS === "web") {
@@ -69,10 +54,10 @@ export const useNotifications = async (
       }
 
       const notification = {
-        classId: classes?.id,
-        businessId: classes?.businessId,
-        message: "new test",
-        userId: userId,
+        classId: classData.id,
+        businessId: classData.businessId,
+        message: classData.description,
+        userId: businessId,
         read: false,
       };
 
@@ -91,87 +76,13 @@ export const useNotifications = async (
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data;
+      setNotifications(data);
+
+      fetchNotifications();
     } catch (error) {
       console.error("Error sending notification:", error);
     }
-  }
+  };
 
-  async function updateNotification() {
-    try {
-      let token;
-      if (Platform.OS === "web") {
-        token = localStorage.getItem("userToken");
-      } else {
-        token = await SecureStore.getItemAsync("userToken");
-      }
-
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const notification = {
-        classId: classes?.id,
-        businessId: classes?.businessId,
-        message: "new test",
-        userId: userId,
-        read: true,
-      };
-
-      const response = await fetch(`${API_URL}/api/notifications`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(notification),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error sending notification:", error);
-    }
-  }
-
-  async function deleteNotification() {
-    try {
-      let token;
-      if (Platform.OS === "web") {
-        token = localStorage.getItem("userToken");
-      } else {
-        token = await SecureStore.getItemAsync("userToken");
-      }
-
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await fetch(
-        `${API_URL}/api/notifications/${classes?.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-    }
-  }
+  return { notifications, fetchNotifications, sendNotification };
 };
