@@ -16,6 +16,7 @@ import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
 import { Colors } from "@/constants/Colors";
+import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 
@@ -89,34 +90,14 @@ export default function Business() {
 
   return (
     <ScrollView style={{ paddingHorizontal: 10 }}>
-      <CSS.BusinessDetails>
-        <CSS.Title>{business.name}</CSS.Title>
-        <CSS.DetailText>
-          <CSS.BoldText>Address:</CSS.BoldText> {business.address}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Phone:</CSS.BoldText> {business.phoneNumber}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Email:</CSS.BoldText> {business.email}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Type:</CSS.BoldText> {business.type}
-        </CSS.DetailText>
-        <CSS.DetailText>
-          <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
-        </CSS.DetailText>
-      </CSS.BusinessDetails>
-
-      {classes.length > 0 &&
-        classes.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            onPress={() => handleClassPress(item)}
-          >
-            <ClassesCard item={item} />
-          </TouchableOpacity>
-        ))}
+      
+      <BusinessCard item={business} fullWidth />
+ 
+      {classes.map((item) => (
+        <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
+          <ClassesCard item={item} />
+        </TouchableOpacity>
+      ))}
 
       <Modal
         animationType="fade"

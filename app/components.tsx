@@ -1,6 +1,7 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import styled from "styled-components/native";
 import Button from "./ui/button/button";
+import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 
 export default function Components() {
@@ -20,6 +21,28 @@ export default function Components() {
       </Section>
 
       <Section>
+        <SectionTitle>Business Card</SectionTitle>
+        <SectionContent>
+          <BusinessCard fullWidth item={{
+            userId: 1,
+            name: "Example Business",
+            address: "123 Main St",
+            city: "Anytown",
+            state: "CA",
+            country: "USA",
+            zipCode: "12345",
+            phoneNumber: "(555) 555-5555",
+            email: "example@example.com",
+            type: "Restaurant",
+            description: "Strength, Conditioning",
+            hours: "Mon-Fri",
+          }} onPress={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
+        </SectionContent>
+      </Section>
+
+      <Section>
         <SectionTitle>BeWell tab bar</SectionTitle>
         <SectionContent>
           <BeWellTabBar />
@@ -29,9 +52,9 @@ export default function Components() {
   );
 }
 
-const Container = styled(View)`
+const Container = styled(ScrollView)`
   flex: 1;
-  padding: 20px;
+  padding: 10px 20px;
 `;
 
 const Section = styled(View)`
