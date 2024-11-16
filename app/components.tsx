@@ -1,6 +1,7 @@
 import { View, Text, ScrollView } from "react-native";
 import styled from "styled-components/native";
 import Button from "./ui/button/button";
+import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 
@@ -17,6 +18,28 @@ export default function Components() {
           <Button title="Small" onPress={() => {}} size="small" />
           <Button title="Medium" onPress={() => {}} size="medium" />
           <Button title="Large" onPress={() => {}} size="large" />
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionTitle>Business Card</SectionTitle>
+        <SectionContent>
+          <BusinessCard fullWidth item={{
+            userId: 1,
+            name: "Example Business",
+            address: "123 Main St",
+            city: "Anytown",
+            state: "CA",
+            country: "USA",
+            zipCode: "12345",
+            phoneNumber: "(555) 555-5555",
+            email: "example@example.com",
+            type: "Restaurant",
+            description: "Strength, Conditioning",
+            hours: "Mon-Fri",
+          }} onPress={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
         </SectionContent>
       </Section>
 
