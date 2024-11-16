@@ -17,34 +17,46 @@ interface NavigationBarProps {
 
 
 export const NavigationBar = ({ title, subtitle, left, right }: NavigationBarProps) => {
-const navigation = useNavigation();
+    const navigation = useNavigation();
 
-return (
-    <CSS.Container>
+    const renderItem = (item?: NavigationItem, isRight = false) => {
+        if (!item) return null;
+    
+        const handlePress = () => {
+            if (item.onPress) {
+                item.onPress();
+            } else if (navigation.canGoBack()) {
+                navigation.goBack();
+            }
+        };
+        
+        return isRight ? (
+            <CSS.RightItem key={item.label} onPress={handlePress}>
+                {item.icon}
+                {item.label && <CSS.RightItemText>{item.label}</CSS.RightItemText>}
+            </CSS.RightItem>
+        ) : (
+            <CSS.LeftItem key={item.label} onPress={handlePress}>
+                {item.icon}
+                {item.label && <CSS.LeftItemText>{item.label}</CSS.LeftItemText>}
+            </CSS.LeftItem>
+        );
+    };
 
-        <CSS.LeftContainer>
-                {left?.map((item) => (
-                    <CSS.LeftItem key={item.label} onPress={item.onPress}>
-                        {item.icon}
-                        {item.label && <CSS.LeftItemText>{item.label}</CSS.LeftItemText>}
-                </CSS.LeftItem>
-            ))}
-        </CSS.LeftContainer>
+    return (
+        <CSS.Container>
+            <CSS.LeftContainer>
+                {left?.map((item) => renderItem(item, false))}
+            </CSS.LeftContainer>
 
-        <CSS.TitleContainer>
-            <CSS.Title>{title}</CSS.Title>
-            <CSS.Subtitle>{subtitle}</CSS.Subtitle>
-        </CSS.TitleContainer>
+            <CSS.TitleContainer>
+                <CSS.Title>{title}</CSS.Title>
+                <CSS.Subtitle>{subtitle}</CSS.Subtitle>
+            </CSS.TitleContainer>
 
-        <CSS.RightContainer>
-            {right?.map((item) => (
-                <CSS.RightItem key={item.label} onPress={item.onPress}>
-                    {item.icon}
-                    {item.label && <CSS.RightItemText>{item.label}</CSS.RightItemText>}
-                </CSS.RightItem>
-            ))}
-        </CSS.RightContainer>
-
-    </CSS.Container>
-)
-}
+            <CSS.RightContainer>
+                {right?.map((item) => renderItem(item, true))}
+            </CSS.RightContainer>
+        </CSS.Container>
+    );
+};
