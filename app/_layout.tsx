@@ -7,6 +7,7 @@ import { SafeAreaView, View } from "react-native";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 
 export default function RootLayout() {
+  const headerShown = true;
   return (
     // <SafeAreaView>
     <ThemeProvider>
@@ -14,15 +15,26 @@ export default function RootLayout() {
         <BusinessProvider>
           <BeWellBackground>
             <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="logIn" options={{ headerShown: false }} />
-              <Stack.Screen name="signUp" options={{ headerShown: false }} />
-              <Stack.Screen name="home" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="index"
+                options={{ headerShown: headerShown }}
+              />
+              <Stack.Screen
+                name="logIn"
+                options={{ headerShown: headerShown }}
+              />
+              <Stack.Screen
+                name="signUp"
+                options={{ headerShown: headerShown }}
+              />
+              <Stack.Screen
+                name="home"
+                options={{ headerShown: headerShown }}
+              />
               <Stack.Screen
                 name="business/[id]/classes"
-                options={{ headerShown: false }}
+                options={{ headerShown: headerShown }}
               />
-              <Stack.Screen name="mapPage" options={{ headerShown: true }} />
             </Stack>
           </BeWellBackground>
         </BusinessProvider>

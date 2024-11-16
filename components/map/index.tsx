@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import * as SecureStore from "expo-secure-store";
-import { API_URL } from "@/env";
+import { Business } from "../../app/contexts/BusinessContext";
+import { router } from "expo-router";
 
 const INITIAL_REGION = {
   //london
@@ -19,54 +19,9 @@ const INITIAL_REGION = {
   longitudeDelta: 0.0421,
 };
 
-const markers = [
-  {
-    id: "1",
-    latitude: "51.5081",
-    longitude: "0.0759",
-    name: "Tower of London",
-    address: "St Katharine's & Wapping, London",
-    city: "London",
-    state: "England",
-    country: "United Kingdom",
-  },
-  {
-    id: "2",
-    latitude: "51.5033",
-    longitude: "0.1195",
-    name: "London Eye",
-    address: "Lambeth, London",
-    city: "London",
-    state: "England",
-    country: "United Kingdom",
-  },
-  {
-    id: "3",
-    latitude: "51.5014",
-    longitude: "0.1419",
-    name: "Buckingham Palace",
-    address: "Westminster, London",
-    city: "London",
-    state: "England",
-    country: "United Kingdom",
-  },
-];
-
-const Map = () => {
+const Map = ({ businesses }: { businesses: Business[] }) => {
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
-  interface MarkerData {
-    id: string;
-    latitude: string;
-    longitude: string;
-    name: string;
-    address: string;
-    city: string;
-    state: string;
-    country: string;
-  }
-
-  const [data, setData] = useState<MarkerData[]>([]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -78,46 +33,10 @@ const Map = () => {
         </TouchableOpacity>
       ),
     });
-    fetchBusinesses();
   }, []);
 
   const focusMap = () => {
     mapRef.current?.animateToRegion(INITIAL_REGION, 1000);
-  };
-
-  const fetchBusinesses = async () => {
-    try {
-      let token;
-      if (Platform.OS === "web") {
-        token = localStorage.getItem("userToken");
-      } else {
-        token = await SecureStore.getItemAsync("userToken");
-      }
-
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await fetch(`${API_URL}/api/businesses?all=true`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const json = await response.json();
-      console.log(json);
-      setData(json);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
   };
 
   const onMarkerPress = (marker: { latitude: number; longitude: number }) => {
@@ -141,7 +60,7 @@ const Map = () => {
         showsCompass
         ref={mapRef}
       >
-        {data.map(
+        {businesses.map(
           (
             marker //filter out the markers that have null atitude or longitude
           ) =>
@@ -150,17 +69,19 @@ const Map = () => {
               <Marker
                 key={marker.id}
                 coordinate={{
-                  latitude: parseFloat(marker.latitude),
-                  longitude: parseFloat(marker.longitude),
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
                 }}
                 onPress={() =>
                   onMarkerPress({
-                    latitude: parseFloat(marker.latitude),
-                    longitude: parseFloat(marker.longitude),
+                    latitude: marker.latitude!,
+                    longitude: marker.longitude!,
                   })
                 }
               >
-                <Callout>
+                <Callout
+                  onPress={() => router.push(`/business/${marker.id}/classes`)}
+                >
                   <Text>{marker.name}</Text>
                   <Text>{marker.address}</Text>
                   <Text>
@@ -181,8 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
   },
 });
 
