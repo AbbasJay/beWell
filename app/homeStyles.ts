@@ -1,10 +1,6 @@
 import styled from "styled-components/native";
-import { Dimensions } from "react-native";
 
-const { width: viewportWidth } = Dimensions.get("window");
-
-export const Container = styled.View`
-  flex: 1;
+export const Container = styled.TouchableOpacity`
   padding-top: 20px;
   padding-bottom: 20px;
 `;
@@ -14,12 +10,17 @@ export const FlatListContainer = styled.View`
 `;
 
 export const Card = styled.View`
+  shadow-color: #c7c7c7;
+  shadow-offset: 0px 0px;
+  shadow-opacity: 0.5;
+  shadow-radius: 5px;
+  elevation: 5;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 16px;
-  margin-left: 25px;
-  margin-right: 25px;
-  width: ${viewportWidth * 0.6}px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 300px;
   height: 200px;
 `;
 
