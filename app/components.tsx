@@ -10,7 +10,7 @@ export default function Components() {
       <Section>
         <SectionTitle>Buttons</SectionTitle>
         <SectionContent>
-          <Button title="Primary"  onPress={() => {}} />
+          <Button title="Primary" onPress={() => {}} />
           <Button title="Secondary" onPress={() => {}} variant="secondary" />
           <Button title="Tertiary" onPress={() => {}} variant="tertiary" />
           <Button title="Disabled" onPress={() => {}} disabled />
@@ -30,10 +30,23 @@ export default function Components() {
       <Section>
         <SectionTitle>Navigation bar</SectionTitle>
         <SectionContent style={{ gap: 60 }}>
-          <NavigationBar title="Title" subtitle="Subtitle" left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
-          <NavigationBar title="Title" subtitle="Subtitle" left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
-          <NavigationBar left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
-          <NavigationBar right={{label: "Next", onPress: () => {}}} />
+          <NavigationBar
+            title="Title"
+            subtitle="Subtitle"
+            left={{ label: "Back", onPress: () => {} }}
+            right={{ label: "Next", onPress: () => {} }}
+          />
+          <NavigationBar
+            title="Title"
+            subtitle="Subtitle"
+            left={{ label: "Back", onPress: () => {} }}
+            right={{ label: "Next", onPress: () => {} }}
+          />
+          <NavigationBar
+            left={{ label: "Back", onPress: () => {} }}
+            right={{ label: "Next", onPress: () => {} }}
+          />
+          <NavigationBar right={{ label: "Next", onPress: () => {} }} />
           <NavigationBar title="Title" />
         </SectionContent>
       </Section>
@@ -64,4 +77,3 @@ const SectionContent = styled.View`
   display: flex;
   gap: 20px;
 `;
-
