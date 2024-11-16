@@ -3,7 +3,6 @@ import { ThemeProvider } from "@/hooks/themeContext";
 import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { BusinessProvider } from "./contexts/BusinessContext";
-import { SafeAreaView, View } from "react-native";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { Colors } from "@/constants/Colors";
 
@@ -12,10 +11,11 @@ export default function RootLayout() {
     <ThemeProvider>
       <PaperProvider>
         <BusinessProvider>
-          <BeWellBackground>
             <Stack screenOptions={{ 
               headerShown: false,
-              contentStyle: { backgroundColor: Colors.light.secondary, paddingHorizontal: 10 },
+              contentStyle: { backgroundColor: Colors.light.secondary },
+              statusBarStyle: 'dark',
+              statusBarColor: Colors.light.primary,
             }}>
               <Stack.Screen name="index" />
               <Stack.Screen name="logIn" />
@@ -24,7 +24,6 @@ export default function RootLayout() {
               <Stack.Screen name="components" />
               <Stack.Screen name="business/[id]/classes" />
             </Stack>
-          </BeWellBackground>
         </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
