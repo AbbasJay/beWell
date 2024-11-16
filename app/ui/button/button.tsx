@@ -1,5 +1,6 @@
 import React from "react";
-import { Container, StyledText } from "./styled";
+import * as Haptics from "expo-haptics";
+import * as CSS from "./styles";
 
 interface ButtonProps {
   variant?: "primary" | "secondary" | "tertiary";
@@ -9,7 +10,19 @@ interface ButtonProps {
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
   fullWidth?: boolean;
+  disabled?: boolean;
 }
+
+const handlePress = async (onPress: () => void, disabled: boolean) => {
+  if (disabled) return;
+  try {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress?.();
+  } catch (error) {
+    console.error('Haptics error:', error);
+    onPress?.();
+  }
+};
 
 export default function Button({
   title,
@@ -19,10 +32,11 @@ export default function Button({
   variant = "primary",
   size = "medium",
   fullWidth = false,
+  disabled = false,
 }: ButtonProps) {
   return (
-    <Container onPress={onPress} fullWidth={fullWidth}>
-      <StyledText>{title}</StyledText>
-    </Container>  
+    <CSS.Container onPress={() => handlePress(onPress, disabled)} fullWidth={fullWidth} variant={variant} size={size} disabled={disabled}>
+      <CSS.StyledText variant={variant} disabled={disabled}>{title}</CSS.StyledText>
+    </CSS.Container>
   );
 }
