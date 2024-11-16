@@ -1,10 +1,13 @@
+import { useState, useCallback } from "react";
 import { Class } from "@/app/contexts/ClassesContext";
 import { API_URL } from "@/env";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
-export const useNotifications = (classes: Class) => {
-  const sendNotification = async () => {
+export const useNotifications = () => {
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = useCallback(async () => {
     try {
       let token;
       if (Platform.OS === "web") {
@@ -17,29 +20,69 @@ export const useNotifications = (classes: Class) => {
         throw new Error("No authentication token found");
       }
 
-      const notificationData = {
-        classId: classes.id,
-        message: "New booking for your class",
-        userId: 12,
+      const response = await fetch(`${API_URL}/api/notifications`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setNotifications(data);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }, []);
+
+  const sendNotification = async (classData: Class, businessId: number) => {
+    try {
+      let token;
+      if (Platform.OS === "web") {
+        token = localStorage.getItem("userToken");
+      } else {
+        token = await SecureStore.getItemAsync("userToken");
+      }
+
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const notification = {
+        classId: classData.id,
+        businessId: classData.businessId,
+        message: classData.description,
+        userId: businessId,
         read: false,
       };
 
       const response = await fetch(`${API_URL}/api/notifications`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(notificationData),
+        body: JSON.stringify(notification),
       });
 
       if (!response.ok) {
-        console.error("Error response:", response);
-        throw new Error("Failed to send notification");
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      setNotifications(data);
+
+      fetchNotifications();
     } catch (error) {
       console.error("Error sending notification:", error);
     }
   };
-  sendNotification();
+
+  return { notifications, fetchNotifications, sendNotification };
 };
