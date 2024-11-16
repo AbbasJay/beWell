@@ -36,7 +36,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <CSS.Container onPress={() => handlePress(onPress, disabled)} fullWidth={fullWidth} variant={variant} size={size} disabled={disabled}>
-      <CSS.StyledText variant={variant}>{title}</CSS.StyledText>
+      <CSS.StyledText variant={variant} disabled={disabled}>{title}</CSS.StyledText>
     </CSS.Container>
   );
 }

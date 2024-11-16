@@ -21,6 +21,7 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
     if (disabled) {
       return `
         background-color: ${Colors.disabled.disabled};
+        opacity: 0.5;
       `;
     }
     switch (variant) {
@@ -42,8 +43,10 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
 `;
 
 export const StyledText = styled(Text)<ContainerProps>`
-  color: ${({ variant }) => {
-    console.log('Text variant:', variant);
+  color: ${({ variant, disabled }) => {
+    if (disabled) {
+      return Colors.dark.text;
+    }
     switch (variant) {
       case "secondary":
         return Colors.dark.text;
