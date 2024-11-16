@@ -1,6 +1,7 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import styled from "styled-components/native";
 import Button from "./ui/button/button";
+import { BusinessCard } from "./ui/business-card/business-card";
 
 export default function Components() {
   return (
@@ -17,13 +18,32 @@ export default function Components() {
           <Button title="Large" onPress={() => {}} size="large" />
         </SectionContent>
       </Section>
+
+      <Section>
+        <SectionTitle>Business Card</SectionTitle>
+        <SectionContent>
+          <BusinessCard item={{
+            userId: 1,
+            name: "Example Business",
+            address: "123 Main St",
+            city: "Anytown",
+            state: "CA",
+            country: "USA",
+            zipCode: "12345",
+            phoneNumber: "(555) 555-5555",
+            email: "example@example.com",
+            type: "Restaurant",
+            description: "Strength, Conditioning",
+          }} />
+        </SectionContent>
+      </Section>
     </Container>
   );
 }
 
-const Container = styled(View)`
+const Container = styled(ScrollView)`
   flex: 1;
-  padding: 20px;
+  padding: 10px 20px;
 `;
 
 const Section = styled(View)`
