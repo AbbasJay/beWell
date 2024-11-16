@@ -11,8 +11,8 @@ interface NavigationItem {
 interface NavigationBarProps {
     title?: string;
     subtitle?: string;
-    left?: NavigationItem[];
-    right?: NavigationItem[];
+    left?: NavigationItem;
+    right?: NavigationItem;
 }
 
 export const NavigationBar: React.FC<NavigationBarProps> = ({ 
@@ -51,7 +51,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     return (
         <CSS.Container>
             <CSS.LeftContainer>
-                {left?.map((item) => renderItem(item, false))}
+                {left && renderItem(left, false)}
             </CSS.LeftContainer>
 
             <CSS.TitleContainer>
@@ -68,7 +68,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             </CSS.TitleContainer>
 
             <CSS.RightContainer>
-                {right?.map((item) => renderItem(item, true))}
+                {right && renderItem(right, true)}
             </CSS.RightContainer>
         </CSS.Container>
     );

@@ -23,6 +23,7 @@ export const Title = styled.Text`
 export const Subtitle = styled.Text`
   font-size: 16px;
   color: gray;
+  text-align: center;
 `;
 
 export const LeftContainer = styled.View`

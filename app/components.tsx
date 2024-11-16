@@ -29,8 +29,12 @@ export default function Components() {
 
       <Section>
         <SectionTitle>Navigation bar</SectionTitle>
-        <SectionContent>
-          <NavigationBar title="Title" subtitle="Subtitle" left={[{label: "Back", onPress: () => {}}]} right={[{label: "Next", onPress: () => {}}]} />
+        <SectionContent style={{ gap: 60 }}>
+          <NavigationBar title="Title" subtitle="Subtitle" left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
+          <NavigationBar title="Title" subtitle="Subtitle" left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
+          <NavigationBar left={{label: "Back", onPress: () => {}}} right={{label: "Next", onPress: () => {}}} />
+          <NavigationBar right={{label: "Next", onPress: () => {}}} />
+          <NavigationBar title="Title" />
         </SectionContent>
       </Section>
     </Container>
