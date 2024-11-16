@@ -22,7 +22,7 @@ export default function Components() {
       <Section>
         <SectionTitle>Business Card</SectionTitle>
         <SectionContent>
-          <BusinessCard item={{
+          <BusinessCard fullWidth item={{
             userId: 1,
             name: "Example Business",
             address: "123 Main St",
