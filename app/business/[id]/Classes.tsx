@@ -82,13 +82,7 @@ export default function Business() {
   };
 
   return (
-    <ScrollView
-      style={{
-        backgroundColor: Colors.light.secondary,
-        paddingLeft: 10,
-        paddingRight: 10,
-      }}
-    >
+    <ScrollView style={{ paddingHorizontal: 10 }}>
       <CSS.BusinessDetails>
         <CSS.Title>{business.name}</CSS.Title>
 

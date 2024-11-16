@@ -1,11 +1,9 @@
 import styled from "styled-components/native";
-import { StatusBar } from "react-native";
+import { StatusBar, Platform } from "react-native";
 import { Colors } from "@/constants/Colors";
-
-const statusBarHeight = StatusBar.currentHeight ?? 50;
 
 export const BeWellBackground = styled.SafeAreaView`
   flex: 1;
-  background-color: ${Colors.light.secondary};
-  padding-top: ${statusBarHeight + 20}px;
+  background-color: ${Colors.dark.background};
+  ${Platform.OS === 'android' ? `padding-top: ${StatusBar.currentHeight}px;` : ''}
 `;

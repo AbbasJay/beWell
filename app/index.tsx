@@ -2,19 +2,13 @@ import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Button from "./ui/button/button";
 import { Colors } from "@/constants/Colors";
+import styled from "styled-components/native";
 
 const Index = () => {
   const router = useRouter();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: Colors.light.secondary,
-      }}
-    >
+    <Container>
       <Text>Welcome to the Home Page</Text>
       <Button
         title="Go to Login"
@@ -24,8 +18,14 @@ const Index = () => {
         title="go to components"
         onPress={() => router.push("/components")}
       />
-    </View>
+    </Container>
   );
 };
+
+const Container = styled(View)`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 export default Index;

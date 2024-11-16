@@ -17,7 +17,6 @@ export default function Components() {
 
 const Container = styled(View)`
   flex: 1;
-  padding: 20px;
 `;
 
 const Section = styled(View)`
