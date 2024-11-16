@@ -2,7 +2,8 @@ import React from "react";
 import { Container, StyledText } from "./styled";
 
 interface ButtonProps {
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "tertiary";
+  size?: "small" | "medium" | "large";
   title: string;
   onPress: () => void;
   iconLeft?: React.ReactNode;
@@ -16,11 +17,12 @@ export default function Button({
   iconLeft,
   iconRight,
   variant = "primary",
+  size = "medium",
   fullWidth = false,
 }: ButtonProps) {
   return (
     <Container onPress={onPress} fullWidth={fullWidth}>
       <StyledText>{title}</StyledText>
-    </Container>
+    </Container>  
   );
 }
