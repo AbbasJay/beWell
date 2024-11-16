@@ -3,7 +3,6 @@ import { View, Text, Dimensions, FlatList, ScrollView } from "react-native";
 import { Container, Card, Title, FlatListContainer } from "./homeStyles";
 import { Business, useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
-import { Colors } from "@/constants/Colors";
 
 const { width: viewportWidth } = Dimensions.get("window");
 

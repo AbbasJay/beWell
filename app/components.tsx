@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import styled from "styled-components/native";
 import Button from "./ui/button/button";
+import { BeWellTabBar } from "@/components/bewellTabBar";
 
 export default function Components() {
   return (
@@ -17,6 +18,13 @@ export default function Components() {
           <Button title="Large" onPress={() => {}} size="large" />
         </SectionContent>
       </Section>
+
+      <Section>
+        <SectionTitle>BeWell tab bar</SectionTitle>
+        <SectionContent>
+          <BeWellTabBar />
+        </SectionContent>
+      </Section>
     </Container>
   );
 }
@@ -28,8 +36,7 @@ const Container = styled(View)`
 
 const Section = styled(View)`
   margin-bottom: 20px;
-`; 
-
+`;
 
 const SectionTitle = styled(Text)`
   font-size: 20px;
@@ -41,9 +48,7 @@ const SectionTitle = styled(Text)`
   border-bottom-color: #000;
 `;
 
-
 const SectionContent = styled(View)`
-display: flex;
-gap: 20px;
+  display: flex;
+  gap: 20px;
 `;
-
