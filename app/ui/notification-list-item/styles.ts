@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 import { Colors } from "@/constants/Colors";
 
 export const Container = styled.View`
-  padding: 8px;
+  padding: 8px 8px 24px 8px;
   border-bottom-width: 1px;
   border-bottom-color: ${Colors.dark.secondary};
   flex-direction: row;

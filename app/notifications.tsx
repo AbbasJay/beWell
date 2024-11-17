@@ -11,7 +11,7 @@ const NotificationsDisplay: React.FC = () => {
     <BeWellBackground>
       <NotificationListItem
         notification={notifications[0]}
-        messageAlert="Congratulations, your booking is now confirmed."
+        messageAlert="Booking confirmed!"
         business={businesses[0]}
       />
     </BeWellBackground>
