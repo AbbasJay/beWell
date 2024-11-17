@@ -2,15 +2,18 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
+import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 
 const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
 
   return (
-    <NotificationListItem
-      notification={notifications[0]}
-      messageAlert="Congratulations, your booking is now confirmed."
-    />
+    <BeWellBackground>
+      <NotificationListItem
+        notification={notifications[0]}
+        messageAlert="Congratulations, your booking is now confirmed."
+      />
+    </BeWellBackground>
     // <View style={styles.container}>
     //   {unreadNotificationsCount > 0 && (
     //     <Text style={styles.unreadCount}>
