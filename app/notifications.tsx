@@ -17,6 +17,7 @@ const NotificationsDisplay: React.FC = () => {
         )}
         {notifications.map((notification) => (
           <NotificationListItem
+            key={notification.id}
             notification={notification}
             messageAlert="Booking confirmed!"
             business={businesses.find(
