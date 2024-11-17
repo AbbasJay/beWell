@@ -17,13 +17,23 @@ export default function NotificationListItem({
 }: NotificationListItemProps) {
   return (
     <CSS.Container>
-      <CSS.SampleImage
-        source={require("@/assets/images/home-gym.webp")}
-        resizeMode="cover"
-      />
-      <CSS.MessageText>{messageAlert}</CSS.MessageText>
-      <CSS.TimeText>{formatDateTime(notification.createdAt)}</CSS.TimeText>
-      <CSS.TimeText>{formatGetTimeAgo(notification.createdAt)}</CSS.TimeText>
+      <CSS.LeftSection>
+        <CSS.SampleImage
+          source={require("@/assets/images/home-gym.webp")}
+          resizeMode="cover"
+        />
+      </CSS.LeftSection>
+
+      <CSS.MiddleSection>
+        <CSS.MessageText>{messageAlert}</CSS.MessageText>
+        <CSS.DateTimeText>
+          {formatDateTime(notification.createdAt)}
+        </CSS.DateTimeText>
+      </CSS.MiddleSection>
+
+      <CSS.RightSection>
+        <CSS.TimeText>{formatGetTimeAgo(notification.createdAt)}</CSS.TimeText>
+      </CSS.RightSection>
     </CSS.Container>
   );
 }
