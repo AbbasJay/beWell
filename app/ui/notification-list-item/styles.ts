@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 import { Colors } from "@/constants/Colors";
 
 export const Container = styled.View`
-  padding: 16px;
+  padding: 8px;
   border-bottom-width: 1px;
   border-bottom-color: ${Colors.dark.secondary};
   flex-direction: row;
@@ -41,4 +41,8 @@ export const RightSection = styled.View`
 export const TimeText = styled.Text`
   color: ${Colors.dark.secondary};
   font-size: 12px;
+`;
+
+export const BusinessNameText = styled.Text`
+  font-weight: 600;
 `;

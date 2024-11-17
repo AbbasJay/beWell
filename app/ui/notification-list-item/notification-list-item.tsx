@@ -1,6 +1,7 @@
 import React from "react";
 import * as CSS from "./styles";
 import { Notification } from "@/app/utils/notification-types";
+import { Business } from "@/app/contexts/BusinessContext";
 import {
   formatGetTimeAgo,
   formatDateTime,
@@ -9,11 +10,13 @@ import {
 interface NotificationListItemProps {
   messageAlert?: string;
   notification: Notification;
+  business?: Business;
 }
 
 export default function NotificationListItem({
   messageAlert,
   notification,
+  business,
 }: NotificationListItemProps) {
   return (
     <CSS.Container>
@@ -26,6 +29,7 @@ export default function NotificationListItem({
 
       <CSS.MiddleSection>
         <CSS.MessageText>{messageAlert}</CSS.MessageText>
+        <CSS.BusinessNameText>{business?.name}</CSS.BusinessNameText>
         <CSS.DateTimeText>
           {formatDateTime(notification.createdAt)}
         </CSS.DateTimeText>

@@ -3,15 +3,16 @@ import { View, Text, StyleSheet } from "react-native";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-
+import { useBusinessContext } from "./contexts/BusinessContext";
 const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
-
+  const { businesses } = useBusinessContext();
   return (
     <BeWellBackground>
       <NotificationListItem
         notification={notifications[0]}
         messageAlert="Congratulations, your booking is now confirmed."
+        business={businesses[0]}
       />
     </BeWellBackground>
     // <View style={styles.container}>
