@@ -4,11 +4,10 @@ import styled from "styled-components/native";
 export const Container = styled.View`
   width: 100%;
   display: flex;
+  align-items: center;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
   background-color: ${Colors.dark.primary};
-  height: 140px;
   padding: 20px 16px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
