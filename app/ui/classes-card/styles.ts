@@ -4,8 +4,6 @@ import { View, Text } from "react-native";
 export const Container = styled(View)`
   flex: 1;
   overflow: scroll;
-  padding-left: 10px;
-  padding-right: 10px;
 `;
 
 export const Card = styled(View)`
