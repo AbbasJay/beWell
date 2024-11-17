@@ -1,40 +1,43 @@
+const TIME_UNITS = {
+  day: 86400,
+  hour: 3600,
+  minute: 60,
+} as const;
+
 function formatGetTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) {
+  if (diffInSeconds < TIME_UNITS.minute) {
     return "just now";
   }
 
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
+  const monthsDiff =
+    (now.getFullYear() - date.getFullYear()) * 12 +
+    (now.getMonth() - date.getMonth());
+
+  if (monthsDiff >= 12) {
+    const years = Math.floor(monthsDiff / 12);
+    return `${years} year${years === 1 ? "" : "s"} ago`;
   }
 
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+  if (monthsDiff >= 1) {
+    return `${monthsDiff} month${monthsDiff === 1 ? "" : "s"} ago`;
   }
 
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 30) {
-    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
+  for (const [unit, seconds] of Object.entries(TIME_UNITS)) {
+    const diff = Math.floor(diffInSeconds / seconds);
+    if (diff >= 1) {
+      return `${diff} ${unit}${diff === 1 ? "" : "s"} ago`;
+    }
   }
 
-  const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12) {
-    return `${diffInMonths} ${diffInMonths === 1 ? "month" : "months"} ago`;
-  }
-
-  const diffInYears = Math.floor(diffInDays / 365);
-  return `${diffInYears} ${diffInYears === 1 ? "year" : "years"} ago`;
+  return "just now";
 }
 
 function formatDateTime(dateString: string): string {
-  const date = new Date(dateString);
-
-  return date.toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
