@@ -16,6 +16,10 @@ import { API_URL } from "@/env";
 import { useBusinessContext } from "../../contexts/BusinessContext";
 import * as CSS from "./styles";
 import { Colors } from "@/constants/Colors";
+import { BusinessCard } from "@/app/ui/business-card/business-card";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
@@ -25,6 +29,8 @@ export default function Business() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const { refreshNotifications } = useNotificationsContext();
+  const { sendNotification } = useNotifications();
 
   if (!business) {
     return <CSS.DetailText>No business data available</CSS.DetailText>;
@@ -39,11 +45,9 @@ export default function Business() {
         } else {
           token = await SecureStore.getItemAsync("userToken");
         }
-
         if (!token) {
           throw new Error("No authentication token found");
         }
-
         const response = await fetch(`${API_URL}/api/classes/${business.id}`, {
           method: "GET",
           headers: {
@@ -51,13 +55,11 @@ export default function Business() {
             "Content-Type": "application/json",
           },
         });
-
         if (!response.ok) {
           const errorText = await response.text();
           console.error("Error response:", errorText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const json = await response.json();
         setClasses(json);
       } catch (error) {
@@ -79,40 +81,18 @@ export default function Business() {
 
   const handleConfirm = () => {
     setShowConfirmation(true);
+
+    if (selectedClass) {
+      sendNotification(selectedClass, business.id || 0);
+      refreshNotifications();
+    }
   };
 
   return (
-    <ScrollView
-      style={{
-        backgroundColor: Colors.light.secondary,
-        paddingLeft: 10,
-        paddingRight: 10,
-      }}
-    >
-      <CSS.BusinessDetails>
-        <CSS.Title>{business.name}</CSS.Title>
-
-        <CSS.DetailText>
-          <CSS.BoldText>Address:</CSS.BoldText> {business.address}
-        </CSS.DetailText>
-
-        <CSS.DetailText>
-          <CSS.BoldText>Phone:</CSS.BoldText> {business.phoneNumber}
-        </CSS.DetailText>
-
-        <CSS.DetailText>
-          <CSS.BoldText>Email:</CSS.BoldText> {business.email}
-        </CSS.DetailText>
-
-        <CSS.DetailText>
-          <CSS.BoldText>Type:</CSS.BoldText> {business.type}
-        </CSS.DetailText>
-
-        <CSS.DetailText>
-          <CSS.BoldText>Hours:</CSS.BoldText> {business.hours}
-        </CSS.DetailText>
-      </CSS.BusinessDetails>
-
+    <ScrollView style={{ paddingHorizontal: 10 }}>
+      
+      <BusinessCard item={business} fullWidth />
+ 
       {classes.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
           <ClassesCard item={item} />
@@ -139,17 +119,14 @@ export default function Business() {
                     <CSS.ClassesTitle>
                       <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
                     </CSS.ClassesTitle>
-
                     <CSS.DetailText>
                       <CSS.BoldText>Description: </CSS.BoldText>
                       {selectedClass.description}
                     </CSS.DetailText>
-
                     <CSS.DetailText>
                       <CSS.BoldText>Instructor: </CSS.BoldText>
                       {selectedClass.instructor}
                     </CSS.DetailText>
-
                     <CSS.DetailText>
                       <CSS.BoldText>Address: </CSS.BoldText>
                       {` ${business.address}, ${selectedClass.location}`}
