@@ -1,5 +1,4 @@
 import styled from "styled-components/native";
-import { Dimensions } from "react-native";
 
 export const Container = styled.TouchableOpacity``;
 
@@ -9,7 +8,7 @@ export const FlatListContainer = styled.View`
 
 export const FullWidthContainer = styled.View`
   margin: 0 -12px;
-  width: ${Dimensions.get("window").width}px;
+  width: auto;
 `;
 
 export const ScrollSeparator = styled.View`
