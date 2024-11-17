@@ -31,6 +31,8 @@ export const MessageText = styled.Text`
 
 export const BusinessNameText = styled.Text`
   font-weight: 600;
+  font-size: 16px;
+  color: #ff0099;
 `;
 
 export const DateTimeText = styled.Text`
