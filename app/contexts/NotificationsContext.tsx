@@ -1,6 +1,21 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
-import { NotificationsContextType } from "@/app/utils/notification-types";
+
+export interface Notification {
+  id: number;
+  businessId: number;
+  classId: number;
+  message: string;
+  userId: number;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface NotificationsContextType {
+  notifications: Notification[];
+  unreadNotificationsCount: number;
+  refreshNotifications: () => void;
+}
 
 const NotificationsContext = createContext<
   NotificationsContextType | undefined
