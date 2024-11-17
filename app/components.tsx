@@ -43,7 +43,7 @@ const notifications: Array<{
   {
     notification: {
       id: 2,
-      createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
       businessId: 1,
       classId: 2,
       message: "Booking confirmed",
@@ -55,7 +55,7 @@ const notifications: Array<{
   {
     notification: {
       id: 3,
-      createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
       businessId: 1,
       classId: 3,
       message: "Special offer",
@@ -67,7 +67,7 @@ const notifications: Array<{
   {
     notification: {
       id: 4,
-      createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
       businessId: 1,
       classId: 4,
       message: "Class reminder",
@@ -79,7 +79,7 @@ const notifications: Array<{
   {
     notification: {
       id: 5,
-      createdAt: new Date(Date.now() - 604800000).toISOString(), // 1 week ago
+      createdAt: new Date(Date.now() - 604800000).toISOString(),
       businessId: 1,
       classId: 5,
       message: "New trainer",
@@ -91,7 +91,7 @@ const notifications: Array<{
   {
     notification: {
       id: 6,
-      createdAt: new Date(Date.now() - 2592000000).toISOString(), // 1 month ago
+      createdAt: new Date(Date.now() - 2592000000).toISOString(),
       businessId: 1,
       classId: 6,
       message: "Membership update",
