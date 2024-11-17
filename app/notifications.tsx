@@ -1,25 +1,30 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 
 const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
 
   return (
-    <View style={styles.container}>
-      {unreadNotificationsCount > 0 && (
-        <Text style={styles.unreadCount}>
-          Unread Notifications: {unreadNotificationsCount}
-        </Text>
-      )}
-      {notifications.map((notification) => (
-        <View key={notification.id} style={styles.notification}>
-          <Text>{`Congratulations, your booking is now confirmed. ${notification.createdAt}`}</Text>
+    <NotificationListItem
+      notification={notifications[0]}
+      messageAlert="Congratulations, your booking is now confirmed."
+    />
+    // <View style={styles.container}>
+    //   {unreadNotificationsCount > 0 && (
+    //     <Text style={styles.unreadCount}>
+    //       Unread Notifications: {unreadNotificationsCount}
+    //     </Text>
+    //   )}
+    //   {notifications.map((notification) => (
+    //     <View key={notification.id} style={styles.notification}>
+    //       <Text>{`Congratulations, your booking is now confirmed. ${notification.createdAt}`}</Text>
 
-          <Text>{"5 mins ago"}</Text>
-        </View>
-      ))}
-    </View>
+    //       <Text>{"5 mins ago"}</Text>
+    //     </View>
+    //   ))}
+    // </View>
   );
 };
 
