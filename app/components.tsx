@@ -5,102 +5,11 @@ import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
-import { Business } from "@/app/contexts/BusinessContext";
-import { Notification } from "@/app/utils/notification-types";
-
-const mockBusiness: Business = {
-  id: 1,
-  name: "Jabbar Fitness",
-  userId: 1,
-  address: "123 Main St",
-  city: "San Francisco",
-  state: "CA",
-  country: "USA",
-  zipCode: "94105",
-  phoneNumber: "(555) 555-5555",
-  email: "info@jabbarfitness.com",
-  type: "Gym",
-  description: "Strength, Conditioning",
-  hours: "Mon-Fri",
-};
-
-const notifications: Array<{
-  notification: Notification;
-  messageAlert: string;
-}> = [
-  {
-    notification: {
-      id: 1,
-      createdAt: new Date().toISOString(),
-      businessId: 1,
-      classId: 1,
-      message: "New class available",
-      userId: 1,
-      read: false,
-    },
-    messageAlert: "New HIIT class starting next week!",
-  },
-  {
-    notification: {
-      id: 2,
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-      businessId: 1,
-      classId: 2,
-      message: "Booking confirmed",
-      userId: 1,
-      read: true,
-    },
-    messageAlert: "Your yoga session is confirmed",
-  },
-  {
-    notification: {
-      id: 3,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      businessId: 1,
-      classId: 3,
-      message: "Special offer",
-      userId: 1,
-      read: false,
-    },
-    messageAlert: "50% off on annual membership!",
-  },
-  {
-    notification: {
-      id: 4,
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      businessId: 1,
-      classId: 4,
-      message: "Class reminder",
-      userId: 1,
-      read: true,
-    },
-    messageAlert: "Your spinning class is tomorrow",
-  },
-  {
-    notification: {
-      id: 5,
-      createdAt: new Date(Date.now() - 604800000).toISOString(),
-      businessId: 1,
-      classId: 5,
-      message: "New trainer",
-      userId: 1,
-      read: false,
-    },
-    messageAlert: "Welcome our new fitness trainer Sarah!",
-  },
-  {
-    notification: {
-      id: 6,
-      createdAt: new Date(Date.now() - 2592000000).toISOString(),
-      businessId: 1,
-      classId: 6,
-      message: "Membership update",
-      userId: 1,
-      read: true,
-    },
-    messageAlert: "Your membership has been renewed",
-  },
-];
+import { mockBusinessCard } from "@/app/utils/components-data/business-card-data";
+import {
+  notifications,
+  mockBusinessNotification,
+} from "@/app/utils/components-data/notifications-data";
 
 export default function Components() {
   return (
@@ -123,20 +32,7 @@ export default function Components() {
         <SectionContent>
           <BusinessCard
             fullWidth
-            item={{
-              userId: 1,
-              name: "Example Business",
-              address: "123 Main St",
-              city: "Anytown",
-              state: "CA",
-              country: "USA",
-              zipCode: "12345",
-              phoneNumber: "(555) 555-5555",
-              email: "example@example.com",
-              type: "Restaurant",
-              description: "Strength, Conditioning",
-              hours: "Mon-Fri",
-            }}
+            item={mockBusinessCard[0]}
             onPress={function (): void {
               throw new Error("Function not implemented.");
             }}
@@ -183,7 +79,7 @@ export default function Components() {
               key={notification.id}
               notification={notification}
               messageAlert={messageAlert}
-              business={mockBusiness}
+              business={mockBusinessNotification}
             />
           ))}
         </SectionContent>
