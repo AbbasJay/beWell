@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
+import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 
 const { width: viewportWidth } = Dimensions.get("window");
 

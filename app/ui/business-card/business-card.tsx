@@ -8,16 +8,17 @@ type BusinessCardProps = {
   fullWidth?: boolean;
 };
 
-export const BusinessCard = ({ item, onPress, fullWidth }: BusinessCardProps) => {
+export const BusinessCard = ({
+  item,
+  onPress,
+  fullWidth,
+}: BusinessCardProps) => {
   return (
     <CSS.Wrapper>
       <CSS.Container onPress={onPress} fullWidth={fullWidth}>
-        <CSS.ImageWrapper>
-          <CSS.CardHours>{item.hours}</CSS.CardHours>
-          <CSS.BookmarkIcon />
-        </CSS.ImageWrapper>
+        <CSS.ImageWrapper></CSS.ImageWrapper>
         <CSS.SampleImage
-          source={require('@/assets/images/image 84.png')}
+          source={require("@/assets/images/home-gym.webp")}
           resizeMode="cover"
         />
         <CSS.ContentWrapper>

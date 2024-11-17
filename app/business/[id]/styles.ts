@@ -1,5 +1,9 @@
 import styled from "styled-components/native";
 
+export const BusinessCardContainer = styled.View`
+  margin-bottom: 5px;
+`;
+
 export const ModalBackground = styled.View`
   flex: 1;
   justify-content: flex-end;

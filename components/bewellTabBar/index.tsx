@@ -1,10 +1,10 @@
 "use client";
 
-import { Colors } from "@/constants/Colors";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import BeWellIcons from "@/assets/icons/icons";
 
 export const BeWellTabBar = () => {
   const { unreadNotificationsCount } = useNotificationsContext();
@@ -20,19 +20,20 @@ export const BeWellTabBar = () => {
             router.push("/notifications");
           }}
         >
-          <View>
-            {unreadNotificationsCount > 0 && (
-              <Text>{unreadNotificationsCount}</Text>
+          <View style={styles.iconContainer}>
+            {unreadNotificationsCount > 0 ? (
+              <BeWellIcons
+                name="notificationsBellActive"
+                width={24}
+                height={24}
+              />
+            ) : (
+              <BeWellIcons
+                name="notificationsBellInactive"
+                width={24}
+                height={24}
+              />
             )}
-            <Text
-              style={
-                activeTab === "Notifications"
-                  ? styles.activeTabText
-                  : styles.tabText
-              }
-            >
-              Notifications
-            </Text>
           </View>
         </Pressable>
         <Pressable
@@ -87,5 +88,8 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: "orange",
     fontWeight: "bold",
+  },
+  iconContainer: {
+    alignItems: "center",
   },
 });

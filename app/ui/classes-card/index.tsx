@@ -13,7 +13,7 @@ export const ClassesCard = ({ item }: { item: Class }) => {
     <CSS.Container key={item.id}>
       <CSS.Card>
         <CSS.CardIcon>
-          <BeWellIcons />
+          <BeWellIcons name="myIcon" />
         </CSS.CardIcon>
         <CSS.CardInfo>
           <CSS.CardText>

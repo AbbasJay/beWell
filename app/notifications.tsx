@@ -7,16 +7,16 @@ const NotificationsDisplay: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Notifications</Text>
-      <Text style={styles.unreadCount}>
-        Unread Notifications: {unreadNotificationsCount}
-      </Text>
+      {unreadNotificationsCount > 0 && (
+        <Text style={styles.unreadCount}>
+          Unread Notifications: {unreadNotificationsCount}
+        </Text>
+      )}
       {notifications.map((notification) => (
         <View key={notification.id} style={styles.notification}>
-          <Text>{notification.message}</Text>
-          <Text>{notification.read ? "Read" : "Unread"}</Text>
-          <Text>{notification.message}</Text>
-          <Text>{notification.userId}</Text>
+          <Text>{`Congratulations, your booking is now confirmed. ${notification.createdAt}`}</Text>
+
+          <Text>{"5 mins ago"}</Text>
         </View>
       ))}
     </View>
@@ -36,6 +36,10 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   notification: {
+    gap: 40,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",

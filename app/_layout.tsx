@@ -1,11 +1,14 @@
 import React from "react";
-import { ThemeProvider } from "@/hooks/themeContext";
-import { Stack, useRouter, usePathname } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { PaperProvider } from "react-native-paper";
-import { BusinessProvider } from "./contexts/BusinessContext";
+
+import { ThemeProvider } from "@/hooks/themeContext";
 import { Colors } from "@/constants/Colors";
 import { BeWellTabBar } from "@/components/bewellTabBar";
+
+import { BusinessProvider } from "./contexts/BusinessContext";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
+import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 
 export default function RootLayout() {
   const currentRoute = usePathname();
@@ -16,12 +19,15 @@ export default function RootLayout() {
       <PaperProvider>
         <BusinessProvider>
           <NotificationsProvider>
+            {!hideTabBarRoutes.includes(currentRoute) && (
+              <NavigationBar title="Title" left={{ label: "Back" }} />
+            )}
             <Stack
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: Colors.light.secondary },
-                //statusBarStyle: "dark",
-                statusBarColor: Colors.light.primary,
+                // statusBarStyle: "dark",
+                statusBarColor: "black",
               }}
             >
               <Stack.Screen name="index" />
