@@ -21,11 +21,12 @@ export const SampleImage = styled.Image`
 
 export const MiddleSection = styled.View`
   flex: 1;
-  justify-content: center;
+  justify-content: space-between;
+  min-height: 80px;
 `;
 
 export const MessageText = styled.Text`
-  margin-bottom: 4px;
+  font-weight: 600;
 `;
 
 export const DateTimeText = styled.Text`
@@ -39,4 +40,5 @@ export const RightSection = styled.View`
 
 export const TimeText = styled.Text`
   color: ${Colors.dark.secondary};
+  font-size: 12px;
 `;
