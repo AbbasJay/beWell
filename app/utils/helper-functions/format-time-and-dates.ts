@@ -37,7 +37,7 @@ function formatGetTimeAgo(dateString: string): string {
 }
 
 function formatDateTime(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString("en-GB", {
     weekday: "short",
     month: "short",
     day: "numeric",
