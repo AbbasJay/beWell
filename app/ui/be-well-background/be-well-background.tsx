@@ -20,7 +20,7 @@ const StyledView = styled.View`
 const StyledSafeAreaView = styled(SafeAreaView)`
   flex: 1;
   background-color: ${Colors.light.secondary};
-  padding: 10px 0;
+  padding: 10px 12px;
 `;
 
 export const BeWellBackground: React.FC<BeWellBackgroundProps> = ({

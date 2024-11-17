@@ -1,11 +1,26 @@
 import React from "react";
-import { View, Text, Dimensions, FlatList, ScrollView } from "react-native";
-import { Container, Card, Title, FlatListContainer } from "./homeStyles";
+import {
+  View,
+  Text,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  Platform,
+} from "react-native";
+import {
+  Container,
+  Card,
+  Title,
+  FlatListContainer,
+  FullWidthContainer,
+  ScrollSeparator,
+} from "./homeStyles";
 import { Business, useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
+import styled from "styled-components/native";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -54,7 +69,7 @@ export default function HomePage() {
 
   return (
     <BeWellBackground>
-      <ScrollView>
+      <FullWidthContainer>
         <Container>
           <FlatListContainer>
             <FlatList
@@ -66,10 +81,17 @@ export default function HomePage() {
               snapToAlignment="center"
               decelerationRate="fast"
               snapToInterval={viewportWidth * 0.6 + 50}
+              contentContainerStyle={Platform.select({
+                android: { paddingHorizontal: 12 },
+              })}
+              contentInset={Platform.select({
+                ios: { left: 12, right: 12 },
+              })}
+              ItemSeparatorComponent={() => <ScrollSeparator />}
             />
           </FlatListContainer>
         </Container>
-      </ScrollView>
+      </FullWidthContainer>
     </BeWellBackground>
   );
 }
