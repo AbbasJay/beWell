@@ -62,13 +62,6 @@ export default function HomePage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <TouchableOpacity
-        onPress={() => {
-          setIsMapView(!isMapView);
-        }}
-      >
-        <Text>{isMapView ? "Map View" : "List View"}</Text>
-      </TouchableOpacity>
       {isMapView ? (
         <Map businesses={businesses} />
       ) : (
@@ -89,6 +82,13 @@ export default function HomePage() {
           </Container>
         </ScrollView>
       )}
+      <TouchableOpacity
+        onPress={() => {
+          setIsMapView(!isMapView);
+        }}
+      >
+        <Text>{isMapView ? "Map View" : "List View"}</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -20,7 +20,7 @@ export default function RootLayout() {
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: Colors.light.secondary },
-                statusBarStyle: "dark",
+                //statusBarStyle: "dark",
                 statusBarColor: Colors.light.primary,
               }}
             >

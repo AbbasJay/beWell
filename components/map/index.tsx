@@ -5,11 +5,13 @@ import {
   TouchableOpacity,
   Text,
   Platform,
+  Dimensions,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
+import Carousel from "react-native-reanimated-carousel";
 
 const INITIAL_REGION = {
   //london
@@ -19,9 +21,17 @@ const INITIAL_REGION = {
   longitudeDelta: 0.0421,
 };
 
+const { width: viewportWidth } = Dimensions.get("window");
+
 const Map = ({ businesses }: { businesses: Business[] }) => {
+  if (Platform.OS === "web") {
+    return <Text>Map View is not supported on web</Text>;
+  }
+
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  businesses = businesses.filter((b) => b.latitude && b.longitude);
 
   useEffect(() => {
     navigation.setOptions({
@@ -33,10 +43,54 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
         </TouchableOpacity>
       ),
     });
+
+    if (businesses.length > 0) {
+      const { latitude, longitude } = businesses[selectedIndex];
+      if (latitude && longitude) {
+        mapRef.current?.animateToRegion(
+          {
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000
+        );
+      }
+    }
   }, []);
 
   const focusMap = () => {
     mapRef.current?.animateToRegion(INITIAL_REGION, 1000);
+  };
+
+  const renderCarouselItem = ({ item }: { item: Business }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(`/business/${item.id}/classes`)}
+    >
+      <Text style={styles.cardTitle}>{item.name}</Text>
+      <Text style={styles.cardAddress}>{item.address}</Text>
+      <Text style={styles.cardAddress}>
+        {item.city}, {item.state}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const onSnapToItem = (index: number) => {
+    setSelectedIndex(index);
+    const { latitude, longitude } = businesses[index];
+    if (latitude && longitude) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000
+      );
+    }
   };
 
   const onMarkerPress = (marker: { latitude: number; longitude: number }) => {
@@ -93,6 +147,17 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
             )
         )}
       </MapView>
+
+      {/* Carousel */}
+      <View>
+        <Carousel
+          data={businesses}
+          renderItem={renderCarouselItem}
+          width={viewportWidth * 0.8}
+          onSnapToItem={onSnapToItem}
+          style={styles.carouselContainer}
+        />
+      </View>
     </View>
   );
 };
@@ -103,6 +168,33 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  carouselContainer: {
+    position: "absolute",
+    bottom: 20,
+    width: "100%",
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  cardAddress: {
+    fontSize: 14,
+    color: "#555",
   },
 });
 
