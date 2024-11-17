@@ -37,6 +37,7 @@ export const BusinessNameText = styled.Text`
 
 export const DateTimeText = styled.Text`
   color: ${Colors.dark.secondary};
+  font-size: 12px;
 `;
 
 export const RightSection = styled.View`

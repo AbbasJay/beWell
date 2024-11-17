@@ -30,7 +30,7 @@ export default function NotificationListItem({
         <CSS.MessageText>{messageAlert}</CSS.MessageText>
         <CSS.BusinessNameText>{business?.name}</CSS.BusinessNameText>
         <CSS.DateTimeText>
-          {formatDateTime(notification.createdAt)}
+          Booked: {formatDateTime(notification.createdAt)}
         </CSS.DateTimeText>
       </CSS.MiddleSection>
       <CSS.RightSection>
