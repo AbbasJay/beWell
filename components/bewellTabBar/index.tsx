@@ -8,7 +8,6 @@ import BeWellIcons from "@/assets/icons/icons";
 
 export const BeWellTabBar = () => {
   const { unreadNotificationsCount } = useNotificationsContext();
-  const [activeTab, setActiveTab] = useState("Home");
 
   return (
     <View>
@@ -16,7 +15,6 @@ export const BeWellTabBar = () => {
         <Pressable
           style={styles.tab}
           onPress={() => {
-            setActiveTab("Notifications");
             router.push("/notifications");
           }}
         >
@@ -39,30 +37,18 @@ export const BeWellTabBar = () => {
         <Pressable
           style={styles.tab}
           onPress={() => {
-            setActiveTab("Home");
             router.push("/home");
           }}
         >
-          <Text
-            style={activeTab === "Home" ? styles.activeTabText : styles.tabText}
-          >
-            Home
-          </Text>
+          <Text style={styles.tabText}>Home</Text>
         </Pressable>
         <Pressable
           style={styles.tab}
           onPress={() => {
-            setActiveTab("Settings");
             router.push("/components");
           }}
         >
-          <Text
-            style={
-              activeTab === "Settings" ? styles.activeTabText : styles.tabText
-            }
-          >
-            Settings
-          </Text>
+          <Text style={styles.tabText}>Settings</Text>
         </Pressable>
       </View>
     </View>
