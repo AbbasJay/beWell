@@ -1,5 +1,5 @@
 import { Business } from "@/app/contexts/BusinessContext";
-import { Notification } from "@/app/utils/notification-types";
+import { Notification } from "@/app/contexts/NotificationsContext";
 
 export const notifications: Array<{
   notification: Notification;
