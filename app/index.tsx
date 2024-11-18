@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Button from "./ui/button/button";
-import { Colors } from "@/constants/Colors";
 import styled from "styled-components/native";
 
 const Index = () => {

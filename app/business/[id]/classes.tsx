@@ -26,6 +26,7 @@ export default function Business() {
   const { id } = useLocalSearchParams();
   const business = businesses.find((b) => b.id === Number(id));
   const [classes, setClasses] = useState<Class[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
@@ -63,6 +64,7 @@ export default function Business() {
         }
         const json = await response.json();
         setClasses(json);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -92,18 +94,24 @@ export default function Business() {
   return (
     <BeWellBackground>
       <ScrollView>
-        <CSS.BusinessCardContainer>
+        <CSS.BusinessCardContainer style={{ marginTop: 12 }}>
           <BusinessCard item={business} fullWidth />
         </CSS.BusinessCardContainer>
 
-        {classes.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            onPress={() => handleClassPress(item)}
-          >
-            <ClassesCard item={item} />
-          </TouchableOpacity>
-        ))}
+        {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}
+
+        {isLoading ? (
+          <CSS.HeaderText>Loading Classes...</CSS.HeaderText>
+        ) : (
+          classes.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => handleClassPress(item)}
+            >
+              <ClassesCard item={item} />
+            </TouchableOpacity>
+          ))
+        )}
 
         <Modal
           animationType="fade"

@@ -1,4 +1,3 @@
-import { View } from "react-native";
 import { Business } from "@/app/contexts/BusinessContext";
 import * as CSS from "./styles";
 

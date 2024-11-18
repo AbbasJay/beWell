@@ -9,10 +9,18 @@ export const FlatListContainer = styled.View`
 export const FullWidthContainer = styled.View`
   margin: 0 -12px;
   width: auto;
+  margin-bottom: 12px;
 `;
 
 export const ScrollSeparator = styled.View`
   width: 16px;
+`;
+
+export const HeaderText = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 12px;
 `;
 
 export const Card = styled.View`

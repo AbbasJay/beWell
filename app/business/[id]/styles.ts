@@ -4,6 +4,13 @@ export const BusinessCardContainer = styled.View`
   margin-bottom: 5px;
 `;
 
+export const HeaderText = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 12px;
+`;
+
 export const ModalBackground = styled.View`
   flex: 1;
   justify-content: flex-end;
