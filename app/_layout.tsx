@@ -10,6 +10,8 @@ import { BusinessProvider } from "./contexts/BusinessContext";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 
+import { MaterialIcons } from "@expo/vector-icons";
+
 export default function RootLayout() {
   const currentRoute = usePathname();
   const hideTabBarRoutes = ["/", "/logIn", "/signUp"];
@@ -20,7 +22,14 @@ export default function RootLayout() {
         <BusinessProvider>
           <NotificationsProvider>
             {!hideTabBarRoutes.includes(currentRoute) && (
-              <NavigationBar title="Title" left={{ label: "Back" }} />
+              <NavigationBar
+                title="Title"
+                left={{
+                  icon: (
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                  ),
+                }}
+              />
             )}
             <Stack
               screenOptions={{
