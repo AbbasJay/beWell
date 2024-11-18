@@ -26,7 +26,7 @@ export const BeWellTabBar = () => {
           <CSS.IconContainer>
             <MaterialIcons
               name="notifications"
-              size={30}
+              size={20}
               color={unreadNotificationsCount > 0 ? "red" : "black"}
             />
             <CSS.TabText>Notifications</CSS.TabText>
@@ -45,11 +45,7 @@ export const BeWellTabBar = () => {
           }}
         >
           <CSS.IconContainer>
-            <MaterialIcons
-              name="home"
-              size={30}
-              color={activeRoute === "/home" ? "blue" : "black"}
-            />
+            <MaterialIcons name="home" size={20} color={"black"} />
             <CSS.TabText>Home</CSS.TabText>
           </CSS.IconContainer>
         </CSS.Tab>
@@ -59,11 +55,7 @@ export const BeWellTabBar = () => {
           }}
         >
           <CSS.IconContainer>
-            <MaterialIcons
-              name="settings"
-              size={30}
-              color={activeRoute === "/components" ? "blue" : "black"}
-            />
+            <MaterialIcons name="settings" size={20} color={"black"} />
             <CSS.TabText>Settings</CSS.TabText>
           </CSS.IconContainer>
         </CSS.Tab>

@@ -53,7 +53,7 @@ export default function RootLayout() {
           <NotificationsProvider>
             {!hideTabBarRoutes.includes(currentRoute) && (
               <NavigationBar
-                title="Be Well"
+                title="beWell"
                 left={{
                   icon: (
                     <MaterialIcons name="arrow-back" size={24} color="black" />

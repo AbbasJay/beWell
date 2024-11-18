@@ -47,4 +47,11 @@ function formatDateTime(dateString: string): string {
   });
 }
 
-export { formatGetTimeAgo, formatDateTime };
+const formattedStartDate = (dateString: string) =>
+  new Intl.DateTimeFormat("en-UK", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(dateString));
+
+export { formatGetTimeAgo, formatDateTime, formattedStartDate };

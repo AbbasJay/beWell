@@ -5,33 +5,31 @@ type BusinessCardProps = {
   item: Business;
   onPress?: () => void;
   disabled?: boolean;
-  fullWidth?: boolean;
+  width?: string;
+  height?: string;
 };
 
 export const BusinessCard = ({
   item,
   onPress,
-  fullWidth,
+  width,
+  height,
   disabled,
 }: BusinessCardProps) => {
   return (
     <CSS.Wrapper>
-      <CSS.Container
-        onPress={onPress}
-        fullWidth={fullWidth}
-        disabled={disabled}
-      >
+      <CSS.Container onPress={onPress} width={width} disabled={disabled}>
         <CSS.ImageWrapper></CSS.ImageWrapper>
         <CSS.SampleImage
+          height={height}
           source={require("@/assets/images/home-gym.webp")}
           resizeMode="cover"
         />
         <CSS.ContentWrapper>
           <CSS.CardTitle>{item.name}</CSS.CardTitle>
-          <CSS.CardAddress>{item.address}</CSS.CardAddress>
-          <CSS.CardDescription>{item.description}</CSS.CardDescription>
-          <CSS.CardPhoneNumber>{item.phoneNumber}</CSS.CardPhoneNumber>
-          <CSS.CardType>{item.type}</CSS.CardType>
+          <CSS.Info>{item.address}</CSS.Info>
+          <CSS.Info>{item.phoneNumber}</CSS.Info>
+          <CSS.Info>{item.type}</CSS.Info>
         </CSS.ContentWrapper>
       </CSS.Container>
     </CSS.Wrapper>

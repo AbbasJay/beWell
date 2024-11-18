@@ -67,16 +67,7 @@ export const StyledLink = styled(TouchableOpacity)`
 `;
 
 export const ButtonContainer = styled.View`
-  margin-top: 20px;
   margin-bottom: 20px;
-  gap: 10px;
-`;
-
-export const StyledButton = styled(Button)`
-  padding: 8px 0;
-  justify-content: center;
-  border-radius: 8px;
-  ${(props) => props.disabled && `background-color: gray`};
 `;
 
 export const OptionContainer = styled.View`
@@ -90,10 +81,7 @@ export const IconContainer = styled.View`
   margin-bottom: 20px;
 `;
 
-export const Footer = styled.View`
-  padding: 20px 0;
-  align-items: center;
-`;
+export const Footer = styled.View``;
 
 export const FooterText = styled.Text`
   text-align: center;

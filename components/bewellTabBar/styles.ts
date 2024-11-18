@@ -7,19 +7,18 @@ export const Content = styled.View`
 export const TabBar = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  background-color: #eee;
   padding-vertical: 10px;
 `;
 
 export const Tab = styled.TouchableOpacity`
   flex: 1;
   align-items: center;
-  padding: 10px;
+  padding: 6px;
 `;
 
 export const TabText = styled.Text`
   color: #000;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 800;
 `;
 
@@ -30,8 +29,8 @@ export const ActiveTabText = styled(TabText)`
 
 export const BadgeContainer = styled.View`
   position: absolute;
-  top: -16px;
-  right: -4px;
+  top: -12px;
+  right: 2px;
   border-radius: 100px;
   padding: 4px 6px;
   display: flex;
@@ -40,7 +39,7 @@ export const BadgeContainer = styled.View`
 `;
 
 export const NotificationBadge = styled.Text`
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
 `;
 

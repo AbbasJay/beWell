@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled, { css } from "styled-components/native";
 import { View, Text } from "react-native";
 
 export const Container = styled(View)`
@@ -13,6 +13,8 @@ export const Card = styled(View)`
   margin-top: 5px;
   margin-bottom: 5px;
   border-radius: 8px;
+  border-bottom-width: 1px;
+  border-bottom-color: #c7c7c7;
 `;
 
 export const CardIcon = styled(View)`
@@ -22,15 +24,22 @@ export const CardIcon = styled(View)`
   align-items: center;
   justify-content: center;
   margin-right: 20px;
+  margin-left: 10px;
 `;
 
 export const CardInfo = styled(View)``;
 
-export const CardText = styled(Text)`
-  font-size: 16px;
+export const CardText = styled(Text)<{ isTitle?: boolean }>`
+  font-size: 14px;
   color: #333;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  ${({ isTitle }) =>
+    isTitle &&
+    css`
+      font-weight: bold;
+    `}
 `;
 
-export const CardTitle = styled(Text)`
-  font-weight: bold;
-`;
+export const CardTitle = styled(Text)``;

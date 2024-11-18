@@ -94,7 +94,7 @@ export default function Business() {
   return (
     <BeWellBackground scrollable>
       <CSS.BusinessCardContainer>
-        <BusinessCard item={business} fullWidth disabled />
+        <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
 
       {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}

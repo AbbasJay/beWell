@@ -95,6 +95,7 @@ const LoginForm = () => {
               outlineStyle={{ borderRadius: 12 }}
               textColor={Colors.light.text}
               mode="outlined"
+              activeOutlineColor={Colors.light.text}
               value={value}
               placeholder="Email"
               placeholderTextColor={Colors.light.text}
@@ -114,6 +115,7 @@ const LoginForm = () => {
               outlineStyle={{ borderRadius: 12 }}
               textColor={Colors.light.text}
               mode="outlined"
+              activeOutlineColor={Colors.light.text}
               value={value}
               placeholder="Password"
               placeholderTextColor={Colors.light.text}
