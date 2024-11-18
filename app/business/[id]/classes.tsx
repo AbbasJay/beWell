@@ -90,71 +90,69 @@ export default function Business() {
   };
 
   return (
-    <BeWellBackground>
-      <ScrollView>
-        <CSS.BusinessCardContainer>
-          <BusinessCard item={business} fullWidth />
-        </CSS.BusinessCardContainer>
+    <BeWellBackground
+      useScrollView
+      scrollViewContentContainerStyle={{ paddingTop: 12 }}
+    >
+      <CSS.BusinessCardContainer>
+        <BusinessCard item={business} fullWidth />
+      </CSS.BusinessCardContainer>
 
-        {classes.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            onPress={() => handleClassPress(item)}
-          >
-            <ClassesCard item={item} />
-          </TouchableOpacity>
-        ))}
+      {classes.map((item) => (
+        <TouchableOpacity key={item.id} onPress={() => handleClassPress(item)}>
+          <ClassesCard item={item} />
+        </TouchableOpacity>
+      ))}
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <CSS.ModalBackground>
-            <CSS.ModalContainer>
-              <CSS.CloseButton onPress={() => setModalVisible(false)}>
-                <CSS.CloseButtonText>{"x"}</CSS.CloseButtonText>
-              </CSS.CloseButton>
-              <CSS.ModalLayout>
-                {showConfirmation ? (
-                  <CSS.ConfirmedText>Booking Confirmed</CSS.ConfirmedText>
-                ) : (
-                  selectedClass && (
-                    <View>
-                      <CSS.ClassesTitle>
-                        <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
-                      </CSS.ClassesTitle>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Description: </CSS.BoldText>
-                        {selectedClass.description}
-                      </CSS.DetailText>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Instructor: </CSS.BoldText>
-                        {selectedClass.instructor}
-                      </CSS.DetailText>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Address: </CSS.BoldText>
-                        {` ${business.address}, ${selectedClass.location}`}
-                      </CSS.DetailText>
-                    </View>
-                  )
-                )}
-              </CSS.ModalLayout>
-              <CSS.ButtonContainer>
-                <Button
-                  title={showConfirmation ? "Close" : "Confirm"}
-                  onPress={
-                    showConfirmation
-                      ? () => setModalVisible(false)
-                      : handleConfirm
-                  }
-                />
-              </CSS.ButtonContainer>
-            </CSS.ModalContainer>
-          </CSS.ModalBackground>
-        </Modal>
-      </ScrollView>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <CSS.ModalBackground>
+          <CSS.ModalContainer>
+            <CSS.CloseButton onPress={() => setModalVisible(false)}>
+              <CSS.CloseButtonText>{"x"}</CSS.CloseButtonText>
+            </CSS.CloseButton>
+            <CSS.ModalLayout>
+              {showConfirmation ? (
+                <CSS.ConfirmedText>Booking Confirmed</CSS.ConfirmedText>
+              ) : (
+                selectedClass && (
+                  <View>
+                    <CSS.ClassesTitle>
+                      <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
+                    </CSS.ClassesTitle>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Description: </CSS.BoldText>
+                      {selectedClass.description}
+                    </CSS.DetailText>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Instructor: </CSS.BoldText>
+                      {selectedClass.instructor}
+                    </CSS.DetailText>
+                    <CSS.DetailText>
+                      <CSS.BoldText>Address: </CSS.BoldText>
+                      {` ${business.address}, ${selectedClass.location}`}
+                    </CSS.DetailText>
+                  </View>
+                )
+              )}
+            </CSS.ModalLayout>
+            <CSS.ButtonContainer>
+              <Button
+                title={showConfirmation ? "Close" : "Confirm"}
+                onPress={
+                  showConfirmation
+                    ? () => setModalVisible(false)
+                    : handleConfirm
+                }
+              />
+            </CSS.ButtonContainer>
+          </CSS.ModalContainer>
+        </CSS.ModalBackground>
+      </Modal>
     </BeWellBackground>
   );
 }
