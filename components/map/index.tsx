@@ -8,10 +8,11 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
 import Carousel from "react-native-reanimated-carousel";
+import * as Location from "expo-location";
+import { set } from "react-hook-form";
 
 const INITIAL_REGION = {
   //london
@@ -29,39 +30,64 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
   }
 
   const mapRef = useRef<MapView>(null);
-  const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [location, setLocation] = useState<any>(null);
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={focusMap}>
-          <View style={{ marginRight: 20 }}>
-            <Text>Focus</Text>
-          </View>
-        </TouchableOpacity>
-      ),
-    });
+    // navigation.setOptions({
+    //   headerRight: () => (
+    //     <TouchableOpacity onPress={focusMap}>
+    //       <View style={{ marginRight: 20 }}>
+    //         <Text>Focus</Text>
+    //       </View>
+    //     </TouchableOpacity>
+    //   ),
+    // });
 
-    if (businesses.length > 0) {
-      const { latitude, longitude } = businesses[selectedIndex];
-      if (latitude && longitude) {
-        mapRef.current?.animateToRegion(
-          {
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          1000
-        );
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status == "granted") {
+        console.log("Permission to access location was granted");
+      } else {
+        console.log("Permission to access location was denied");
+        setLocation(INITIAL_REGION);
+        return;
       }
-    }
+      const loc = await Location.getCurrentPositionAsync({});
+      console.log("loc", loc);
+
+      const { latitude, longitude } = loc.coords;
+
+      const user_location = {
+        latitude,
+        longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      };
+
+      setLocation(user_location);
+      console.log("location", loc);
+    })();
+
+    // if (businesses.length > 0) {
+    //   const { latitude, longitude } = businesses[selectedIndex];
+    //   if (latitude && longitude) {
+    //     mapRef.current?.animateToRegion(
+    //       {
+    //         latitude,
+    //         longitude,
+    //         latitudeDelta: 0.01,
+    //         longitudeDelta: 0.01,
+    //       },
+    //       1000
+    //     );
+    //   }
+    // }
   }, []);
 
   const focusMap = () => {
-    mapRef.current?.animateToRegion(INITIAL_REGION, 1000);
+    mapRef.current?.animateToRegion(location, 1000);
   };
 
   const renderCarouselItem = ({ item }: { item: Business }) => (
@@ -108,11 +134,10 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={INITIAL_REGION}
+        initialRegion={location}
+        ref={mapRef}
         showsUserLocation
         showsMyLocationButton
-        showsCompass
-        ref={mapRef}
       >
         {businesses.map(
           (
