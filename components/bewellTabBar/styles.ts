@@ -32,7 +32,6 @@ export const BadgeContainer = styled.View`
   position: absolute;
   top: -16px;
   right: -4px;
-  background-color: red;
   border-radius: 100px;
   padding: 4px 6px;
   display: flex;

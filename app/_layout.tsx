@@ -1,5 +1,5 @@
-import React from "react";
-import { Stack, usePathname } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { router, Stack, usePathname } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 
 import { ThemeProvider } from "@/hooks/themeContext";
@@ -12,9 +12,39 @@ import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 export default function RootLayout() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentRoute = usePathname();
   const hideTabBarRoutes = ["/", "/logIn", "/signUp"];
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        let token;
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("userToken");
+        } else {
+          token = await SecureStore.getItemAsync("userToken");
+        }
+
+        if (!token && !hideTabBarRoutes.includes(currentRoute)) {
+          router.replace("/logIn");
+        }
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, [currentRoute]);
+
+  if (isAuthenticated === null) {
+    return null;
+  }
 
   return (
     <ThemeProvider>

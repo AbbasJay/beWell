@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Button from "./ui/button/button";
-import { Colors } from "@/constants/Colors";
 import styled from "styled-components/native";
 
 const Index = () => {
@@ -10,10 +9,7 @@ const Index = () => {
   return (
     <Container>
       <Text>Welcome to the Home Page</Text>
-      <Button
-        title="Go to Login"
-        onPress={() => router.push("/home")} // TODO: should be '/logIn', for now to bypass login page we are going '/home'
-      />
+      <Button title="Go to Login" onPress={() => router.push("/logIn")} />
       <Button
         title="go to components"
         onPress={() => router.push("/components")}
