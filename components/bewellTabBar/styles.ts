@@ -11,7 +11,7 @@ export const TabBar = styled.View`
   padding-vertical: 10px;
 `;
 
-export const Tab = styled.Pressable`
+export const Tab = styled.TouchableOpacity`
   flex: 1;
   align-items: center;
   padding: 10px;
