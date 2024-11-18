@@ -4,6 +4,7 @@ import * as CSS from "./styles";
 type BusinessCardProps = {
   item: Business;
   onPress?: () => void;
+  disabled?: boolean;
   fullWidth?: boolean;
 };
 
@@ -11,10 +12,15 @@ export const BusinessCard = ({
   item,
   onPress,
   fullWidth,
+  disabled,
 }: BusinessCardProps) => {
   return (
     <CSS.Wrapper>
-      <CSS.Container onPress={onPress} fullWidth={fullWidth}>
+      <CSS.Container
+        onPress={onPress}
+        fullWidth={fullWidth}
+        disabled={disabled}
+      >
         <CSS.ImageWrapper></CSS.ImageWrapper>
         <CSS.SampleImage
           source={require("@/assets/images/home-gym.webp")}

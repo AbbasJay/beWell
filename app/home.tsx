@@ -47,53 +47,53 @@ export default function HomePage() {
   };
 
   return (
-    <ScrollView>
-      <BeWellBackground hasNavigationBar={true}>
-        <FullWidthContainer>
-          <Container>
-            <HeaderText style={{ marginLeft: 12 }}>Near you</HeaderText>
-            <FlatListContainer>
-              <FlatList
-                data={businesses}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id?.toString() || ""}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="center"
-                decelerationRate="fast"
-                snapToInterval={viewportWidth * 0.6 + 50}
-                contentContainerStyle={Platform.select({
-                  android: { paddingHorizontal: 12 },
-                })}
-                contentInset={Platform.select({
-                  ios: { left: 12, right: 12 },
-                })}
-                ItemSeparatorComponent={() => <ScrollSeparator />}
-              />
-            </FlatListContainer>
-            <HeaderText style={{ marginLeft: 12 }}>Trending Now</HeaderText>
-            <FlatListContainer>
-              <FlatList
-                data={businesses}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id?.toString() || ""}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="center"
-                decelerationRate="fast"
-                snapToInterval={viewportWidth * 0.6 + 50}
-                contentContainerStyle={Platform.select({
-                  android: { paddingHorizontal: 12 },
-                })}
-                contentInset={Platform.select({
-                  ios: { left: 12, right: 12 },
-                })}
-                ItemSeparatorComponent={() => <ScrollSeparator />}
-              />
-            </FlatListContainer>
-          </Container>
-        </FullWidthContainer>
-      </BeWellBackground>
-    </ScrollView>
+    <BeWellBackground scrollable>
+      <FullWidthContainer>
+        <Container>
+          <HeaderText style={{ marginLeft: 12 }}>Near you</HeaderText>
+          <FlatListContainer
+            style={{ marginHorizontal: -20, marginBottom: 12 }}
+          >
+            <FlatList
+              data={businesses}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id?.toString() || ""}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              snapToInterval={viewportWidth * 0.6 + 50}
+              contentContainerStyle={Platform.select({
+                android: { paddingHorizontal: 12 },
+              })}
+              contentInset={Platform.select({
+                ios: { left: 12, right: 12 },
+              })}
+              ItemSeparatorComponent={() => <ScrollSeparator />}
+            />
+          </FlatListContainer>
+          <HeaderText style={{ marginLeft: 12 }}>Trending Now</HeaderText>
+          <FlatListContainer style={{ marginHorizontal: -20 }}>
+            <FlatList
+              data={businesses}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id?.toString() || ""}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              snapToInterval={viewportWidth * 0.6 + 50}
+              contentContainerStyle={Platform.select({
+                android: { paddingHorizontal: 12 },
+              })}
+              contentInset={Platform.select({
+                ios: { left: 12, right: 12 },
+              })}
+              ItemSeparatorComponent={() => <ScrollSeparator />}
+            />
+          </FlatListContainer>
+        </Container>
+      </FullWidthContainer>
+    </BeWellBackground>
   );
 }

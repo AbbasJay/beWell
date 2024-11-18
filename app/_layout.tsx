@@ -9,6 +9,9 @@ import { BeWellTabBar } from "@/components/bewellTabBar";
 import { BusinessProvider } from "./contexts/BusinessContext";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
+
+import { MaterialIcons } from "@expo/vector-icons";
+
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 export default function RootLayout() {
@@ -49,7 +52,14 @@ export default function RootLayout() {
         <BusinessProvider>
           <NotificationsProvider>
             {!hideTabBarRoutes.includes(currentRoute) && (
-              <NavigationBar title="Title" left={{ label: "Back" }} />
+              <NavigationBar
+                title="Be Well"
+                left={{
+                  icon: (
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                  ),
+                }}
+              />
             )}
             <Stack
               screenOptions={{

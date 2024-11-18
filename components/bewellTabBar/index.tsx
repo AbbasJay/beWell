@@ -1,81 +1,73 @@
 "use client";
 
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import BeWellIcons from "@/assets/icons/icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as CSS from "./styles";
 
 export const BeWellTabBar = () => {
   const { unreadNotificationsCount } = useNotificationsContext();
+  const [activeRoute, setActiveRoute] = useState("");
+  const currentRoute = usePathname();
+
+  useEffect(() => {
+    setActiveRoute(currentRoute);
+  }, [currentRoute]);
 
   return (
-    <View>
-      <View style={styles.tabBar}>
-        <Pressable
-          style={styles.tab}
+    <CSS.Content>
+      <CSS.TabBar>
+        <CSS.Tab
           onPress={() => {
             router.push("/notifications");
           }}
         >
-          <View style={styles.iconContainer}>
-            {unreadNotificationsCount > 0 ? (
-              <BeWellIcons
-                name="notificationsBellActive"
-                width={24}
-                height={24}
-              />
-            ) : (
-              <BeWellIcons
-                name="notificationsBellInactive"
-                width={24}
-                height={24}
-              />
+          <CSS.IconContainer>
+            <MaterialIcons
+              name="notifications"
+              size={30}
+              color={unreadNotificationsCount > 0 ? "red" : "black"}
+            />
+            <CSS.TabText>Notifications</CSS.TabText>
+            {unreadNotificationsCount > 0 && (
+              <CSS.BadgeContainer>
+                <CSS.NotificationBadge>
+                  {unreadNotificationsCount}
+                </CSS.NotificationBadge>
+              </CSS.BadgeContainer>
             )}
-          </View>
-        </Pressable>
-        <Pressable
-          style={styles.tab}
+          </CSS.IconContainer>
+        </CSS.Tab>
+        <CSS.Tab
           onPress={() => {
             router.push("/home");
           }}
         >
-          <Text style={styles.tabText}>Home</Text>
-        </Pressable>
-        <Pressable
-          style={styles.tab}
+          <CSS.IconContainer>
+            <MaterialIcons
+              name="home"
+              size={30}
+              color={activeRoute === "/home" ? "blue" : "black"}
+            />
+            <CSS.TabText>Home</CSS.TabText>
+          </CSS.IconContainer>
+        </CSS.Tab>
+        <CSS.Tab
           onPress={() => {
             router.push("/components");
           }}
         >
-          <Text style={styles.tabText}>Settings</Text>
-        </Pressable>
-      </View>
-    </View>
+          <CSS.IconContainer>
+            <MaterialIcons
+              name="settings"
+              size={30}
+              color={activeRoute === "/components" ? "blue" : "black"}
+            />
+            <CSS.TabText>Settings</CSS.TabText>
+          </CSS.IconContainer>
+        </CSS.Tab>
+      </CSS.TabBar>
+    </CSS.Content>
   );
 };
-
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-  },
-  tabBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#eee",
-    paddingVertical: 10,
-  },
-  tab: {
-    padding: 10,
-  },
-  tabText: {
-    color: "#000",
-  },
-  activeTabText: {
-    color: "orange",
-    fontWeight: "bold",
-  },
-  iconContainer: {
-    alignItems: "center",
-  },
-});

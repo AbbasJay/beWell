@@ -8,24 +8,22 @@ const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
   const { businesses } = useBusinessContext();
   return (
-    <BeWellBackground>
-      <ScrollView>
-        {unreadNotificationsCount > 0 && (
-          <Text style={styles.unreadCount}>
-            Unread Notifications: {unreadNotificationsCount}
-          </Text>
-        )}
-        {notifications.map((notification) => (
-          <NotificationListItem
-            key={notification.id}
-            notification={notification}
-            messageAlert="Booking confirmed!"
-            business={businesses.find(
-              (business) => business.id === notification.businessId
-            )}
-          />
-        ))}
-      </ScrollView>
+    <BeWellBackground scrollable>
+      {unreadNotificationsCount > 0 && (
+        <Text style={styles.unreadCount}>
+          Unread Notifications: {unreadNotificationsCount}
+        </Text>
+      )}
+      {notifications.map((notification) => (
+        <NotificationListItem
+          key={notification.id}
+          notification={notification}
+          messageAlert="Booking confirmed!"
+          business={businesses.find(
+            (business) => business.id === notification.businessId
+          )}
+        />
+      ))}
     </BeWellBackground>
   );
 };
