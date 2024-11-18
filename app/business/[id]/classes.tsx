@@ -92,7 +92,7 @@ export default function Business() {
   return (
     <BeWellBackground scrollable>
       <CSS.BusinessCardContainer>
-        <BusinessCard item={business} fullWidth />
+        <BusinessCard item={business} fullWidth disabled={true} />
       </CSS.BusinessCardContainer>
 
       {classes.map((item) => (
