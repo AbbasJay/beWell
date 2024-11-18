@@ -4,6 +4,12 @@ import Button from "./ui/button/button";
 import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
+import NotificationListItem from "./ui/notification-list-item/notification-list-item";
+import { mockBusinessCard } from "@/app/utils/components-data/business-card-data";
+import {
+  notifications,
+  mockBusinessNotification,
+} from "@/app/utils/components-data/notifications-data";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
 
 export default function Components() {
@@ -27,20 +33,7 @@ export default function Components() {
         <SectionContent>
           <BusinessCard
             fullWidth
-            item={{
-              userId: 1,
-              name: "Example Business",
-              address: "123 Main St",
-              city: "Anytown",
-              state: "CA",
-              country: "USA",
-              zipCode: "12345",
-              phoneNumber: "(555) 555-5555",
-              email: "example@example.com",
-              type: "Restaurant",
-              description: "Strength, Conditioning",
-              hours: "Mon-Fri",
-            }}
+            item={mockBusinessCard[0]}
             onPress={function (): void {
               throw new Error("Function not implemented.");
             }}
@@ -76,6 +69,20 @@ export default function Components() {
           />
           <NavigationBar right={{ label: "Next", onPress: () => {} }} />
           <NavigationBar title="Title" />
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionTitle>Notification list item</SectionTitle>
+        <SectionContent>
+          {notifications.map(({ notification, messageAlert }) => (
+            <NotificationListItem
+              key={notification.id}
+              notification={notification}
+              messageAlert={messageAlert}
+              business={mockBusinessNotification}
+            />
+          ))}
         </SectionContent>
       </Section>
 

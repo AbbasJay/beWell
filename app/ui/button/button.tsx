@@ -19,7 +19,7 @@ const handlePress = async (onPress: () => void, disabled: boolean) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onPress?.();
   } catch (error) {
-    console.error('Haptics error:', error);
+    console.error("Haptics error:", error);
     onPress?.();
   }
 };
@@ -35,8 +35,16 @@ export default function Button({
   disabled = false,
 }: ButtonProps) {
   return (
-    <CSS.Container onPress={() => handlePress(onPress, disabled)} fullWidth={fullWidth} variant={variant} size={size} disabled={disabled}>
-      <CSS.StyledText variant={variant} disabled={disabled}>{title}</CSS.StyledText>
+    <CSS.Container
+      onPress={() => handlePress(onPress, disabled)}
+      fullWidth={fullWidth}
+      variant={variant}
+      size={size}
+      disabled={disabled}
+    >
+      <CSS.StyledText variant={variant} disabled={disabled}>
+        {title}
+      </CSS.StyledText>
     </CSS.Container>
   );
 }

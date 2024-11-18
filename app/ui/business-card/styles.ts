@@ -2,10 +2,7 @@ import { Image } from "react-native";
 import { styled } from "styled-components/native";
 import { Colors } from "@/constants/Colors";
 
-export const Wrapper = styled.View`
-  padding-right: 8px;
-  padding-left: 8px;
-`;
+export const Wrapper = styled.View``;
 
 export const Container = styled.TouchableOpacity<{ fullWidth?: boolean }>`
   background-color: #ffffff;

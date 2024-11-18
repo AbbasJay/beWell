@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
 
-interface Notification {
+export interface Notification {
   id: number;
   businessId: number;
   classId: number;
@@ -11,7 +11,7 @@ interface Notification {
   createdAt: string;
 }
 
-interface NotificationsContextType {
+export interface NotificationsContextType {
   notifications: Notification[];
   unreadNotificationsCount: number;
   refreshNotifications: () => void;

@@ -13,10 +13,15 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: ${(props) => props.size === "small" ? "8px 16px" : props.size === "large" ? "16px 32px" : "14px 20px"};
+  padding: ${(props) =>
+    props.size === "small"
+      ? "8px 16px"
+      : props.size === "large"
+      ? "16px 32px"
+      : "14px 20px"};
   border-radius: 5px;
   width: ${(props) => (props.fullWidth ? "100%" : "auto")};
-  
+
   ${({ variant, disabled }) => {
     if (disabled) {
       return `

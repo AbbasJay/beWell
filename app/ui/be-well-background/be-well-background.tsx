@@ -7,6 +7,7 @@ interface BeWellBackgroundProps {
   children: React.ReactNode;
   style?: any;
   useSafeArea?: boolean;
+  hasNavigationBar?: boolean;
 }
 
 const StyledView = styled.View`
@@ -17,18 +18,24 @@ const StyledView = styled.View`
     : ""}
 `;
 
-const StyledSafeAreaView = styled(SafeAreaView)`
+const StyledSafeAreaView = styled(SafeAreaView)<{ hasNavigationBar?: boolean }>`
   flex: 1;
   background-color: ${Colors.light.secondary};
-  padding: 10px 0;
+  padding-horizontal: 12px;
+  padding-top: ${(props) => (props.hasNavigationBar ? "10px" : "0")};
 `;
 
 export const BeWellBackground: React.FC<BeWellBackgroundProps> = ({
   children,
   style,
   useSafeArea = true,
+  hasNavigationBar = false,
 }) => {
   const Container = useSafeArea ? StyledSafeAreaView : StyledView;
 
-  return <Container style={style}>{children}</Container>;
+  return (
+    <Container hasNavigationBar={hasNavigationBar} style={style}>
+      {children}
+    </Container>
+  );
 };

@@ -1,12 +1,18 @@
 import styled from "styled-components/native";
 
-export const Container = styled.TouchableOpacity`
-  /* padding-top: 20px;
-  padding-bottom: 20px; */
-`;
+export const Container = styled.TouchableOpacity``;
 
 export const FlatListContainer = styled.View`
   height: fit-content;
+`;
+
+export const FullWidthContainer = styled.View`
+  margin: 0 -12px;
+  width: auto;
+`;
+
+export const ScrollSeparator = styled.View`
+  width: 16px;
 `;
 
 export const Card = styled.View`
