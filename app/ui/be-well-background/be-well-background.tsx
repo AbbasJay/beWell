@@ -1,9 +1,6 @@
 import React from "react";
-import styled from "styled-components/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "@/constants/Colors";
-import { Platform, StatusBar, View, ScrollView } from "react-native";
+import * as CSS from "./styles";
 
 interface BeWellBackgroundProps {
   children: React.ReactNode;
@@ -13,15 +10,6 @@ interface BeWellBackgroundProps {
   scrollViewContentContainerStyle?: any;
   useScrollView?: boolean;
 }
-
-const StyledSafeAreaView = styled(SafeAreaView)<{
-  fixedPaddingTop?: boolean;
-}>`
-  flex: 1;
-  background-color: ${Colors.light.secondary};
-  padding-horizontal: 12px;
-  padding-top: ${({ fixedPaddingTop }) => (fixedPaddingTop ? "12px" : "0px")};
-`;
 
 export const BeWellBackground: React.FC<BeWellBackgroundProps> = ({
   children,
@@ -33,22 +21,32 @@ export const BeWellBackground: React.FC<BeWellBackgroundProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
 
+  const containerStyle = {
+    paddingTop: fixedPaddingTop ? insets.top : 0,
+    paddingBottom: hasNavigationBar ? insets.bottom : 0,
+    ...style,
+  };
+
   return (
-    <StyledSafeAreaView style={style} fixedPaddingTop={fixedPaddingTop}>
+    <CSS.StyledSafeAreaView style={containerStyle}>
       {useScrollView ? (
-        <ScrollView contentContainerStyle={scrollViewContentContainerStyle}>
-          {children}
-        </ScrollView>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            paddingTop: hasNavigationBar ? insets.top : 0,
+        <CSS.StyledScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 0,
+            ...scrollViewContentContainerStyle,
           }}
+          showsVerticalScrollIndicator={false}
         >
           {children}
-        </View>
+        </CSS.StyledScrollView>
+      ) : (
+        <CSS.StyledView
+          hasNavigationBar={hasNavigationBar}
+          topInset={insets.top}
+        >
+          {children}
+        </CSS.StyledView>
       )}
-    </StyledSafeAreaView>
+    </CSS.StyledSafeAreaView>
   );
 };
