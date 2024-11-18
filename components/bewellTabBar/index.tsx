@@ -1,13 +1,14 @@
 "use client";
 
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as CSS from "./styles";
 
 export const BeWellTabBar = () => {
   const { unreadNotificationsCount } = useNotificationsContext();
+  const currentRoute = usePathname();
 
   return (
     <CSS.Content>
@@ -39,7 +40,11 @@ export const BeWellTabBar = () => {
           }}
         >
           <CSS.IconContainer>
-            <MaterialIcons name="home" size={30} color="black" />
+            <MaterialIcons
+              name="home"
+              size={30}
+              color={currentRoute === "/home" ? "blue" : "black"}
+            />
             <CSS.TabText>Home</CSS.TabText>
           </CSS.IconContainer>
         </CSS.Tab>
@@ -49,7 +54,11 @@ export const BeWellTabBar = () => {
           }}
         >
           <CSS.IconContainer>
-            <MaterialIcons name="settings" size={30} color="black" />
+            <MaterialIcons
+              name="settings"
+              size={30}
+              color={currentRoute === "/components" ? "blue" : "black"}
+            />
             <CSS.TabText>Settings</CSS.TabText>
           </CSS.IconContainer>
         </CSS.Tab>
