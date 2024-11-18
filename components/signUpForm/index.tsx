@@ -8,6 +8,7 @@ import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
+import { Colors } from "@/constants/Colors";
 
 const SignUp = () => {
   const {
@@ -72,17 +73,15 @@ const SignUp = () => {
   };
 
   return (
-    <CSS.Container colours={colors}>
-      <CSS.StyledText fontSize="40px" colours={colors}>
-        Sign Up
-      </CSS.StyledText>
+    <CSS.Container>
+      <CSS.StyledText fontSize="40px">Sign Up</CSS.StyledText>
 
       <CSS.Body>
-        <CSS.ThemeToggle onPress={toggleTheme}>
+        {/* <CSS.ThemeToggle onPress={toggleTheme}>
           <CSS.ThemeToggleText colours={colors}>
             Toggle Theme (Current: {theme})
           </CSS.ThemeToggleText>
-        </CSS.ThemeToggle>
+        </CSS.ThemeToggle> */}
 
         <Controller
           control={control}
@@ -95,13 +94,13 @@ const SignUp = () => {
                 borderRadius: 12,
               }}
               onBlur={onBlur}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
               value={value}
               placeholder="Full Name"
-              placeholderTextColor={colors.text}
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="account" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="account" />}
             />
           )}
           name="name"
@@ -117,13 +116,13 @@ const SignUp = () => {
               outlineStyle={{
                 borderRadius: 12,
               }}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
               value={value}
               placeholder="Email"
-              placeholderTextColor={colors.text}
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="email" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="email" />}
             />
           )}
           name="emailText"
@@ -139,19 +138,19 @@ const SignUp = () => {
               outlineStyle={{
                 borderRadius: 12,
               }}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
               value={value}
               placeholder="Password"
-              placeholderTextColor={colors.text}
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="lock" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="password"
         />
 
-        <Controller
+        {/* <Controller
           control={control}
           rules={{
             required: true,
@@ -167,11 +166,11 @@ const SignUp = () => {
               placeholder="Confirm Password"
               placeholderTextColor={colors.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="lock" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="confirmPassword"
-        />
+        /> */}
 
         <CSS.ButtonContainer>
           <CSS.StyledButton
@@ -198,7 +197,7 @@ const SignUp = () => {
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText colours={colors}>
+        <CSS.FooterText onPress={() => router.push("/home")}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>
