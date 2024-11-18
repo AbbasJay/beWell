@@ -3,8 +3,6 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   align-items: center;
-  border-bottom-color: ${Colors.dark.secondary};
-  border-bottom-width: 1px;
   flex-direction: row;
   padding: 8px 8px 24px 8px;
 `;
@@ -32,7 +30,7 @@ export const MessageText = styled.Text`
 export const BusinessNameText = styled.Text`
   font-weight: 600;
   font-size: 16px;
-  color: #ff0099;
+  color: ${Colors.dark.secondary};
 `;
 
 export const DateTimeText = styled.Text`
