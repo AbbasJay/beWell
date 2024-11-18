@@ -8,7 +8,6 @@ export const StyledSafeAreaView = styled(SafeAreaView)<{
 }>`
   flex: 1;
   background-color: ${Colors.light.secondary};
-  padding-horizontal: 12px;
   padding-top: ${({ fixedPaddingTop }) => (fixedPaddingTop ? "12px" : "0px")};
 `;
 

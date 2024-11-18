@@ -32,7 +32,6 @@ export const BeWellBackground: React.FC<BeWellBackgroundProps> = ({
       {useScrollView ? (
         <CSS.StyledScrollView
           contentContainerStyle={{
-            paddingHorizontal: 0,
             ...scrollViewContentContainerStyle,
           }}
           showsVerticalScrollIndicator={false}

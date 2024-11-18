@@ -43,55 +43,54 @@ export default function HomePage() {
         }}
         onPress={() => router.push(`/business/${businessId}/classes`)}
       />
-
-      // <Container
-      //   key={businessId}
-      //   onPress={() => router.push(`/business/${businessId}/classes`)}
-      // >
-      //   <Card>
-      //     <Title>{item.name}</Title>
-      //     <Text>
-      //       <Text style={{ fontWeight: "bold" }}>Address: </Text>
-      //       {`${item.address}, ${item.city}, ${item.state}, ${item.zipCode}`}
-      //     </Text>
-      //     <Text>
-      //       <Text style={{ fontWeight: "bold" }}>Phone: </Text>
-      //       {item.phoneNumber}
-      //     </Text>
-      //     <Text>
-      //       <Text style={{ fontWeight: "bold" }}>Type: </Text>
-      //       {item.type}
-      //     </Text>
-      //   </Card>
-      // </Container>
     );
   };
 
   return (
-    <BeWellBackground hasNavigationBar={true}>
-      <FullWidthContainer>
-        <Container>
-          <FlatListContainer>
-            <FlatList
-              data={businesses}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id?.toString() || ""}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              snapToAlignment="center"
-              decelerationRate="fast"
-              snapToInterval={viewportWidth * 0.6 + 50}
-              contentContainerStyle={Platform.select({
-                android: { paddingHorizontal: 12 },
-              })}
-              contentInset={Platform.select({
-                ios: { left: 12, right: 12 },
-              })}
-              ItemSeparatorComponent={() => <ScrollSeparator />}
-            />
-          </FlatListContainer>
-        </Container>
-      </FullWidthContainer>
+    <BeWellBackground
+      hasNavigationBar={true}
+      useScrollView={true}
+      scrollViewContentContainerStyle={{
+        paddingTop: 10,
+        paddingHorizontal: 10,
+      }}
+    >
+      <Container>
+        <FlatListContainer>
+          <FlatList
+            data={businesses}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id?.toString() || ""}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToAlignment="center"
+            decelerationRate="fast"
+            snapToInterval={viewportWidth * 0.6 + 50}
+            contentContainerStyle={{
+              paddingHorizontal: 0,
+            }}
+            ItemSeparatorComponent={() => <ScrollSeparator />}
+          />
+        </FlatListContainer>
+      </Container>
+      <View>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+        <Text>Hello</Text>
+      </View>
     </BeWellBackground>
   );
 }
