@@ -68,7 +68,7 @@ export default function HomePage() {
   };
 
   return (
-    <BeWellBackground>
+    <BeWellBackground hasNavigationBar={true}>
       <FullWidthContainer>
         <Container>
           <FlatListContainer>
