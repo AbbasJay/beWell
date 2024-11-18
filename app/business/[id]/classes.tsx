@@ -90,10 +90,7 @@ export default function Business() {
   };
 
   return (
-    <BeWellBackground
-      useScrollView
-      scrollViewContentContainerStyle={{ paddingTop: 12 }}
-    >
+    <BeWellBackground scrollable>
       <CSS.BusinessCardContainer>
         <BusinessCard item={business} fullWidth />
       </CSS.BusinessCardContainer>
