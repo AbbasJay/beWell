@@ -48,41 +48,19 @@ export default function HomePage() {
 
   return (
     <BeWellBackground scrollable>
-      <Container>
-        <FlatListContainer style={{ marginHorizontal: -20 }}>
-          <FlatList
-            data={businesses}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id?.toString() || ""}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToAlignment="center"
-            decelerationRate="fast"
-            snapToInterval={viewportWidth * 0.6 + 50}
-            ItemSeparatorComponent={() => <ScrollSeparator />}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-            nestedScrollEnabled={true}
-          />
-        </FlatListContainer>
-      </Container>
-      <View>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-        <Text>Hello</Text>
-      </View>
+      <FlatListContainer style={{ marginHorizontal: -20 }}>
+        <FlatList
+          data={businesses}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id?.toString() || ""}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          ItemSeparatorComponent={() => <ScrollSeparator />}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+          nestedScrollEnabled={true}
+        />
+      </FlatListContainer>
     </BeWellBackground>
   );
 }
