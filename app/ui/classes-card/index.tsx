@@ -2,7 +2,10 @@ import { Class } from "@/app/contexts/ClassesContext";
 import BeWellIcons from "@/assets/icons/icons";
 import * as CSS from "./styles";
 import { MaterialIcons } from "@expo/vector-icons";
-import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
+import {
+  formattedStartDate,
+  formatDuration,
+} from "@/app/utils/helper-functions/format-time-and-dates";
 
 export const ClassesCard = ({ item }: { item: Class }) => {
   return (
@@ -23,7 +26,7 @@ export const ClassesCard = ({ item }: { item: Class }) => {
           </CSS.CardText> */}
           <CSS.IconTextWrapper>
             <MaterialIcons name="timer" size={14} color="grey" />
-            <CSS.CardTitle>{item.duration} minutes</CSS.CardTitle>
+            <CSS.CardTitle>{formatDuration(item.duration)}</CSS.CardTitle>
           </CSS.IconTextWrapper>
           {/* <CSS.CardText>
             <CSS.CardTitle>Price:</CSS.CardTitle> {item.price}
