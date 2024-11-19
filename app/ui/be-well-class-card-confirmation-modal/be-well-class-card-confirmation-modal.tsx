@@ -4,6 +4,7 @@ import { BeWellClassCardConfirmation } from "./be-well-class-card-confirmation";
 import * as CSS from "./styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import Button from "../button/button";
+import { theme } from "@/constants/theme";
 
 interface BeWellClassCardConfirmationModalProps {
   visible: boolean;
@@ -59,7 +60,11 @@ export const BeWellClassCardConfirmationModal = ({
             </>
           ) : (
             <CSS.ConfirmContainer>
-              <MaterialIcons name="check-circle" size={100} color="green" />
+              <MaterialIcons
+                name="check-circle"
+                size={100}
+                color={theme.status.success}
+              />
               <CSS.ConfirmText>
                 Thank you for joining the class! Enjoy!
               </CSS.ConfirmText>
