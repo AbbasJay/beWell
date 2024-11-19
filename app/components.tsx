@@ -25,6 +25,7 @@ import {
   Grid,
   Fold,
 } from "react-native-animated-spinkit";
+import { Skeleton } from "react-native-skeletons";
 
 export default function Components() {
   return (
@@ -157,6 +158,41 @@ export default function Components() {
           <Circle size={48} color="#FF0099" />
           <Grid size={48} color="#4287F5" />
           <Fold size={48} color="#F542AA" />
+        </SectionContent>
+      </Section>
+
+      <Section style={{ gap: 60 }}>
+        <SectionTitle>Skeleton</SectionTitle>
+        <SectionContent>
+          <Skeleton height={80} width="100%" />
+          <Skeleton height={40} width="80%" />
+          <Skeleton height={40} width="60%" />
+          <Skeleton height={40} width="40%" />
+          <Skeleton height={40} width="20%" />
+        </SectionContent>
+        <SectionContent>
+          <Skeleton
+            count={4}
+            width={"100%"}
+            height={14}
+            color={"grey"}
+            borderRadius={100}
+          />
+        </SectionContent>
+        <SectionContent></SectionContent>
+        <SectionContent>
+          <Skeleton width="100%" height={120} borderRadius={10} />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Skeleton width={100} height={100} borderRadius={100} />
+            </View>
+            <View style={{ flex: 2, flexDirection: "column", gap: 10 }}>
+              <Skeleton height={14} width="100%" />
+              <Skeleton height={14} width="100%" />
+              <Skeleton height={14} width="100%" />
+            </View>
+          </View>
+          <Skeleton count={3} height={14} width="100%" />
         </SectionContent>
       </Section>
     </Container>
