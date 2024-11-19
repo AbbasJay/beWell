@@ -24,64 +24,55 @@ interface BeWellTextStyleProps {
   color?: string;
   style?: TextStyle;
   children?: React.ReactNode;
+  themeMode?: "light" | "dark";
 }
 
 const getTextStyle = (variant: BeWellTextVariant) => {
   switch (variant) {
     case BeWellTextVariant.Headline1:
-      return { fontSize: 36, fontFamily: "" };
+      return { fontSize: 36, fontWeight: "400" };
     case BeWellTextVariant.Headline2:
-      return { fontSize: 32, fontFamily: "" };
+      return { fontSize: 32, fontWeight: "400" };
     case BeWellTextVariant.Headline3:
-      return { fontSize: 28, fontFamily: "" };
+      return { fontSize: 28, fontWeight: "400" };
     case BeWellTextVariant.Headline4:
-      return { fontSize: 24, fontFamily: "" };
+      return { fontSize: 24, fontWeight: "400" };
     case BeWellTextVariant.Headline5:
-      return { fontSize: 22, fontFamily: "" };
+      return { fontSize: 22, fontWeight: "400" };
     case BeWellTextVariant.Headline6:
-      return { fontSize: 20, fontFamily: "" };
+      return { fontSize: 20, fontWeight: "400" };
     case BeWellTextVariant.TextMedium:
-      return { fontSize: 16, fontFamily: "" };
+      return { fontSize: 16, fontWeight: "400" };
     case BeWellTextVariant.TextMediumBold:
-      return { fontSize: 16, fontFamily: "" };
+      return { fontSize: 16, fontWeight: "700" };
     case BeWellTextVariant.TextSmall:
-      return { fontSize: 14, fontFamily: "" };
+      return { fontSize: 14, fontWeight: "400" };
     case BeWellTextVariant.TextSmallBold:
-      return { fontSize: 14, fontFamily: "" };
+      return { fontSize: 14, fontWeight: "700" };
     case BeWellTextVariant.TextXSmall:
-      return { fontSize: 12, fontFamily: "" };
+      return { fontSize: 12, fontWeight: "400" };
     case BeWellTextVariant.TextXSmallBold:
-      return { fontSize: 12, fontFamily: "" };
+      return { fontSize: 12, fontWeight: "700" };
     case BeWellTextVariant.Numbers:
-      return { fontSize: 44, fontFamily: "" };
+      return { fontSize: 44, fontWeight: "400" };
     default:
-      return { fontSize: 16, fontFamily: "" };
+      return { fontSize: 16, fontWeight: "400" };
   }
 };
-
-const StyledText = styled.Text<BeWellTextStyleProps>`
-  color: ${({ color, theme }) => color || theme.text || "#FFFFFF"};
-  ${({ variant = BeWellTextVariant.TextMedium }) => {
-    const style = getTextStyle(variant);
-    return `
-      font-size: ${style.fontSize}px;
-      font-family: ${style.fontFamily};
-    `;
-  }}
-`;
 
 export const BeWellText: React.FC<BeWellTextStyleProps & TextProps> = ({
   children,
   variant = BeWellTextVariant.TextMedium,
   color,
   style,
+  themeMode = "light",
   ...props
 }) => {
   return (
     <StyledText
       variant={variant}
       color={color}
-      theme={theme}
+      themeMode={themeMode}
       style={style}
       {...props}
     >
@@ -89,3 +80,15 @@ export const BeWellText: React.FC<BeWellTextStyleProps & TextProps> = ({
     </StyledText>
   );
 };
+
+const StyledText = styled.Text<BeWellTextStyleProps>`
+  color: ${({ color, themeMode }) =>
+    color || (themeMode === "light" ? theme.light.text : theme.dark.text)};
+  ${({ variant = BeWellTextVariant.TextMedium }) => {
+    const style = getTextStyle(variant);
+    return `
+      font-size: ${style.fontSize}px;
+      font-weight: ${style.fontWeight};
+    `;
+  }}
+`;

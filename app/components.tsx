@@ -26,6 +26,7 @@ import {
   Fold,
 } from "react-native-animated-spinkit";
 import { Skeleton } from "react-native-skeletons";
+import { BeWellText, BeWellTextVariant } from "./ui/be-well-text/be-well-text";
 
 export default function Components() {
   return (
@@ -193,6 +194,30 @@ export default function Components() {
             </View>
           </View>
           <Skeleton count={3} height={14} width="100%" />
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionTitle>BeWell Text</SectionTitle>
+        <SectionContent>
+          <BeWellText variant={BeWellTextVariant.Headline1}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.Headline2}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.Headline3}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.Headline4}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.Headline5}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.Headline6}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextMedium}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+            Hello
+          </BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextSmall}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextSmallBold}>
+            Hello
+          </BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextXSmall}>Hello</BeWellText>
+          <BeWellText variant={BeWellTextVariant.TextXSmallBold}>
+            Hello
+          </BeWellText>
         </SectionContent>
       </Section>
     </Container>
