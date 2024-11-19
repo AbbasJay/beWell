@@ -8,9 +8,7 @@ export const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
   background-color: ${Colors.dark.primary};
-  padding: 20px 16px;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  padding: 16px 12px;
 `;
 
 export const TitleContainer = styled.View`

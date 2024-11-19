@@ -1,33 +1,50 @@
-import { View } from "react-native";
 import { Business } from "@/app/contexts/BusinessContext";
 import * as CSS from "./styles";
+import { Skeleton } from "react-native-skeletons";
 
 type BusinessCardProps = {
   item: Business;
   onPress?: () => void;
-  fullWidth?: boolean;
+  disabled?: boolean;
+  width?: string;
+  height?: string;
+  isLoading?: boolean;
 };
 
 export const BusinessCard = ({
   item,
   onPress,
-  fullWidth,
+  width,
+  height,
+  disabled,
+  isLoading = false,
 }: BusinessCardProps) => {
   return (
     <CSS.Wrapper>
-      <CSS.Container onPress={onPress} fullWidth={fullWidth}>
-        <CSS.ImageWrapper></CSS.ImageWrapper>
-        <CSS.SampleImage
-          source={require("@/assets/images/home-gym.webp")}
-          resizeMode="cover"
-        />
-        <CSS.ContentWrapper>
-          <CSS.CardTitle>{item.name}</CSS.CardTitle>
-          <CSS.CardAddress>{item.address}</CSS.CardAddress>
-          <CSS.CardDescription>{item.description}</CSS.CardDescription>
-          <CSS.CardPhoneNumber>{item.phoneNumber}</CSS.CardPhoneNumber>
-          <CSS.CardType>{item.type}</CSS.CardType>
-        </CSS.ContentWrapper>
+      <CSS.Container onPress={onPress} width={width} disabled={disabled}>
+        {isLoading ? (
+          <>
+            <Skeleton height={80} width="100%" />
+            <Skeleton height={20} width="60%" style={{ marginTop: 10 }} />
+            <Skeleton height={20} width="80%" style={{ marginTop: 5 }} />
+            <Skeleton height={20} width="40%" style={{ marginTop: 5 }} />
+          </>
+        ) : (
+          <>
+            <CSS.ImageWrapper></CSS.ImageWrapper>
+            <CSS.SampleImage
+              height={height}
+              source={require("@/assets/images/home-gym.webp")}
+              resizeMode="cover"
+            />
+            <CSS.ContentWrapper>
+              <CSS.CardTitle>{item.name}</CSS.CardTitle>
+              <CSS.Info>{item.address}</CSS.Info>
+              <CSS.Info>{item.phoneNumber}</CSS.Info>
+              <CSS.Info>{item.type}</CSS.Info>
+            </CSS.ContentWrapper>
+          </>
+        )}
       </CSS.Container>
     </CSS.Wrapper>
   );

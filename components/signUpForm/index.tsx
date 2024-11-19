@@ -3,11 +3,13 @@ import { useRouter } from "expo-router";
 import { TextInput } from "react-native-paper";
 import { useForm, Controller, useWatch } from "react-hook-form";
 
+import Button from "@/app/ui/button/button";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
 
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
+import { Colors } from "@/constants/Colors";
 
 const SignUp = () => {
   const {
@@ -72,17 +74,13 @@ const SignUp = () => {
   };
 
   return (
-    <CSS.Container colours={colors}>
-      <CSS.StyledText fontSize="40px" colours={colors}>
-        Sign Up
-      </CSS.StyledText>
-
+    <CSS.Container>
       <CSS.Body>
-        <CSS.ThemeToggle onPress={toggleTheme}>
+        {/* <CSS.ThemeToggle onPress={toggleTheme}>
           <CSS.ThemeToggleText colours={colors}>
             Toggle Theme (Current: {theme})
           </CSS.ThemeToggleText>
-        </CSS.ThemeToggle>
+        </CSS.ThemeToggle> */}
 
         <Controller
           control={control}
@@ -95,13 +93,14 @@ const SignUp = () => {
                 borderRadius: 12,
               }}
               onBlur={onBlur}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
+              activeOutlineColor={Colors.light.text}
               value={value}
-              placeholder="Full Name"
-              placeholderTextColor={colors.text}
+              placeholder="Name"
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="account" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="account" />}
             />
           )}
           name="name"
@@ -117,13 +116,14 @@ const SignUp = () => {
               outlineStyle={{
                 borderRadius: 12,
               }}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
+              activeOutlineColor={Colors.light.text}
               value={value}
               placeholder="Email"
-              placeholderTextColor={colors.text}
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="email" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="email" />}
             />
           )}
           name="emailText"
@@ -139,19 +139,20 @@ const SignUp = () => {
               outlineStyle={{
                 borderRadius: 12,
               }}
-              textColor={colors.text}
+              textColor={Colors.light.text}
               mode="outlined"
+              activeOutlineColor={Colors.light.text}
               value={value}
               placeholder="Password"
-              placeholderTextColor={colors.text}
+              placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="lock" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="password"
         />
 
-        <Controller
+        {/* <Controller
           control={control}
           rules={{
             required: true,
@@ -167,38 +168,30 @@ const SignUp = () => {
               placeholder="Confirm Password"
               placeholderTextColor={colors.text}
               onChangeText={onChange}
-              left={<TextInput.Icon color={colors.text} icon="lock" />}
+              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="confirmPassword"
-        />
+        /> */}
 
         <CSS.ButtonContainer>
-          <CSS.StyledButton
-            textColor={colors.text}
-            buttonColor={colors.secondary}
-            mode="contained"
-            uppercase
-            onPress={handleSubmit(onSubmit)}
+          <Button
+            variant="secondary"
+            title="Sign Up"
             disabled={isButtonDisabled}
-          >
-            Sign Up
-          </CSS.StyledButton>
+            onPress={handleSubmit(onSubmit)}
+          />
         </CSS.ButtonContainer>
 
-        <CSS.StyledButton
-          textColor={colors.text}
-          buttonColor={colors.secondary}
-          mode="contained"
-          uppercase
+        <Button
+          variant="secondary"
+          title="Back to Login"
           onPress={() => router.push("/logIn")}
-        >
-          Back to Login
-        </CSS.StyledButton>
+        />
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText colours={colors}>
+        <CSS.FooterText onPress={() => router.push("/home")}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>

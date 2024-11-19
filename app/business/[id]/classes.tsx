@@ -20,12 +20,17 @@ import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
+import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
+import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
+import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
+import { Chase } from "react-native-animated-spinkit";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
   const { id } = useLocalSearchParams();
   const business = businesses.find((b) => b.id === Number(id));
   const [classes, setClasses] = useState<Class[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
@@ -63,6 +68,7 @@ export default function Business() {
         }
         const json = await response.json();
         setClasses(json);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -90,71 +96,42 @@ export default function Business() {
   };
 
   return (
-    <BeWellBackground>
-      <ScrollView>
-        <CSS.BusinessCardContainer>
-          <BusinessCard item={business} fullWidth />
-        </CSS.BusinessCardContainer>
+    <BeWellBackground scrollable>
+      <CSS.BusinessCardContainer>
+        <BusinessCard item={business} width="100%" height="200px" disabled />
+      </CSS.BusinessCardContainer>
 
-        {classes.map((item) => (
+      {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}
+
+      {isLoading ? (
+        <View
+          style={{ alignItems: "center", justifyContent: "center", flex: 2 }}
+        >
+          <Chase size={48} color={Colors.dark.secondary} />
+        </View>
+      ) : (
+        classes.map((item) => (
           <TouchableOpacity
             key={item.id}
             onPress={() => handleClassPress(item)}
           >
             <ClassesCard item={item} />
           </TouchableOpacity>
-        ))}
+        ))
+      )}
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <CSS.ModalBackground>
-            <CSS.ModalContainer>
-              <CSS.CloseButton onPress={() => setModalVisible(false)}>
-                <CSS.CloseButtonText>{"x"}</CSS.CloseButtonText>
-              </CSS.CloseButton>
-              <CSS.ModalLayout>
-                {showConfirmation ? (
-                  <CSS.ConfirmedText>Booking Confirmed</CSS.ConfirmedText>
-                ) : (
-                  selectedClass && (
-                    <View>
-                      <CSS.ClassesTitle>
-                        <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
-                      </CSS.ClassesTitle>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Description: </CSS.BoldText>
-                        {selectedClass.description}
-                      </CSS.DetailText>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Instructor: </CSS.BoldText>
-                        {selectedClass.instructor}
-                      </CSS.DetailText>
-                      <CSS.DetailText>
-                        <CSS.BoldText>Address: </CSS.BoldText>
-                        {` ${business.address}, ${selectedClass.location}`}
-                      </CSS.DetailText>
-                    </View>
-                  )
-                )}
-              </CSS.ModalLayout>
-              <CSS.ButtonContainer>
-                <Button
-                  title={showConfirmation ? "Close" : "Confirm"}
-                  onPress={
-                    showConfirmation
-                      ? () => setModalVisible(false)
-                      : handleConfirm
-                  }
-                />
-              </CSS.ButtonContainer>
-            </CSS.ModalContainer>
-          </CSS.ModalBackground>
-        </Modal>
-      </ScrollView>
+      <BeWellClassCardConfirmationModal
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+        confirmation={showConfirmation}
+        onConfirm={handleConfirm}
+        title={selectedClass?.name || ""}
+        description={selectedClass?.description || ""}
+        instructor={selectedClass?.instructor || ""}
+        address={`${business.address}, ${selectedClass?.location || ""}`}
+        date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
+        duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
+      />
     </BeWellBackground>
   );
 }

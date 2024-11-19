@@ -1,11 +1,9 @@
-import styled from "styled-components/native";
+import styled, { css } from "styled-components/native";
 import { View, Text } from "react-native";
 
 export const Container = styled(View)`
   flex: 1;
   overflow: scroll;
-  padding-left: 10px;
-  padding-right: 10px;
 `;
 
 export const Card = styled(View)`
@@ -15,6 +13,8 @@ export const Card = styled(View)`
   margin-top: 5px;
   margin-bottom: 5px;
   border-radius: 8px;
+  border-bottom-width: 1px;
+  border-bottom-color: #c7c7c7;
 `;
 
 export const CardIcon = styled(View)`
@@ -24,15 +24,30 @@ export const CardIcon = styled(View)`
   align-items: center;
   justify-content: center;
   margin-right: 20px;
+  margin-left: 10px;
 `;
 
-export const CardInfo = styled(View)``;
+export const CardInfo = styled(View)`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
 
-export const CardText = styled(Text)`
-  font-size: 16px;
+export const IconTextWrapper = styled(View)`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const CardText = styled(Text)<{ isTitle?: boolean }>`
+  font-size: 14px;
   color: #333;
+  height: 30px;
+  ${({ isTitle }) =>
+    isTitle &&
+    css`
+      font-weight: bold;
+    `}
 `;
 
-export const CardTitle = styled(Text)`
-  font-weight: bold;
-`;
+export const CardTitle = styled(Text)``;

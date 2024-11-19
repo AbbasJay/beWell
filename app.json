@@ -7,6 +7,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
+      "image": "./assets/splashscreen_logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -40,8 +41,13 @@
     "experiments": {
       "typedRoutes": true
     },
-    "assets": [
-      "./assets"
-    ]
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5cbb3c45-8ea0-493c-80d6-4532856eecb8"
+      }
+    }
   }
 }

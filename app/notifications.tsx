@@ -1,25 +1,33 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
-
+import NotificationListItem from "./ui/notification-list-item/notification-list-item";
+import { BeWellBackground } from "./ui/be-well-background/be-well-background";
+import { useBusinessContext } from "./contexts/BusinessContext";
 const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
-
+  const { businesses } = useBusinessContext();
   return (
-    <View style={styles.container}>
+    <BeWellBackground scrollable>
       {unreadNotificationsCount > 0 && (
         <Text style={styles.unreadCount}>
           Unread Notifications: {unreadNotificationsCount}
         </Text>
       )}
-      {notifications.map((notification) => (
-        <View key={notification.id} style={styles.notification}>
-          <Text>{`Congratulations, your booking is now confirmed. ${notification.createdAt}`}</Text>
-
-          <Text>{"5 mins ago"}</Text>
-        </View>
-      ))}
-    </View>
+      {notifications
+        .slice()
+        .reverse()
+        .map((notification) => (
+          <NotificationListItem
+            key={notification.id}
+            notification={notification}
+            messageAlert="Booking confirmed!"
+            business={businesses.find(
+              (business) => business.id === notification.businessId
+            )}
+          />
+        ))}
+    </BeWellBackground>
   );
 };
 
