@@ -14,10 +14,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { NavigationContainer } from "@react-navigation/native";
 export default function RootLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentRoute = usePathname();
   const hideTabBarRoutes = ["/", "/logIn", "/signUp"];
+  const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -50,34 +52,40 @@ export default function RootLayout() {
     <ThemeProvider>
       <PaperProvider>
         <BusinessProvider>
-          <NotificationsProvider>
-            {!hideTabBarRoutes.includes(currentRoute) && (
-              <NavigationBar
-                title="beWell"
-                left={{
-                  icon: (
-                    <MaterialIcons name="arrow-back" size={24} color="black" />
-                  ),
+          <NavigationContainer>
+            <NotificationsProvider>
+              {!hideNavigationBarRoutes.includes(currentRoute) && (
+                <NavigationBar
+                  title="beWell"
+                  left={{
+                    icon: (
+                      <MaterialIcons
+                        name="arrow-back"
+                        size={24}
+                        color="black"
+                      />
+                    ),
+                  }}
+                />
+              )}
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: Colors.light.secondary },
+                  // statusBarStyle: "dark",
+                  // statusBarColor: "black",
                 }}
-              />
-            )}
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: Colors.light.secondary },
-                // statusBarStyle: "dark",
-                statusBarColor: "black",
-              }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="logIn" />
-              <Stack.Screen name="signUp" />
-              <Stack.Screen name="home" />
-              <Stack.Screen name="components" />
-              <Stack.Screen name="business/[id]/classes" />
-            </Stack>
-            {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
-          </NotificationsProvider>
+              >
+                <Stack.Screen name="index" />
+                <Stack.Screen name="logIn" />
+                <Stack.Screen name="signUp" />
+                <Stack.Screen name="home" />
+                <Stack.Screen name="components" />
+                <Stack.Screen name="business/[id]/classes" />
+              </Stack>
+              {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
+            </NotificationsProvider>
+          </NavigationContainer>
         </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
