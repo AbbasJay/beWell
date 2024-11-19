@@ -11,19 +11,7 @@ export const Container = styled.View`
 
 export const TitleContainer = styled.View``;
 
-export const Title = styled.Text`
-  font-size: 28px;
-  font-weight: 900;
-`;
-
 export const DetailTextWrapper = styled.View``;
-
-export const Subtitle = styled.Text`
-  font-size: 18px;
-  font-weight: 900;
-`;
-
-export const TextInfo = styled.Text``;
 
 export const ModalContainer = styled.View`
   height: 80%;
@@ -59,11 +47,4 @@ export const ButtonContainer = styled.View`
 export const ConfirmContainer = styled.View`
   align-items: center;
   gap: 16px;
-`;
-
-export const ConfirmText = styled.Text`
-  font-size: 20px;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 20px;
 `;

@@ -68,7 +68,7 @@ export const BeWellClassCardConfirmationModal = ({
                 size={100}
                 color={theme.status.success}
               />
-              <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+              <BeWellText variant={BeWellTextVariant.TextMediumBold} textCenter>
                 Thank you for joining the class! Enjoy!
               </BeWellText>
             </CSS.ConfirmContainer>
