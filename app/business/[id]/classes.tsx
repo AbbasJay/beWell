@@ -20,6 +20,10 @@ import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
+import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
+import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
+import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
+import { Chase } from "react-native-animated-spinkit";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
@@ -100,7 +104,11 @@ export default function Business() {
       {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}
 
       {isLoading ? (
-        <CSS.HeaderText>Loading Classes...</CSS.HeaderText>
+        <View
+          style={{ alignItems: "center", justifyContent: "center", flex: 2 }}
+        >
+          <Chase size={48} color={Colors.dark.secondary} />
+        </View>
       ) : (
         classes.map((item) => (
           <TouchableOpacity
@@ -112,55 +120,18 @@ export default function Business() {
         ))
       )}
 
-      <Modal
-        animationType="fade"
-        transparent={true}
+      <BeWellClassCardConfirmationModal
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
-      >
-        <CSS.ModalBackground>
-          <CSS.ModalContainer>
-            <CSS.CloseButton onPress={() => setModalVisible(false)}>
-              <CSS.CloseButtonText>{"x"}</CSS.CloseButtonText>
-            </CSS.CloseButton>
-            <CSS.ModalLayout>
-              {showConfirmation ? (
-                <CSS.ConfirmedText>Booking Confirmed</CSS.ConfirmedText>
-              ) : (
-                selectedClass && (
-                  <View>
-                    <CSS.ClassesTitle>
-                      <CSS.BoldText>{selectedClass.name}</CSS.BoldText>
-                    </CSS.ClassesTitle>
-                    <CSS.DetailText>
-                      <CSS.BoldText>Description: </CSS.BoldText>
-                      {selectedClass.description}
-                    </CSS.DetailText>
-                    <CSS.DetailText>
-                      <CSS.BoldText>Instructor: </CSS.BoldText>
-                      {selectedClass.instructor}
-                    </CSS.DetailText>
-                    <CSS.DetailText>
-                      <CSS.BoldText>Address: </CSS.BoldText>
-                      {` ${business.address}, ${selectedClass.location}`}
-                    </CSS.DetailText>
-                  </View>
-                )
-              )}
-            </CSS.ModalLayout>
-            <CSS.ButtonContainer>
-              <Button
-                title={showConfirmation ? "Close" : "Confirm"}
-                onPress={
-                  showConfirmation
-                    ? () => setModalVisible(false)
-                    : handleConfirm
-                }
-              />
-            </CSS.ButtonContainer>
-          </CSS.ModalContainer>
-        </CSS.ModalBackground>
-      </Modal>
+        confirmation={showConfirmation}
+        onConfirm={handleConfirm}
+        title={selectedClass?.name || ""}
+        description={selectedClass?.description || ""}
+        instructor={selectedClass?.instructor || ""}
+        address={`${business.address}, ${selectedClass?.location || ""}`}
+        date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
+        duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
+      />
     </BeWellBackground>
   );
 }

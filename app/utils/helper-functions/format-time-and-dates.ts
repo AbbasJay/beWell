@@ -54,4 +54,22 @@ const formattedStartDate = (dateString: string) =>
     month: "short",
   }).format(new Date(dateString));
 
-export { formatGetTimeAgo, formatDateTime, formattedStartDate };
+function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  let result = "";
+  if (hours > 0) {
+    result += `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+  if (remainingMinutes > 0) {
+    if (hours > 0) {
+      result += " ";
+    }
+    result += `${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}`;
+  }
+
+  return result || "0 minutes";
+}
+
+export { formatGetTimeAgo, formatDateTime, formattedStartDate, formatDuration };

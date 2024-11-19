@@ -27,13 +27,21 @@ export const CardIcon = styled(View)`
   margin-left: 10px;
 `;
 
-export const CardInfo = styled(View)``;
+export const CardInfo = styled(View)`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+export const IconTextWrapper = styled(View)`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
 
 export const CardText = styled(Text)<{ isTitle?: boolean }>`
   font-size: 14px;
   color: #333;
-  align-items: center;
-  justify-content: center;
   height: 30px;
   ${({ isTitle }) =>
     isTitle &&

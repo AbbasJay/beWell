@@ -14,16 +14,19 @@ const NotificationsDisplay: React.FC = () => {
           Unread Notifications: {unreadNotificationsCount}
         </Text>
       )}
-      {notifications.map((notification) => (
-        <NotificationListItem
-          key={notification.id}
-          notification={notification}
-          messageAlert="Booking confirmed!"
-          business={businesses.find(
-            (business) => business.id === notification.businessId
-          )}
-        />
-      ))}
+      {notifications
+        .slice()
+        .reverse()
+        .map((notification) => (
+          <NotificationListItem
+            key={notification.id}
+            notification={notification}
+            messageAlert="Booking confirmed!"
+            business={businesses.find(
+              (business) => business.id === notification.businessId
+            )}
+          />
+        ))}
     </BeWellBackground>
   );
 };
