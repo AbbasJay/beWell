@@ -13,18 +13,18 @@ export const ClassesCard = ({ item }: { item: Class }) => {
         </CSS.CardIcon>
         <CSS.CardInfo>
           <CSS.CardText isTitle>{item.name}</CSS.CardText>
-          <CSS.CardText>
+          <CSS.IconTextWrapper>
             <MaterialIcons name="calendar-month" size={14} color="grey" />
             <CSS.CardTitle>{formattedStartDate(item.startDate)}</CSS.CardTitle>
-          </CSS.CardText>
+          </CSS.IconTextWrapper>
           {/* 
           <CSS.CardText>
             <CSS.CardTitle>Description:</CSS.CardTitle> {item.description}
           </CSS.CardText> */}
-          <CSS.CardText>
+          <CSS.IconTextWrapper>
             <MaterialIcons name="timer" size={14} color="grey" />
             <CSS.CardTitle>{item.duration} minutes</CSS.CardTitle>
-          </CSS.CardText>
+          </CSS.IconTextWrapper>
           {/* <CSS.CardText>
             <CSS.CardTitle>Price:</CSS.CardTitle> {item.price}
           </CSS.CardText>
