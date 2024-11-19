@@ -7,16 +7,19 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
+      "image": "./assets/splashscreen_logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.abbasjay.bewell"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.abbasjay.bewell"
     },
     "web": {
       "bundler": "metro",
@@ -30,8 +33,13 @@
     "experiments": {
       "typedRoutes": true
     },
-    "assets": [
-      "./assets"
-    ]
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5cbb3c45-8ea0-493c-80d6-4532856eecb8"
+      }
+    }
   }
 }

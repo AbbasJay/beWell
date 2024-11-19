@@ -52,40 +52,34 @@ export default function RootLayout() {
     <ThemeProvider>
       <PaperProvider>
         <BusinessProvider>
-          <NavigationContainer>
-            <NotificationsProvider>
-              {!hideNavigationBarRoutes.includes(currentRoute) && (
-                <NavigationBar
-                  title="beWell"
-                  left={{
-                    icon: (
-                      <MaterialIcons
-                        name="arrow-back"
-                        size={24}
-                        color="black"
-                      />
-                    ),
-                  }}
-                />
-              )}
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: Colors.light.secondary },
-                  // statusBarStyle: "dark",
-                  // statusBarColor: "black",
+          <NotificationsProvider>
+            {!hideNavigationBarRoutes.includes(currentRoute) && (
+              <NavigationBar
+                title="beWell"
+                left={{
+                  icon: (
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                  ),
                 }}
-              >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="logIn" />
-                <Stack.Screen name="signUp" />
-                <Stack.Screen name="home" />
-                <Stack.Screen name="components" />
-                <Stack.Screen name="business/[id]/classes" />
-              </Stack>
-              {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
-            </NotificationsProvider>
-          </NavigationContainer>
+              />
+            )}
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: Colors.light.secondary },
+                // statusBarStyle: "dark",
+                // statusBarColor: "black",
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="logIn" />
+              <Stack.Screen name="signUp" />
+              <Stack.Screen name="home" />
+              <Stack.Screen name="components" />
+              <Stack.Screen name="business/[id]/classes" />
+            </Stack>
+            {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
+          </NotificationsProvider>
         </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
