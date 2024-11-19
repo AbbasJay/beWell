@@ -5,6 +5,7 @@ import * as CSS from "./styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import Button from "../button/button";
 import { theme } from "@/constants/theme";
+import { BeWellText, BeWellTextVariant } from "../be-well-text/be-well-text";
 
 interface BeWellClassCardConfirmationModalProps {
   visible: boolean;
@@ -41,7 +42,9 @@ export const BeWellClassCardConfirmationModal = ({
       <CSS.ModalBackground>
         <CSS.ModalContainer>
           <CSS.ModalTopSection>
-            <CSS.Title>{title}</CSS.Title>
+            <BeWellText variant={BeWellTextVariant.Headline3}>
+              {title}
+            </BeWellText>
             <TouchableOpacity hitSlop={10} onPress={onRequestClose}>
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
@@ -65,9 +68,9 @@ export const BeWellClassCardConfirmationModal = ({
                 size={100}
                 color={theme.status.success}
               />
-              <CSS.ConfirmText>
+              <BeWellText variant={BeWellTextVariant.TextMediumBold}>
                 Thank you for joining the class! Enjoy!
-              </CSS.ConfirmText>
+              </BeWellText>
             </CSS.ConfirmContainer>
           )}
           <CSS.ButtonContainer>

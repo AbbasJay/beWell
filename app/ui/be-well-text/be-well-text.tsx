@@ -23,6 +23,7 @@ interface BeWellTextStyleProps {
   variant?: BeWellTextVariant;
   color?: string;
   style?: TextStyle;
+  textCenter?: boolean;
   children?: React.ReactNode;
   themeMode?: "light" | "dark";
 }
@@ -30,17 +31,17 @@ interface BeWellTextStyleProps {
 const getTextStyle = (variant: BeWellTextVariant) => {
   switch (variant) {
     case BeWellTextVariant.Headline1:
-      return { fontSize: 36, fontWeight: "400" };
+      return { fontSize: 36, fontWeight: "900" };
     case BeWellTextVariant.Headline2:
-      return { fontSize: 32, fontWeight: "400" };
+      return { fontSize: 32, fontWeight: "900" };
     case BeWellTextVariant.Headline3:
-      return { fontSize: 28, fontWeight: "400" };
+      return { fontSize: 28, fontWeight: "900" };
     case BeWellTextVariant.Headline4:
-      return { fontSize: 24, fontWeight: "400" };
+      return { fontSize: 24, fontWeight: "900" };
     case BeWellTextVariant.Headline5:
-      return { fontSize: 22, fontWeight: "400" };
+      return { fontSize: 22, fontWeight: "900" };
     case BeWellTextVariant.Headline6:
-      return { fontSize: 20, fontWeight: "400" };
+      return { fontSize: 20, fontWeight: "900" };
     case BeWellTextVariant.TextMedium:
       return { fontSize: 16, fontWeight: "400" };
     case BeWellTextVariant.TextMediumBold:
@@ -64,6 +65,7 @@ export const BeWellText: React.FC<BeWellTextStyleProps & TextProps> = ({
   children,
   variant = BeWellTextVariant.TextMedium,
   color,
+  textCenter,
   style,
   themeMode = "light",
   ...props
@@ -73,6 +75,7 @@ export const BeWellText: React.FC<BeWellTextStyleProps & TextProps> = ({
       variant={variant}
       color={color}
       themeMode={themeMode}
+      textCenter={textCenter}
       style={style}
       {...props}
     >
@@ -84,11 +87,12 @@ export const BeWellText: React.FC<BeWellTextStyleProps & TextProps> = ({
 const StyledText = styled.Text<BeWellTextStyleProps>`
   color: ${({ color, themeMode }) =>
     color || (themeMode === "light" ? theme.light.text : theme.dark.text)};
-  ${({ variant = BeWellTextVariant.TextMedium }) => {
+  ${({ variant = BeWellTextVariant.TextMedium, textCenter }) => {
     const style = getTextStyle(variant);
     return `
       font-size: ${style.fontSize}px;
       font-weight: ${style.fontWeight};
+      text-align: ${textCenter ? "center" : "left"};    
     `;
   }}
 `;

@@ -1,6 +1,7 @@
 import React from "react";
 import * as CSS from "./styles";
 import Button from "../button/button";
+import { BeWellText, BeWellTextVariant } from "../be-well-text/be-well-text";
 
 interface BeWellClassCardConfirmationProps {
   title: string;
@@ -24,32 +25,50 @@ export const BeWellClassCardConfirmation = ({
   return (
     <CSS.Container>
       <CSS.DetailTextWrapper>
-        <CSS.ConfirmText>You are about to join {title}</CSS.ConfirmText>
+        <BeWellText variant={BeWellTextVariant.Headline5} textCenter>
+          You are about to join {title}
+        </BeWellText>
       </CSS.DetailTextWrapper>
 
       <CSS.DetailTextWrapper>
-        <CSS.Subtitle>Description:</CSS.Subtitle>
-        <CSS.TextInfo>{description}</CSS.TextInfo>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Description:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>
+          {description}
+        </BeWellText>
       </CSS.DetailTextWrapper>
 
       <CSS.DetailTextWrapper>
-        <CSS.Subtitle>Instructor:</CSS.Subtitle>
-        <CSS.TextInfo>{instructor}</CSS.TextInfo>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Instructor:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>
+          {instructor}
+        </BeWellText>
       </CSS.DetailTextWrapper>
 
       <CSS.DetailTextWrapper>
-        <CSS.Subtitle>Address:</CSS.Subtitle>
-        <CSS.TextInfo>{address}</CSS.TextInfo>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Address:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>{address}</BeWellText>
       </CSS.DetailTextWrapper>
 
       <CSS.DetailTextWrapper>
-        <CSS.Subtitle>Date:</CSS.Subtitle>
-        <CSS.TextInfo>{date}</CSS.TextInfo>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Date:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>{date}</BeWellText>
       </CSS.DetailTextWrapper>
 
       <CSS.DetailTextWrapper>
-        <CSS.Subtitle>Duration:</CSS.Subtitle>
-        <CSS.TextInfo>{duration}</CSS.TextInfo>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Duration:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>
+          {duration}
+        </BeWellText>
       </CSS.DetailTextWrapper>
     </CSS.Container>
   );
