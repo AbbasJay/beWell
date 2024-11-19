@@ -12,7 +12,6 @@ import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
 import Carousel from "react-native-reanimated-carousel";
 import * as Location from "expo-location";
-import { set } from "react-hook-form";
 
 const INITIAL_REGION = {
   //london
@@ -30,21 +29,11 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
   }
 
   const mapRef = useRef<MapView>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [location, setLocation] = useState<any>(null);
+  const [region, setRegion] = useState<any>(null);
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
   useEffect(() => {
-    // navigation.setOptions({
-    //   headerRight: () => (
-    //     <TouchableOpacity onPress={focusMap}>
-    //       <View style={{ marginRight: 20 }}>
-    //         <Text>Focus</Text>
-    //       </View>
-    //     </TouchableOpacity>
-    //   ),
-    // });
-
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status == "granted") {
@@ -69,21 +58,6 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
       setLocation(user_location);
       console.log("location", loc);
     })();
-
-    // if (businesses.length > 0) {
-    //   const { latitude, longitude } = businesses[selectedIndex];
-    //   if (latitude && longitude) {
-    //     mapRef.current?.animateToRegion(
-    //       {
-    //         latitude,
-    //         longitude,
-    //         latitudeDelta: 0.01,
-    //         longitudeDelta: 0.01,
-    //       },
-    //       1000
-    //     );
-    //   }
-    // }
   }, []);
 
   const focusMap = () => {
@@ -104,9 +78,13 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
   );
 
   const onSnapToItem = (index: number) => {
-    setSelectedIndex(index);
-    const { latitude, longitude } = businesses[index];
+    let { latitude, longitude } = businesses[index];
+
     if (latitude && longitude) {
+      if (typeof latitude === "string" && typeof longitude === "string") {
+        latitude = parseFloat(latitude);
+        longitude = parseFloat(longitude);
+      }
       mapRef.current?.animateToRegion(
         {
           latitude,
@@ -116,10 +94,25 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
         },
         1000
       );
+      // setRegion({
+      //   latitude,
+      //   longitude,
+      //   latitudeDelta: 0.01,
+      //   longitudeDelta: 0.01,
+      // });
     }
   };
 
   const onMarkerPress = (marker: { latitude: number; longitude: number }) => {
+    if (
+      typeof marker.latitude === "string" &&
+      typeof marker.longitude === "string"
+    ) {
+      console.log("marker latitude is string", marker.latitude);
+      marker.latitude = parseFloat(marker.latitude);
+      marker.longitude = parseFloat(marker.longitude);
+    }
+
     mapRef.current?.animateToRegion(
       {
         latitude: marker.latitude,
@@ -135,9 +128,8 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
       <MapView
         style={styles.map}
         initialRegion={location}
+        region={region}
         ref={mapRef}
-        showsUserLocation
-        showsMyLocationButton
       >
         {businesses.map(
           (
@@ -148,8 +140,14 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
               <Marker
                 key={marker.id}
                 coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude,
+                  latitude:
+                    typeof marker.latitude === "string"
+                      ? parseFloat(marker.latitude)
+                      : marker.latitude,
+                  longitude:
+                    typeof marker.longitude === "string"
+                      ? parseFloat(marker.longitude)
+                      : marker.longitude,
                 }}
                 onPress={() =>
                   onMarkerPress({
@@ -174,7 +172,7 @@ const Map = ({ businesses }: { businesses: Business[] }) => {
       </MapView>
 
       {/* Carousel */}
-      <View>
+      <View style={StyleSheet.absoluteFill}>
         <Carousel
           data={businesses}
           renderItem={renderCarouselItem}
