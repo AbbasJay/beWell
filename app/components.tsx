@@ -11,6 +11,20 @@ import {
   mockBusinessNotification,
 } from "@/app/utils/components-data/notifications-data";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
+import {
+  Chase,
+  Plane,
+  Pulse,
+  CircleFade,
+  Wander,
+  Bounce,
+  Wave,
+  Swing,
+  Flow,
+  Circle,
+  Grid,
+  Fold,
+} from "react-native-animated-spinkit";
 
 export default function Components() {
   return (
@@ -32,7 +46,6 @@ export default function Components() {
         <SectionTitle>Business Card</SectionTitle>
         <SectionContent>
           <BusinessCard
-            fullWidth
             item={mockBusinessCard[0]}
             onPress={function (): void {
               throw new Error("Function not implemented.");
@@ -119,6 +132,31 @@ export default function Components() {
           <MaterialIcons name="beach-access" size={28} color="#00b4d8" />
           <MaterialIcons name="flight" size={56} color="#3a86ff" />
           <MaterialIcons name="local-florist" size={44} color="#2a9d8f" />
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionTitle>Loading spinner</SectionTitle>
+        <SectionContent
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 20,
+          }}
+        >
+          <Plane size={48} color="#E63946" />
+          <Chase size={48} color="#2A9D8F" />
+          <Pulse size={48} color="#7209B7" />
+          <CircleFade size={48} color="#BC6C25" />
+          <Wander size={48} color="#3A86FF" />
+          <Bounce size={48} color="#D62828" />
+          <Wave size={48} color="#4254F5" />
+          <Swing size={48} color="#F54263" />
+          <Flow size={48} color="#9942F5" />
+          <Circle size={48} color="#FF0099" />
+          <Grid size={48} color="#4287F5" />
+          <Fold size={48} color="#F542AA" />
         </SectionContent>
       </Section>
     </Container>
