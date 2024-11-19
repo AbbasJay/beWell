@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal } from "react-native";
+import { Modal, TouchableOpacity } from "react-native";
 import { BeWellClassCardConfirmation } from "./be-well-class-card-confirmation";
 import * as CSS from "./styles";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -39,23 +39,36 @@ export const BeWellClassCardConfirmationModal = ({
     >
       <CSS.ModalBackground>
         <CSS.ModalContainer>
-          <CSS.ModalCloseIcon onPress={onRequestClose}>
-            <MaterialIcons name="close" size={24} color="black" />
-          </CSS.ModalCloseIcon>
-          <CSS.TitleContainer>
+          <CSS.ModalTopSection>
             <CSS.Title>{title}</CSS.Title>
-          </CSS.TitleContainer>
-          <BeWellClassCardConfirmation
-            title={title}
-            description={description}
-            address={address}
-            date={date}
-            duration={duration}
-            instructor={instructor}
-            confirmation={confirmation}
-          />
+            <TouchableOpacity hitSlop={10} onPress={onRequestClose}>
+              <MaterialIcons name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </CSS.ModalTopSection>
+          {!confirmation ? (
+            <>
+              <BeWellClassCardConfirmation
+                title={title}
+                description={description}
+                address={address}
+                date={date}
+                duration={duration}
+                instructor={instructor}
+                confirmation={confirmation}
+              />
+            </>
+          ) : (
+            <CSS.ConfirmContainer>
+              <MaterialIcons name="check-circle" size={100} color="green" />
+              <CSS.ConfirmText>
+                Thank you for joining the class! Enjoy!
+              </CSS.ConfirmText>
+            </CSS.ConfirmContainer>
+          )}
           <CSS.ButtonContainer>
             <Button
+              fullWidth
+              variant="secondary"
               title={confirmation ? "Close" : "Confirm"}
               onPress={confirmation ? onRequestClose : onConfirm}
             />

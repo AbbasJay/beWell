@@ -23,9 +23,10 @@ export const BeWellClassCardConfirmation = ({
 }: BeWellClassCardConfirmationProps) => {
   return (
     <CSS.Container>
-      <CSS.TitleContainer>
-        <CSS.Title>{title}</CSS.Title>
-      </CSS.TitleContainer>
+      <CSS.DetailTextWrapper>
+        <CSS.ConfirmText>You are about to join {title}</CSS.ConfirmText>
+      </CSS.DetailTextWrapper>
+
       <CSS.DetailTextWrapper>
         <CSS.Subtitle>Description:</CSS.Subtitle>
         <CSS.TextInfo>{description}</CSS.TextInfo>

@@ -2,17 +2,26 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   width: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
 `;
 
-export const TitleContainer = styled.View`
-  align-items: center;
-`;
+export const TitleContainer = styled.View``;
 
-export const Title = styled.Text``;
+export const Title = styled.Text`
+  font-size: 28px;
+  font-weight: 900;
+`;
 
 export const DetailTextWrapper = styled.View``;
 
-export const Subtitle = styled.Text``;
+export const Subtitle = styled.Text`
+  font-size: 18px;
+  font-weight: 900;
+`;
 
 export const TextInfo = styled.Text``;
 
@@ -32,13 +41,29 @@ export const ModalBackground = styled.View`
   justify-content: flex-end;
 `;
 
-export const ModalCloseIcon = styled.TouchableOpacity.attrs({
-  hitSlop: { top: 10, bottom: 10, left: 10, right: 10 },
-})`
+export const ModalTopSection = styled.View`
   width: 100%;
-  align-items: flex-end;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom-width: 1px;
+  border-bottom-color: black;
+  padding-bottom: 10px;
 `;
 
 export const ButtonContainer = styled.View`
   align-items: center;
+`;
+
+export const ConfirmContainer = styled.View`
+  align-items: center;
+  gap: 16px;
+`;
+
+export const ConfirmText = styled.Text`
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 20px;
 `;
