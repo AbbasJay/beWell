@@ -7,19 +7,23 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Container, Card, Title, FlatListContainer } from "./homeStyles";
+import { Container, FlatListContainer } from "./homeStyles";
 import { Business, useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
-import { BeWellBackground } from "./ui/be-well-background/be-well-background";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
   const { businesses } = useBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
+
+  const toggleListView = () => {
+    setIsMapView(!isMapView);
+  };
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
@@ -64,7 +68,7 @@ export default function HomePage() {
   return (
     <View style={{ flex: 1 }}>
       {isMapView ? (
-        <Map businesses={businesses} />
+        <Map businesses={businesses} toggleListView={toggleListView} />
       ) : (
         <ScrollView style={{ backgroundColor: Colors.light.secondary }}>
           <Container>
@@ -83,13 +87,37 @@ export default function HomePage() {
           </Container>
         </ScrollView>
       )}
-      <TouchableOpacity
-        onPress={() => {
-          setIsMapView(!isMapView);
-        }}
-      >
-        <Text>{isMapView ? "Map View" : "List View"}</Text>
-      </TouchableOpacity>
+
+      {!isMapView && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 60,
+            right: 20,
+            gap: 10,
+            zIndex: 10,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              backgroundColor: "white",
+              borderRadius: 5,
+              elevation: 2,
+              shadowColor: "#000",
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              shadowOffset: {
+                width: 1,
+                height: 10,
+              },
+            }}
+            onPress={toggleListView}
+          >
+            <Ionicons name="map" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
