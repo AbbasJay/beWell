@@ -107,7 +107,7 @@ export default function Business() {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 2 }}
         >
-          <Chase size={48} color="#2A9D8F" />
+          <Chase size={48} color={Colors.dark.secondary} />
         </View>
       ) : (
         classes.map((item) => (
