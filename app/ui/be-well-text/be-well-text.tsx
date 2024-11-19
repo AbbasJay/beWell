@@ -44,15 +44,15 @@ const getTextStyle = (variant: BeWellTextVariant) => {
     case BeWellTextVariant.TextMedium:
       return { fontSize: 16, fontWeight: "400" };
     case BeWellTextVariant.TextMediumBold:
-      return { fontSize: 16, fontWeight: "700" };
+      return { fontSize: 16, fontWeight: "900" };
     case BeWellTextVariant.TextSmall:
       return { fontSize: 14, fontWeight: "400" };
     case BeWellTextVariant.TextSmallBold:
-      return { fontSize: 14, fontWeight: "700" };
+      return { fontSize: 14, fontWeight: "900" };
     case BeWellTextVariant.TextXSmall:
       return { fontSize: 12, fontWeight: "400" };
     case BeWellTextVariant.TextXSmallBold:
-      return { fontSize: 12, fontWeight: "700" };
+      return { fontSize: 12, fontWeight: "900" };
     case BeWellTextVariant.Numbers:
       return { fontSize: 44, fontWeight: "400" };
     default:
