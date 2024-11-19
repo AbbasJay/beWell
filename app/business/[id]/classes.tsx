@@ -23,6 +23,7 @@ import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background
 import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
 import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
+import { Chase } from "react-native-animated-spinkit";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
@@ -103,7 +104,11 @@ export default function Business() {
       {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}
 
       {isLoading ? (
-        <CSS.HeaderText>Loading Classes...</CSS.HeaderText>
+        <View
+          style={{ alignItems: "center", justifyContent: "center", flex: 2 }}
+        >
+          <Chase size={48} color="#2A9D8F" />
+        </View>
       ) : (
         classes.map((item) => (
           <TouchableOpacity
