@@ -58,7 +58,6 @@ const LoginForm = () => {
           localStorage.setItem("userToken", token);
         } else {
           await SecureStore.setItemAsync("userToken", token);
-          console.log("SecureStore token:", token);
         }
 
         router.push("/home");

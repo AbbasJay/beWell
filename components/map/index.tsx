@@ -56,15 +56,12 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status == "granted") {
-        console.log("Permission to access location was granted");
       } else {
-        console.log("Permission to access location was denied");
         setLocation(INITIAL_REGION);
         setCenter(INITIAL_REGION);
         return;
       }
       const loc = await Location.getCurrentPositionAsync({});
-      console.log("loc", loc);
 
       const { latitude, longitude } = loc.coords;
 
@@ -77,13 +74,11 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
 
       setLocation(user_location);
       setCenter(user_location);
-      console.log("location", loc);
     })();
   }, []);
 
   const focusMap = () => {
     mapRef.current?.animateToRegion(location, 1000);
-    console.log("map", mapRef.current);
   };
 
   const zoomIn = () => {
@@ -150,7 +145,6 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
       typeof marker.latitude === "string" &&
       typeof marker.longitude === "string"
     ) {
-      console.log("marker latitude is string", marker.latitude);
       marker.latitude = parseFloat(marker.latitude);
       marker.longitude = parseFloat(marker.longitude);
     }
@@ -192,7 +186,6 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
         ref={mapRef}
         onRegionChangeComplete={(region) => {
           setCenter(region);
-          console.log("region", region);
         }}
       >
         {businesses.map(

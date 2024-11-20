@@ -88,7 +88,6 @@ export default function Business() {
 
   const handleConfirm = () => {
     setShowConfirmation(true);
-    console.log("selectedClass", selectedClass);
     if (selectedClass) {
       sendNotification(selectedClass, business.id || 0);
       refreshNotifications();
