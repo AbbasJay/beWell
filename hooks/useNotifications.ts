@@ -71,14 +71,10 @@ export const useNotifications = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
-      setNotifications(data);
 
-      fetchNotifications();
+      await fetchNotifications();
     } catch (error) {
       console.error("Error sending notification:", error);
     }

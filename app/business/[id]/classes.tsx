@@ -86,11 +86,12 @@ export default function Business() {
     setModalVisible(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setShowConfirmation(true);
+
     if (selectedClass) {
-      sendNotification(selectedClass, 19); // todo: this needs to be user id
-      refreshNotifications();
+      await sendNotification(selectedClass, 19); // todo: this needs to be user id
+      await refreshNotifications();
     }
   };
 
