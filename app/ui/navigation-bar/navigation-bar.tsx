@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import * as CSS from "./styles";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
 
 interface NavigationItem {
   label?: string;

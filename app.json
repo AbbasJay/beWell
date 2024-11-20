@@ -13,13 +13,21 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.abbasjay.bewell"
+      "bundleIdentifier": "com.abbasjay.bewell",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDaS1Cu-plIcFJeDlJ8i2aTrH3sBSsP9WY"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "com.abbasjay.bewell"
+      "package": "com.abbasjay.bewell",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBI9bwIvOS6AGxEPCHJywU0xKXUCfyrNRY"
+        }
+     }   
     },
     "web": {
       "bundler": "metro",

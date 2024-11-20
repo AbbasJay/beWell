@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { NavigationContainer } from "@react-navigation/native";
+
 export default function RootLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentRoute = usePathname();
