@@ -19,7 +19,7 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
       : props.size === "large"
       ? "16px 32px"
       : "14px 20px"};
-  border-radius: 5px;
+  border-radius: 12px;
   width: ${(props) => (props.fullWidth ? "100%" : "auto")};
 
   ${({ variant, disabled }) => {

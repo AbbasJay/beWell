@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import styled from "styled-components/native";
+import { Platform } from "react-native";
 
 export const Container = styled.View`
   width: 100%;
@@ -8,7 +9,7 @@ export const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
   background-color: ${Colors.dark.primary};
-  padding: 16px 12px;
+  padding: ${Platform.OS === "ios" ? "56px 12px 0 12px" : "16px 12px"};
 `;
 
 export const TitleContainer = styled.View`

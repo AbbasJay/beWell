@@ -7,7 +7,7 @@ export const BusinessCardContainer = styled.View`
 export const HeaderText = styled.Text`
   font-size: 24px;
   font-weight: bold;
-  margin-top: 12px;
+
   margin-bottom: 12px;
 `;
 

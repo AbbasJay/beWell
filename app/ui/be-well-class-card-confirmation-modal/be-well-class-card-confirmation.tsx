@@ -25,7 +25,7 @@ export const BeWellClassCardConfirmation = ({
   return (
     <CSS.Container>
       <CSS.DetailTextWrapper>
-        <BeWellText variant={BeWellTextVariant.Headline5} textCenter>
+        <BeWellText variant={BeWellTextVariant.Headline5}>
           You are about to join {title}
         </BeWellText>
       </CSS.DetailTextWrapper>

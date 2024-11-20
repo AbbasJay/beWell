@@ -1,6 +1,6 @@
 import styled from "styled-components/native";
 import { TextInput, Button, Text } from "react-native-paper";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 export const Container = styled.View`
@@ -10,6 +10,7 @@ export const Container = styled.View`
   height: 100%;
   padding: 20px;
   background-color: ${Colors.light.background};
+  margin-top: ${Platform.OS === "ios" ? "62px" : "0"};
 `;
 
 export const Logo = styled.View`

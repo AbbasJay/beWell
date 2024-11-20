@@ -31,29 +31,29 @@ interface BeWellTextStyleProps {
 const getTextStyle = (variant: BeWellTextVariant) => {
   switch (variant) {
     case BeWellTextVariant.Headline1:
-      return { fontSize: 36, fontWeight: "900" };
+      return { fontSize: 36, fontWeight: "700" };
     case BeWellTextVariant.Headline2:
-      return { fontSize: 32, fontWeight: "900" };
+      return { fontSize: 32, fontWeight: "700" };
     case BeWellTextVariant.Headline3:
-      return { fontSize: 28, fontWeight: "900" };
+      return { fontSize: 28, fontWeight: "700" };
     case BeWellTextVariant.Headline4:
-      return { fontSize: 24, fontWeight: "900" };
+      return { fontSize: 24, fontWeight: "700" };
     case BeWellTextVariant.Headline5:
-      return { fontSize: 22, fontWeight: "900" };
+      return { fontSize: 22, fontWeight: "700" };
     case BeWellTextVariant.Headline6:
-      return { fontSize: 20, fontWeight: "900" };
+      return { fontSize: 20, fontWeight: "700" };
     case BeWellTextVariant.TextMedium:
       return { fontSize: 16, fontWeight: "400" };
     case BeWellTextVariant.TextMediumBold:
-      return { fontSize: 16, fontWeight: "900" };
+      return { fontSize: 16, fontWeight: "700" };
     case BeWellTextVariant.TextSmall:
       return { fontSize: 14, fontWeight: "400" };
     case BeWellTextVariant.TextSmallBold:
-      return { fontSize: 14, fontWeight: "900" };
+      return { fontSize: 14, fontWeight: "700" };
     case BeWellTextVariant.TextXSmall:
       return { fontSize: 12, fontWeight: "400" };
     case BeWellTextVariant.TextXSmallBold:
-      return { fontSize: 12, fontWeight: "900" };
+      return { fontSize: 12, fontWeight: "700" };
     case BeWellTextVariant.Numbers:
       return { fontSize: 44, fontWeight: "400" };
     default:

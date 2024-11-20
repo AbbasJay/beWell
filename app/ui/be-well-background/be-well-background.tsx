@@ -9,7 +9,6 @@ interface BeWellBackgroundProps {
 
 const defaultContentContainerStyle = {
   paddingHorizontal: 12,
-  paddingTop: 12,
 };
 
 export const BeWellBackground = ({
