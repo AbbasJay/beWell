@@ -18,7 +18,7 @@ import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
 import Carousel from "react-native-reanimated-carousel";
 import * as Location from "expo-location";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { set } from "react-hook-form";
 
 const INITIAL_REGION = {
@@ -47,8 +47,8 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
   }
 
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<any>(null);
-  const [center, setCenter] = useState<any>(null);
+  const [location, setLocation] = useState<any>(INITIAL_REGION);
+  const [center, setCenter] = useState<any>(INITIAL_REGION);
 
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
@@ -170,17 +170,16 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={focusMap}>
-          <Ionicons name="locate" size={24} color="black" />
+          <MaterialIcons name="my-location" size={24} color="black" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.button} onPress={toggleListView}>
-          <Ionicons name="list" size={24} color="black" />
+          <MaterialIcons name="list" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={zoomOut}>
-          <Ionicons name="arrow-up" size={24} color="black" />
+          <MaterialIcons name="arrow-upward" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={zoomIn}>
-          <Ionicons name="arrow-down" size={24} color="black" />
+          <MaterialIcons name="arrow-downward" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
