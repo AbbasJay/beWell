@@ -89,7 +89,7 @@ export default function Business() {
   const handleConfirm = () => {
     setShowConfirmation(true);
     if (selectedClass) {
-      sendNotification(selectedClass, business.id || 0);
+      sendNotification(selectedClass, 19); // todo: this needs to be user id
       refreshNotifications();
     }
   };

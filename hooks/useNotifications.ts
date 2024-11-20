@@ -40,7 +40,7 @@ export const useNotifications = () => {
     }
   }, []);
 
-  const sendNotification = async (classData: Class, businessId: number) => {
+  const sendNotification = async (classData: Class, userId: number) => {
     try {
       let token;
       if (Platform.OS === "web") {
@@ -57,7 +57,7 @@ export const useNotifications = () => {
         classId: classData.id,
         businessId: classData.businessId,
         message: classData.description,
-        userId: businessId,
+        userId: userId,
         read: false,
       };
 
