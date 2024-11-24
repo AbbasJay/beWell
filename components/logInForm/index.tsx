@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Linking, Platform, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 import { Icon, TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
-import { API_URL } from "@/env";
-import { Colors } from "@/constants/Colors";
-import { useTheme } from "@/hooks/themeContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import useUserContext from "@/app/contexts/UserContext";
-import Button from "@/app/ui/button/button";
+import { useTheme } from "@/hooks/themeContext";
+
 import * as CSS from "./styles";
+import { API_URL } from "@/env";
+import Button from "@/app/ui/button/button";
+import { Colors } from "@/constants/Colors";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -26,7 +26,6 @@ const LoginForm = () => {
 
   const { theme, setTheme } = useTheme();
   // const colors = useThemeColor();
-  const { setUser } = useUserContext();
 
   const email = watch("email");
   const password = watch("password");
@@ -54,7 +53,6 @@ const LoginForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         const token = responseData.token;
-        const user = responseData.user;
 
         if (Platform.OS === "web") {
           localStorage.setItem("userToken", token);
@@ -62,7 +60,6 @@ const LoginForm = () => {
           await SecureStore.setItemAsync("userToken", token);
         }
 
-        setUser(user);
         router.push("/home");
       } else {
         console.error("Login failed:", response.statusText);

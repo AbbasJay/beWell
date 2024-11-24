@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import useNotificationsContext from "@/app/contexts/NotificationsContext";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-import useBusinessContext from "./contexts/BusinessContext";
+import { useBusinessContext } from "./contexts/BusinessContext";
 const NotificationsDisplay: React.FC = () => {
   const { notifications, unreadNotificationsCount } = useNotificationsContext();
   const { businesses } = useBusinessContext();

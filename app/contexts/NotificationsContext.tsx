@@ -51,7 +51,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export default function useNotificationsContext() {
+export const useNotificationsContext = () => {
   const context = useContext(NotificationsContext);
   if (!context) {
     throw new Error(
@@ -59,4 +59,4 @@ export default function useNotificationsContext() {
     );
   }
   return context;
-}
+};

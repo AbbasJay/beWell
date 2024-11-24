@@ -9,13 +9,14 @@ import { BeWellTabBar } from "@/components/bewellTabBar";
 import { BusinessProvider } from "./contexts/BusinessContext";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
-import { UserProvider } from "./contexts/UserContext";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { getToken } from "@/app/utils/helper-functions/get-token";
+
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export default function RootLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentRoute = usePathname();
   const hideTabBarRoutes = ["/", "/logIn", "/signUp"];
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
@@ -23,7 +24,12 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = await getToken();
+        let token;
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("userToken");
+        } else {
+          token = await SecureStore.getItemAsync("userToken");
+        }
 
         if (!token && !hideTabBarRoutes.includes(currentRoute)) {
           router.replace("/logIn");
@@ -45,40 +51,36 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <PaperProvider>
-        <UserProvider>
-          <BusinessProvider>
-            <NotificationsProvider>
-              {!hideNavigationBarRoutes.includes(currentRoute) && (
-                <NavigationBar
-                  title="beWell"
-                  left={{
-                    icon: (
-                      <MaterialIcons
-                        name="arrow-back"
-                        size={24}
-                        color="black"
-                      />
-                    ),
-                  }}
-                />
-              )}
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: Colors.light.secondary },
+        <BusinessProvider>
+          <NotificationsProvider>
+            {!hideNavigationBarRoutes.includes(currentRoute) && (
+              <NavigationBar
+                title="beWell"
+                left={{
+                  icon: (
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                  ),
                 }}
-              >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="logIn" />
-                <Stack.Screen name="signUp" />
-                <Stack.Screen name="home" />
-                <Stack.Screen name="components" />
-                <Stack.Screen name="business/[id]/classes" />
-              </Stack>
-              {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
-            </NotificationsProvider>
-          </BusinessProvider>
-        </UserProvider>
+              />
+            )}
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: Colors.light.secondary },
+                // statusBarStyle: "dark",
+                // statusBarColor: "black",
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="logIn" />
+              <Stack.Screen name="signUp" />
+              <Stack.Screen name="home" />
+              <Stack.Screen name="components" />
+              <Stack.Screen name="business/[id]/classes" />
+            </Stack>
+            {!hideTabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
+          </NotificationsProvider>
+        </BusinessProvider>
       </PaperProvider>
     </ThemeProvider>
   );

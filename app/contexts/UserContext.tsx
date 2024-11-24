@@ -5,8 +5,9 @@ import React, {
   ReactNode,
   useState,
 } from "react";
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
-import { getToken } from "../utils/helper-functions/get-token";
 
 export type User = {
   id: number;
@@ -21,6 +22,14 @@ type UserContextType = {
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
+
+const getToken = async () => {
+  if (Platform.OS === "web") {
+    return localStorage.getItem("userToken");
+  } else {
+    return await SecureStore.getItemAsync("userToken");
+  }
+};
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -44,32 +53,31 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         });
 
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error response:", errorText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const userData: User = await response.json();
+        const userData = await response.json();
         setUser(userData);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
-
     fetchUser();
   }, []);
 
-  const userContextValue = React.useMemo(() => ({ user, setUser }), [user]);
+  const contextValue = React.useMemo(() => ({ user, setUser }), [user]);
 
   return (
-    <UserContext.Provider value={userContextValue}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
 };
 
-export default function useUserContext() {
+export const useUserContext = () => {
   const context = useContext(UserContext);
   if (!context) {
     throw new Error("useUserContext must be used within a UserProvider");
   }
   return context;
-}
+};
