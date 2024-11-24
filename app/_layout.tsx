@@ -15,9 +15,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { getToken } from "@/app/utils/helper-functions/get-token";
 
 export default function RootLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const currentRoute = usePathname();
   const hideTabBarRoutes = ["/", "/logIn", "/signUp"];
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
@@ -25,12 +26,7 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        let token;
-        if (Platform.OS === "web") {
-          token = localStorage.getItem("userToken");
-        } else {
-          token = await SecureStore.getItemAsync("userToken");
-        }
+        const token = await getToken();
 
         if (!token && !hideTabBarRoutes.includes(currentRoute)) {
           router.replace("/logIn");
