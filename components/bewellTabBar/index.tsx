@@ -1,6 +1,6 @@
 "use client";
 
-import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import useNotificationsContext from "@/app/contexts/NotificationsContext";
 import { router, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";

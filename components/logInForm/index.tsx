@@ -9,7 +9,7 @@ import { API_URL } from "@/env";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/hooks/themeContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useUserContext } from "@/app/contexts/UserContext";
+import useUserContext from "@/app/contexts/UserContext";
 import Button from "@/app/ui/button/button";
 import * as CSS from "./styles";
 

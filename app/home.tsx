@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Business, useBusinessContext } from "./contexts/BusinessContext";
+import { Business } from "./contexts/BusinessContext";
+import useBusinessContext from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";

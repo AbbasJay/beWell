@@ -6,7 +6,7 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import Button from "@/app/ui/button/button";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
-import { useUserContext } from "@/app/contexts/UserContext";
+import useUserContext from "@/app/contexts/UserContext";
 
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
