@@ -1,13 +1,13 @@
+import { Platform } from "react-native";
 import React, {
   createContext,
   useContext,
-  useState,
   useEffect,
   ReactNode,
+  useState,
 } from "react";
-import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
+import { API_URL } from "@/env";
 
 export type User = {
   id: number;
@@ -24,11 +24,9 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const getToken = async () => {
-  if (Platform.OS === "web") {
-    return localStorage.getItem("userToken");
-  } else {
-    return await SecureStore.getItemAsync("userToken");
-  }
+  return Platform.OS === "web"
+    ? localStorage.getItem("userToken")
+    : await SecureStore.getItemAsync("userToken");
 };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -53,8 +51,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response:", errorText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -64,6 +60,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error fetching user data:", error);
       }
     };
+
     fetchUser();
   }, []);
 

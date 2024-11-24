@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Linking, Platform, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
 import { Icon, TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useTheme } from "@/hooks/themeContext";
-
-import * as CSS from "./styles";
 import { API_URL } from "@/env";
-import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/hooks/themeContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
 import { useUserContext } from "@/app/contexts/UserContext";
+import Button from "@/app/ui/button/button";
+import * as CSS from "./styles";
 
 const LoginForm = () => {
   const router = useRouter();

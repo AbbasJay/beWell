@@ -1,30 +1,33 @@
 import React, { useEffect, useState } from "react";
 import {
+  Modal,
   Platform,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
-  Modal,
-  Text,
 } from "react-native";
-import Button from "@/app/ui/button/button";
 import { useLocalSearchParams } from "expo-router";
-import { Class } from "@/app/contexts/ClassesContext";
-import { ClassesCard } from "@/app/ui/classes-card";
 import * as SecureStore from "expo-secure-store";
-import { API_URL } from "@/env";
-import { useBusinessContext } from "../../contexts/BusinessContext";
-import * as CSS from "./styles";
-import { Colors } from "@/constants/Colors";
-import { BusinessCard } from "@/app/ui/business-card/business-card";
-import { useNotifications } from "@/hooks/useNotifications";
-import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
-import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
-import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
-import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
-import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
 import { Chase } from "react-native-animated-spinkit";
+
+import { API_URL } from "@/env";
+import { Colors } from "@/constants/Colors";
+import { Class } from "@/app/contexts/ClassesContext";
 import { useUserContext } from "@/app/contexts/UserContext";
+import { useBusinessContext } from "../../contexts/BusinessContext";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { BusinessCard } from "@/app/ui/business-card/business-card";
+import { ClassesCard } from "@/app/ui/classes-card";
+import Button from "@/app/ui/button/button";
+import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
+import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
+import {
+  formattedStartDate,
+  formatDuration,
+} from "@/app/utils/helper-functions/format-time-and-dates";
+import * as CSS from "./styles";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
