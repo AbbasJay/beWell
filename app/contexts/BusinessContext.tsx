@@ -1,13 +1,12 @@
 import React, {
   createContext,
   useContext,
-  useState,
   useEffect,
   ReactNode,
+  useState,
 } from "react";
 import { API_URL } from "@/env";
-import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
+import { getToken } from "../utils/helper-functions/get-token";
 
 export type Business = {
   id?: number;
@@ -42,12 +41,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
-        let token;
-        if (Platform.OS === "web") {
-          token = localStorage.getItem("userToken");
-        } else {
-          token = await SecureStore.getItemAsync("userToken");
-        }
+        const token = await getToken();
 
         if (!token) {
           throw new Error("No authentication token found");

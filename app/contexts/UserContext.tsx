@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import React, {
   createContext,
   useContext,
@@ -6,8 +5,8 @@ import React, {
   ReactNode,
   useState,
 } from "react";
-import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@/env";
+import { getToken } from "../utils/helper-functions/get-token";
 
 export type User = {
   id: number;
@@ -22,12 +21,6 @@ type UserContextType = {
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
-
-const getToken = async () => {
-  return Platform.OS === "web"
-    ? localStorage.getItem("userToken")
-    : await SecureStore.getItemAsync("userToken");
-};
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
