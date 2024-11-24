@@ -57,10 +57,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     fetchUser();
   }, []);
 
-  const contextValue = React.useMemo(() => ({ user, setUser }), [user]);
+  const usersValue = React.useMemo(() => ({ user, setUser }), [user]);
 
   return (
-    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+    <UserContext.Provider value={usersValue}>{children}</UserContext.Provider>
   );
 };
 
