@@ -12,6 +12,7 @@ import * as CSS from "./styles";
 import { API_URL } from "@/env";
 import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
+import { useUserContext } from "@/app/contexts/UserContext";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const LoginForm = () => {
 
   const { theme, setTheme } = useTheme();
   // const colors = useThemeColor();
+  const { setUser } = useUserContext();
 
   const email = watch("email");
   const password = watch("password");
