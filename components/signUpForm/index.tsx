@@ -6,6 +6,7 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import Button from "@/app/ui/button/button";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTheme } from "@/hooks/themeContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
@@ -33,6 +34,8 @@ const SignUp = () => {
 
   const { theme, setTheme } = useTheme();
   const colors = useThemeColor();
+
+  const { setUser } = useUserContext();
 
   const isButtonDisabled = !Boolean(
     name && emailText && password && confirmPassword
@@ -63,11 +66,10 @@ const SignUp = () => {
         throw new Error(errorData.error || "Failed to register");
       }
 
-      if (response.ok) {
-        router.push("/home");
-      } else {
-        console.log("Signup failed");
-      }
+      const userData = await response.json();
+      setUser(userData);
+
+      router.push("/home");
     } catch (error) {
       console.error("Error signing up:", error);
     }
