@@ -47,7 +47,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const userData = await response.json();
+        const userData: User = await response.json();
         setUser(userData);
       } catch (error) {
         console.error("Error fetching user data:", error);
