@@ -24,6 +24,7 @@ import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and
 import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
 import { Chase } from "react-native-animated-spinkit";
+import { useUserContext } from "@/app/contexts/UserContext";
 
 export default function Business() {
   const { businesses } = useBusinessContext();
@@ -37,6 +38,7 @@ export default function Business() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { refreshNotifications } = useNotificationsContext();
   const { sendNotification } = useNotifications();
+  const { user } = useUserContext();
 
   if (!business) {
     return <CSS.DetailText>No business data available</CSS.DetailText>;
@@ -89,8 +91,8 @@ export default function Business() {
   const handleConfirm = async () => {
     setShowConfirmation(true);
 
-    if (selectedClass) {
-      await sendNotification(selectedClass, 19); // todo: this needs to be user id
+    if (selectedClass && user) {
+      await sendNotification(selectedClass, user.id); // todo: this needs to be user id
       await refreshNotifications();
     }
   };
