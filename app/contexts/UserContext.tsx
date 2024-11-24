@@ -23,21 +23,25 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+const getToken = async () => {
+  if (Platform.OS === "web") {
+    return localStorage.getItem("userToken");
+  } else {
+    return await SecureStore.getItemAsync("userToken");
+  }
+};
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        let token;
-        if (Platform.OS === "web") {
-          token = localStorage.getItem("userToken");
-        } else {
-          token = await SecureStore.getItemAsync("userToken");
-        }
+        const token = await getToken();
 
         if (!token) {
-          throw new Error("No authentication token found");
+          console.warn("No authentication token found");
+          return;
         }
 
         const response = await fetch(`${API_URL}/api/user`, {
@@ -63,10 +67,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     fetchUser();
   }, []);
 
+  const contextValue = React.useMemo(() => ({ user, setUser }), [user]);
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
 };
 
