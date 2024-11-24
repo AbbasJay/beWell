@@ -12,9 +12,6 @@ import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 import { UserProvider } from "./contexts/UserContext";
 
 import { MaterialIcons } from "@expo/vector-icons";
-
-import { Platform } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { getToken } from "@/app/utils/helper-functions/get-token";
 
 export default function RootLayout() {

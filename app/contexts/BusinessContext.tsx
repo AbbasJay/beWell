@@ -80,7 +80,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useBusinessContext = () => {
+export default function useBusinessContext() {
   const context = useContext(BusinessContext);
   if (!context) {
     throw new Error(
@@ -88,4 +88,4 @@ export const useBusinessContext = () => {
     );
   }
   return context;
-};
+}

@@ -78,10 +78,10 @@ export const ClassesProvider = ({
   );
 };
 
-export const useClassesContext = () => {
+export default function useClassesContext() {
   const context = useContext(ClassesContext);
   if (!context) {
     throw new Error("useClassesContext must be used within a ClassesProvider");
   }
   return context;
-};
+}

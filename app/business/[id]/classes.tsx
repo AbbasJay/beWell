@@ -14,13 +14,12 @@ import { Chase } from "react-native-animated-spinkit";
 import { API_URL } from "@/env";
 import { Colors } from "@/constants/Colors";
 import { Class } from "@/app/contexts/ClassesContext";
-import { useUserContext } from "@/app/contexts/UserContext";
-import { useBusinessContext } from "../../contexts/BusinessContext";
-import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import useUserContext from "@/app/contexts/UserContext";
+import useBusinessContext from "@/app/contexts/BusinessContext";
+import useNotificationsContext from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { ClassesCard } from "@/app/ui/classes-card";
-import Button from "@/app/ui/button/button";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
 import {
