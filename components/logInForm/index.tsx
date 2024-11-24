@@ -55,6 +55,7 @@ const LoginForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         const token = responseData.token;
+        const user = responseData.user;
 
         if (Platform.OS === "web") {
           localStorage.setItem("userToken", token);
@@ -62,6 +63,7 @@ const LoginForm = () => {
           await SecureStore.setItemAsync("userToken", token);
         }
 
+        setUser(user);
         router.push("/home");
       } else {
         console.error("Login failed:", response.statusText);
