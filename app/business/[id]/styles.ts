@@ -105,3 +105,24 @@ export const CloseButtonText = styled.Text`
   font-size: 24px;
   color: #333;
 `;
+
+const styles = {
+  BusinessCardContainer,
+  HeaderText,
+  ModalBackground,
+  ConfirmedText,
+  BusinessDetails,
+  Title,
+  DetailText,
+  BoldText,
+  ReadMoreText,
+  ModalLayout,
+  ModalContainer,
+  ButtonContainer,
+  FullWidthButton,
+  ButtonText,
+  CloseButton,
+  CloseButtonText,
+} as const;
+
+export default styles;
