@@ -29,9 +29,15 @@ const { width: viewportWidth } = Dimensions.get("window");
 export default function HomePage() {
   const { businesses } = useBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
+  const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
 
   const toggleListView = () => {
     setIsMapView(!isMapView);
+  };
+
+  const toggleFilterMenu = () => {
+    console.log("toggleFilterMenu", isFilterMenuVisible);
+    setIsFilterMenuVisible(!isFilterMenuVisible);
   };
 
   const renderItem = ({ item }: { item: Business }) => {
@@ -54,7 +60,11 @@ export default function HomePage() {
   return (
     <View style={{ flex: 1 }}>
       {isMapView ? (
-        <Map businesses={businesses} toggleListView={toggleListView} />
+        <Map
+          businesses={businesses}
+          toggleListView={toggleListView}
+          toggleFilterMenu={toggleFilterMenu}
+        />
       ) : (
         <>
           <BeWellBackground scrollable>

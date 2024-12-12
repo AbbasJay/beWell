@@ -38,10 +38,15 @@ const provider = Platform.select({
 
 interface MapComponentProps {
   toggleListView: () => void;
+  toggleFilterMenu: () => void;
   businesses: Business[];
 }
 
-const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
+const Map: React.FC<MapComponentProps> = ({
+  toggleListView,
+  toggleFilterMenu,
+  businesses,
+}) => {
   if (Platform.OS === "web") {
     return <Text>Map View is not supported on web</Text>;
   }
@@ -168,6 +173,9 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={toggleListView}>
           <MaterialIcons name="list" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={toggleFilterMenu}>
+          <MaterialIcons name="filter-alt" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={zoomOut}>
           <MaterialIcons name="arrow-upward" size={24} color="black" />
