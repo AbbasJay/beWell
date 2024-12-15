@@ -39,12 +39,14 @@ const provider = Platform.select({
 interface MapComponentProps {
   toggleListView: () => void;
   toggleFilterMenu: () => void;
+  filterMenuVisible: boolean;
   businesses: Business[];
 }
 
 const Map: React.FC<MapComponentProps> = ({
   toggleListView,
   toggleFilterMenu,
+  filterMenuVisible,
   businesses,
 }) => {
   if (Platform.OS === "web") {
@@ -167,6 +169,7 @@ const Map: React.FC<MapComponentProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={focusMap}>
           <MaterialIcons name="my-location" size={24} color="black" />
