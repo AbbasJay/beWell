@@ -15,6 +15,8 @@ import { Business, useBusinessContext } from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
+import Slider from "@react-native-community/slider";
+import { Chip } from "react-native-paper";
 
 import {
   Container,
@@ -27,14 +29,21 @@ import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import Button from "./ui/button/button";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
   const { businesses } = useBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
+
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const animatedValue = useRef(new Animated.Value(1)).current;
+
+  const [rating, setRating] = useState(0);
+  const [distance, setDistance] = useState(1);
+  const categories = ["gym", "classes"];
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const translateY = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -78,40 +87,100 @@ export default function HomePage() {
 
   return (
     <View style={{ flex: 1 }}>
-      {isFilterMenuVisible && (
-        <Animated.View
+      <Animated.View
+        style={{
+          position: "absolute",
+          transform: [{ translateY }],
+          bottom: 0,
+          zIndex: 15,
+          width: "100%",
+          height: "75%",
+          backgroundColor: "white",
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+        }}
+      >
+        <TouchableOpacity
           style={{
-            position: "absolute",
-            transform: [{ translateY }],
-            bottom: 0,
-            zIndex: 15,
-            width: "100%",
-            height: "75%",
-            backgroundColor: "red",
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
+            alignSelf: "flex-start",
+            padding: 20,
+            borderRadius: 5,
+            elevation: 6,
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 6,
+            shadowOffset: {
+              width: 1,
+              height: 10,
+            },
           }}
+          onPress={toggleFilterMenu}
         >
-          <TouchableOpacity
+          <MaterialIcons name="clear" size={24} color="black" />
+        </TouchableOpacity>
+
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Min Rating {rating}/5</Text>
+          <Slider
+            style={{ width: 200, height: 40 }}
+            minimumValue={0}
+            maximumValue={5}
+            step={1}
+            value={rating}
+            onValueChange={(value) => setRating(value)}
+            minimumTrackTintColor="#000000"
+            maximumTrackTintColor="#000000"
+          />
+          <Text>Max Distance {distance} km</Text>
+          <Slider
+            style={{ width: 200, height: 40 }}
+            minimumValue={1}
+            maximumValue={10}
+            step={1}
+            value={distance}
+            onValueChange={(value) => setDistance(value)}
+            minimumTrackTintColor="#000000"
+            maximumTrackTintColor="#000000"
+          ></Slider>
+          <Text>Type</Text>
+          <View
             style={{
-              alignSelf: "flex-start",
-              padding: 20,
-              borderRadius: 5,
-              elevation: 6,
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 6,
-              shadowOffset: {
-                width: 1,
-                height: 10,
-              },
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "space-evenly",
+              padding: 10,
             }}
-            onPress={toggleFilterMenu}
           >
-            <MaterialIcons name="clear" size={24} color="black" />
-          </TouchableOpacity>
-        </Animated.View>
-      )}
+            {categories.map((category) => (
+              <Chip
+                style={{ margin: 5 }}
+                key={category}
+                selected={selectedCategories.includes(category)}
+                onPress={() => {
+                  setSelectedCategories((prev) =>
+                    prev.includes(category)
+                      ? prev.filter((item) => item !== category)
+                      : [...prev, category]
+                  );
+                }}
+              >
+                {category}
+              </Chip>
+            ))}
+          </View>
+          <View style={{ top: 10 }}>
+            <Button
+              fullWidth
+              variant="secondary"
+              title="Apply Filters"
+              onPress={toggleFilterMenu}
+            />
+          </View>
+        </View>
+      </Animated.View>
+
       {isMapView ? (
         <Map
           businesses={businesses}
