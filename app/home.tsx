@@ -11,7 +11,11 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { Business, useBusinessContext } from "./contexts/BusinessContext";
+import {
+  Business,
+  useBusinessContext,
+  useFilterBusinessContext,
+} from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
@@ -30,18 +34,21 @@ import { HeaderText } from "./homeStyles";
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import Button from "./ui/button/button";
+import * as Location from "expo-location";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
   const { businesses } = useBusinessContext();
+  const { updateFilters } = useFilterBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
+  const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
 
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const animatedValue = useRef(new Animated.Value(1)).current;
 
-  const [rating, setRating] = useState(0);
-  const [distance, setDistance] = useState(1);
+  const [rating, setRating] = useState(1);
+  const [distance, setDistance] = useState(5);
   const categories = ["gym", "classes"];
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -58,6 +65,22 @@ export default function HomePage() {
     setIsFilterMenuVisible(!isFilterMenuVisible);
   };
 
+  const applyFilters = () => {
+    updateFilters(
+      distance * 1000,
+      { lat: location.current.lat, lng: location.current.lng },
+      rating,
+      selectedCategories
+    );
+    console.log(
+      "Filters applied with",
+      distance,
+      location.current,
+      rating,
+      selectedCategories
+    );
+  };
+
   //use effect here to trigger the animation
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -67,6 +90,20 @@ export default function HomePage() {
       useNativeDriver: true,
     }).start();
   }, [isFilterMenuVisible, animatedValue]);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const loc = await Location.getCurrentPositionAsync();
+
+      const { latitude, longitude } = loc.coords;
+
+      location.current = { lat: latitude, lng: longitude };
+
+      applyFilters();
+    };
+
+    fetchLocation();
+  }, []);
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
@@ -175,7 +212,7 @@ export default function HomePage() {
               fullWidth
               variant="secondary"
               title="Apply Filters"
-              onPress={toggleFilterMenu}
+              onPress={applyFilters}
             />
           </View>
         </View>
