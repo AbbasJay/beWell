@@ -21,10 +21,9 @@ export default function RootLayout() {
             <Stack.Screen name="notifications" />
             <Stack.Screen name="components" />
             <Stack.Screen 
-              name="business/[id]/classes" 
+              name="business/[id]/classes"
               options={{
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
+                headerShown: false
               }}
             />
           </Stack>

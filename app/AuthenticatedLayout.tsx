@@ -20,7 +20,20 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   // Routes where we don't want to show the tab bar or require auth
   const publicRoutes = ["/", "/logIn", "/signUp"];
   // Routes where we don't want to show the navigation bar
-  const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
+  const hideNavigationBarRoutes = [
+    "/",
+    "/home",
+    "/logIn",
+    "/signUp"
+  ];
+
+  const shouldHideNavigationBar = () => {
+    return hideNavigationBarRoutes.some(route => {
+      const routePattern = route.replace('[id]', '[^/]+');
+      const regex = new RegExp(`^${routePattern}$`);
+      return regex.test(currentRoute);
+    });
+  };
 
   useEffect(() => {
     try {
@@ -37,7 +50,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   return (
     <View style={{ flex: 1 }}>
-      {!hideNavigationBarRoutes.includes(currentRoute) && (
+      {!shouldHideNavigationBar() && (
         <NavigationBar
           title="beWell"
           left={{

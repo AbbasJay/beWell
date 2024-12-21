@@ -51,7 +51,10 @@ export default function HomePage() {
           phoneNumber: item.phoneNumber,
           description: "",
         }}
-        onPress={() => router.push(`/business/${businessId}/classes`)}
+        onPress={() => router.push({
+          pathname: "/business/[id]/classes",
+          params: { id: businessId }
+        })}
       />
     );
   };
