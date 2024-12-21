@@ -1,14 +1,42 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { useBusinessContext } from "./contexts/BusinessContext";
+import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { ErrorMessage } from "@/app/ui/error-message";
 const NotificationsDisplay: React.FC = () => {
-  const { notifications, unreadNotificationsCount } = useNotificationsContext();
-  const { businesses } = useBusinessContext();
+  const { notifications, unreadNotificationsCount, refreshNotifications } = useNotificationsContext();
+  const { businesses, isLoading: businessesLoading } = useBusinessContext();
+  const [error, setError] = useState<Error | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setIsRefreshing(true);
+    setError(null);
+    try {
+      await refreshNotifications();
+    } catch (error) {
+      setError(error instanceof Error ? error : new Error('Failed to refresh notifications'));
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshNotifications]);
+
+  if (businessesLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
   return (
-    <BeWellBackground scrollable>
+    <BeWellBackground 
+      scrollable 
+      refreshControl={
+        <RefreshControl 
+          refreshing={isRefreshing} 
+          onRefresh={onRefresh} 
+        />
+      }
+    >
       {unreadNotificationsCount > 0 && (
         <Text style={styles.unreadCount}>
           Unread Notifications: {unreadNotificationsCount}

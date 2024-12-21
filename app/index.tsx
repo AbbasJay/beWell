@@ -1,11 +1,23 @@
+import { useState } from "react";
 import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
-import Button from "./ui/button/button";
 import styled from "styled-components/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { ErrorMessage } from "@/app/ui/error-message";
 
 const Index = () => {
   const router = useRouter();
+  const [error, setError] = useState<Error | null>(null);
+
+  const handleNavigation = () => {
+    try {
+      router.push("/logIn");
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Navigation failed'));
+    }
+  };
+
+  if (error) return <ErrorMessage error={error} />;
 
   return (
     <Container>
@@ -14,7 +26,7 @@ const Index = () => {
       </Text>
 
       <MaterialIcons
-        onPress={() => router.push("/logIn")}
+        onPress={handleNavigation}
         name="login"
         size={80}
         color="black"

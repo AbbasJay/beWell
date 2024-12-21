@@ -34,7 +34,7 @@ const { width: viewportWidth } = Dimensions.get("window");
 const provider = Platform.select({
   ios: PROVIDER_DEFAULT,
   android: PROVIDER_GOOGLE,
-});
+}) as typeof PROVIDER_GOOGLE;
 
 interface MapComponentProps {
   toggleListView: () => void;
@@ -220,14 +220,13 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
       {/* Carousel */}
       {/* <GestureHandlerRootView>
         <GestureDetector gesture={carouselGesture}> */}
-      <View style={styles.outerView}>
+      <View style={styles.outerView} pointerEvents="auto">
         <Carousel
           data={businesses}
           renderItem={renderCarouselItem}
           width={viewportWidth * 0.8}
           onSnapToItem={onSnapToItem}
           style={styles.carouselContainer}
-          pointerEvents="auto"
         />
       </View>
       {/* </GestureDetector>

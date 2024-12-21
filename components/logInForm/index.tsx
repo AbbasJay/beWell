@@ -1,20 +1,19 @@
 import { useState } from "react";
-import { Linking, Platform, ScrollView } from "react-native";
+import { Linking, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Icon, TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import * as SecureStore from "expo-secure-store";
-
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useTheme } from "@/hooks/themeContext";
-
-import * as CSS from "./styles";
-import { API_URL } from "@/env";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
+import { ErrorMessage } from "@/app/ui/error-message";
+import { API_URL } from "@/env";
+import * as CSS from "./styles";
 
 const LoginForm = () => {
   const router = useRouter();
+  const [loginError, setLoginError] = useState<Error | null>(null);
   const { control, handleSubmit, watch } = useForm({
     defaultValues: {
       email: "",
@@ -23,10 +22,6 @@ const LoginForm = () => {
   });
 
   const [status, setStatus] = useState("checked");
-
-  const { theme, setTheme } = useTheme();
-  // const colors = useThemeColor();
-
   const email = watch("email");
   const password = watch("password");
   const isButtonDisabled = !Boolean(email && password);
@@ -35,12 +30,9 @@ const LoginForm = () => {
     setStatus(status === "checked" ? "unchecked" : "checked");
   };
 
-  // const toggleTheme = () => {
-  //   setTheme(theme === "light" ? "dark" : "light");
-  // };
-
   const onSubmit = async (data: any) => {
     try {
+      setLoginError(null); // Clear any previous errors
       const response = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,31 +54,30 @@ const LoginForm = () => {
 
         router.push("/home");
       } else {
-        console.error("Login failed:", response.statusText);
-        // Handle login failure
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      // Handle error
+      setLoginError(error instanceof Error ? error : new Error('An unexpected error occurred'));
     }
+  };
+
+  const { continueAsGuest } = useAuth();
+
+  const handleContinueAsGuest = () => {
+    continueAsGuest();
+    router.push("/home");
   };
 
   return (
     // <ScrollView>
     <CSS.Container>
-      {/* <CSS.Logo>
-        <CSS.StyledText fontSize="40px" colours={colors}>
-          LOGO
-        </CSS.StyledText>
-      </CSS.Logo> */}
-
       <CSS.Body>
-        {/* <CSS.ThemeToggle onPress={toggleTheme}>
-          <CSS.ThemeToggleText colours={colors}>
-            Toggle Theme (Current: {theme})
-          </CSS.ThemeToggleText>
-        </CSS.ThemeToggle> */}
-
+        {loginError && (
+          <ErrorMessage error={loginError} />
+        )}
+        
         <Controller
           control={control}
           rules={{ required: true }}
@@ -165,7 +156,7 @@ const LoginForm = () => {
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText onPress={() => router.push("/home")}>
+        <CSS.FooterText onPress={handleContinueAsGuest}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>

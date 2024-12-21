@@ -23,12 +23,17 @@ import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { ErrorMessage } from "@/app/ui/error-message";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
-  const { businesses } = useBusinessContext();
+  const { businesses, isLoading, error } = useBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
 
   const toggleListView = () => {
     setIsMapView(!isMapView);

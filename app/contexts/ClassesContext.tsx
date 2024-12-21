@@ -27,6 +27,8 @@ export type Class = {
 
 type ClassesContextType = {
   classes: Class[];
+  isLoading: boolean;
+  error: Error | null;
 };
 
 const ClassesContext = createContext<ClassesContextType | undefined>(undefined);
@@ -39,9 +41,12 @@ export const ClassesProvider = ({
   businessId: number;
 }) => {
   const [classes, setClasses] = useState<Class[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchClasses = async () => {
+      setIsLoading(true);
       try {
         let token;
         if (Platform.OS === "web") {
@@ -70,15 +75,23 @@ export const ClassesProvider = ({
 
         const json = await response.json();
         setClasses(json);
+        setError(null);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError(error as Error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchClasses();
   }, [businessId]);
 
   return (
-    <ClassesContext.Provider value={{ classes }}>
+    <ClassesContext.Provider value={{ 
+      classes,
+      isLoading,
+      error
+    }}>
       {children}
     </ClassesContext.Provider>
   );

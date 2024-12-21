@@ -5,15 +5,23 @@ import { router, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as CSS from "./styles";
+import { ErrorMessage } from "@/app/ui/error-message";
 
 export const BeWellTabBar = () => {
   const { unreadNotificationsCount } = useNotificationsContext();
   const [activeRoute, setActiveRoute] = useState("");
   const currentRoute = usePathname();
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    setActiveRoute(currentRoute);
+    try {
+      setActiveRoute(currentRoute);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Navigation error'));
+    }
   }, [currentRoute]);
+
+  if (error) return <ErrorMessage error={error} />;
 
   return (
     <CSS.Content>

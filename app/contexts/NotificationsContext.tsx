@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
 
 export interface Notification {
@@ -31,12 +31,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchNotifications(); // Initial fetch
   }, [fetchNotifications]);
 
+  const unreadCount = useMemo(() => 
+    notifications.filter((notification: Notification) => !notification.read).length,
+    [notifications]
+  );
+
   useEffect(() => {
-    const unreadCount = notifications.filter(
-      (notification: any) => !notification.read
-    ).length;
     setUnreadNotificationsCount(unreadCount);
-  }, [notifications]);
+  }, [unreadCount]);
 
   return (
     <NotificationsContext.Provider

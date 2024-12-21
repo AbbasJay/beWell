@@ -6,10 +6,20 @@ import {
   formattedStartDate,
   formatDuration,
 } from "@/app/utils/helper-functions/format-time-and-dates";
+import { useState } from "react";
+import { ErrorMessage } from "@/app/ui/error-message";
 
 export const ClassesCard = ({ item }: { item: Class }) => {
+  const [error, setError] = useState<Error | null>(null);
+
+  if (!item) {
+    setError(new Error("Class data is missing"));
+    return <ErrorMessage error={error} />;
+  }
+
   return (
     <CSS.Container key={item.id}>
+      {error && <ErrorMessage error={error} />}
       <CSS.Card>
         <CSS.CardIcon>
           <BeWellIcons name="myIcon" width={50} height={50} />
