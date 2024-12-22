@@ -10,6 +10,7 @@ export const Container = styled.View`
   justify-content: space-between;
   background-color: ${Colors.dark.primary};
   padding: ${Platform.OS === "ios" ? "56px 12px 0 12px" : "16px 12px"};
+  padding-bottom: 12px;
 `;
 
 export const TitleContainer = styled.View`

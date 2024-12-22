@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 import { ClassesProvider, useClassesContext, Class } from "@/app/contexts/ClassesContext";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
 import { BusinessCard } from "@/app/ui/business-card/business-card";
@@ -52,7 +53,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const { classes, isLoading, error: classesError } = useClassesContext();
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
   const { refreshNotifications } = useNotificationsContext();
   const { sendNotification } = useNotifications();
   const [error, setError] = useState<Error | null>(null);
@@ -66,27 +67,22 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const handleClassPress = (classItem: Class) => {
     setError(null); // Clear any previous errors
     setSelectedClass(classItem);
-    setShowConfirmation(false);
     setModalVisible(true);
   };
 
-  const handleConfirm = async () => {
-    if (!selectedClass) {
-      setError(new Error("No class selected"));
-      return;
-    }
+  const handleBookClass = async () => {
+    if (!selectedClass) return;
     
-    setShowConfirmation(true);
-    setError(null); // Clear any previous errors
-    
+    setIsBooking(true);
     try {
-      const userId = 19; // Temporary user ID
-      await sendNotification(selectedClass, userId);
+      await sendNotification(selectedClass);
       await refreshNotifications();
+      setModalVisible(false);
     } catch (err) {
       console.error('Error booking class:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err : new Error('Failed to book class'));
-      setShowConfirmation(false);
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -118,8 +114,8 @@ function BusinessClasses({ business }: BusinessClassesProps) {
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
-        confirmation={showConfirmation}
-        onConfirm={handleConfirm}
+        confirmation={isBooking}
+        onConfirm={handleBookClass}
         title={selectedClass?.name ?? ""}
         description={selectedClass?.description ?? ""}
         instructor={selectedClass?.instructor ?? ""}

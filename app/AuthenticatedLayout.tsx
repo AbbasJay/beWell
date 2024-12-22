@@ -13,19 +13,17 @@ interface AuthenticatedLayoutProps {
 }
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const { token, isLoading, isGuestMode, error: authError } = useAuth();
-  const currentRoute = usePathname();
-  const [error, setError] = useState<Error | null>(null);
 
-  // Routes where we don't want to show the tab bar or require auth
+  const { tokens, isLoading, isGuestMode } = useAuth();
+  const currentRoute = usePathname();
+
+  const tabBarRoutes = ["/", "/logIn", "/signUp", 'home'];
+
+  // Routes that don't require authentication
   const publicRoutes = ["/", "/logIn", "/signUp"];
-  // Routes where we don't want to show the navigation bar
-  const hideNavigationBarRoutes = [
-    "/",
-    "/home",
-    "/logIn",
-    "/signUp"
-  ];
+  
+  // Routes where we don't show the navigation bar
+  const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
 
   const shouldHideNavigationBar = () => {
     return hideNavigationBarRoutes.some(route => {
@@ -36,17 +34,21 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   };
 
   useEffect(() => {
-    try {
-      if (!token && !isGuestMode && !publicRoutes.includes(currentRoute)) {
-        router.replace("/logIn");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Authentication error'));
+    // Don't do anything while loading or on public routes
+    if (isLoading || publicRoutes.includes(currentRoute)) {
+      return;
     }
-  }, [token, isGuestMode, currentRoute]);
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error || authError) return <ErrorMessage error={error || authError} />;
+    // Only redirect to login if trying to access protected route without auth
+    if (!tokens?.accessToken && !isGuestMode) {
+      router.replace("/logIn");
+    }
+  }, [currentRoute, tokens?.accessToken, isGuestMode, isLoading]);
+
+  // Only show loading spinner for protected routes
+  if (isLoading && !publicRoutes.includes(currentRoute)) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -62,7 +64,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       
       {children}
 
-      {!publicRoutes.includes(currentRoute) && <BeWellTabBar />}
+      {!tabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
     </View>
   );
 } 

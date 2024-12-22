@@ -6,14 +6,14 @@ import { NotificationsProvider } from './NotificationsContext';
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <BusinessProvider>
           <NotificationsProvider>
             {children}
           </NotificationsProvider>
         </BusinessProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }; 

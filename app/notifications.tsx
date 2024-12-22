@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
-import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, FlatList } from "react-native";
+import { useNotificationsContext, Notification } from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { useBusinessContext } from "./contexts/BusinessContext";
-import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
+
 const NotificationsDisplay: React.FC = () => {
-  const { notifications, unreadNotificationsCount, refreshNotifications } = useNotificationsContext();
-  const { businesses, isLoading: businessesLoading } = useBusinessContext();
+  const { notifications, refreshNotifications, markAsRead } = useNotificationsContext();
+  const { businesses } = useBusinessContext();
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
     setError(null);
     try {
@@ -24,37 +24,37 @@ const NotificationsDisplay: React.FC = () => {
     }
   }, [refreshNotifications]);
 
-  if (businessesLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
+  const handleNotificationPress = useCallback((notification: Notification) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
+  }, [markAsRead]);
+
+
 
   return (
-    <BeWellBackground 
-      scrollable 
-      refreshControl={
-        <RefreshControl 
-          refreshing={isRefreshing} 
-          onRefresh={onRefresh} 
+    <BeWellBackground contentContainerStyle={styles.container}>
+      {error ? (
+        <ErrorMessage error={error} />
+      ) : (
+        <FlatList
+          data={notifications}
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+
+          renderItem={({ item }) => (
+            <NotificationListItem
+              notification={item}
+              messageAlert="Booking confirmed!"
+              business={businesses.find(
+                (business) => business.id === item.businessId
+              )}
+              onPress={() => handleNotificationPress(item)}
+            />
+          )}
+          keyExtractor={(item) => item.id.toString()}
         />
-      }
-    >
-      {unreadNotificationsCount > 0 && (
-        <Text style={styles.unreadCount}>
-          Unread Notifications: {unreadNotificationsCount}
-        </Text>
       )}
-      {notifications
-        .slice()
-        .reverse()
-        .map((notification) => (
-          <NotificationListItem
-            key={notification.id}
-            notification={notification}
-            messageAlert="Booking confirmed!"
-            business={businesses.find(
-              (business) => business.id === notification.businessId
-            )}
-          />
-        ))}
     </BeWellBackground>
   );
 };

@@ -1,148 +1,321 @@
-import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useReducer, useEffect } from 'react';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import { API_URL } from '@/env';
+
+// Types
+type UserRole = 'user' | 'admin' | 'business_owner';
+
+interface AuthUser {
+  id: number;
+  email: string;
+  role: UserRole;
+}
+
+interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
 
 interface AuthState {
-  token: string | null;
+  user: AuthUser | null;
+  tokens: AuthTokens | null;
   isLoading: boolean;
   error: Error | null;
   isGuestMode: boolean;
 }
 
-interface AuthContextType {
-  token: string | null;
-  isLoading: boolean;
-  error: Error | null;
-  isGuestMode: boolean;
-  signIn: (token: string) => Promise<void>;
+// Action types
+type AuthAction =
+  | { type: 'AUTH_START' }
+  | { type: 'AUTH_SUCCESS'; payload: { user: AuthUser; tokens: AuthTokens } }
+  | { type: 'AUTH_ERROR'; payload: Error }
+  | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
+  | { type: 'SET_GUEST_MODE' }
+  | { type: 'SIGN_OUT' };
+
+// Context type
+interface AuthContextType extends AuthState {
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   continueAsGuest: () => void;
+  hasPermission: (requiredRole: UserRole) => boolean;
+}
+
+const initialState: AuthState = {
+  user: null,
+  tokens: null,
+  isLoading: false,
+  error: null,
+  isGuestMode: false,
+};
+
+// Reducer
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case 'AUTH_START':
+      return {
+        ...state,
+        isLoading: true,
+        error: null,
+      };
+    
+    case 'AUTH_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        tokens: action.payload.tokens,
+        isLoading: false,
+        error: null,
+        isGuestMode: false,
+      };
+    
+    case 'AUTH_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      };
+    
+    case 'REFRESH_TOKEN_SUCCESS':
+      return {
+        ...state,
+        tokens: action.payload,
+        error: null,
+        isLoading: false,
+      };
+    
+    case 'SET_GUEST_MODE':
+      return {
+        ...initialState,
+        isGuestMode: true,
+        isLoading: false,
+      };
+    
+    case 'SIGN_OUT':
+      return {
+        ...initialState,
+        isLoading: false,
+      };
+    
+    default:
+      return state;
+  }
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    token: null,
-    isLoading: false,
-    error: null,
-    isGuestMode: false
-  });
+  const [state, dispatch] = useReducer(authReducer, initialState);
 
-  const storeToken = async (token: string) => {
+  // Token storage helpers
+  const storeTokens = async (tokens: AuthTokens) => {
     try {
       if (Platform.OS === "web") {
-        localStorage.setItem("userToken", token);
+        localStorage.setItem("accessToken", tokens.accessToken);
+        localStorage.setItem("refreshToken", tokens.refreshToken);
       } else {
-        await SecureStore.setItemAsync("userToken", token);
+        await SecureStore.setItemAsync("accessToken", tokens.accessToken);
+        await SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
       }
+      console.log('Tokens stored successfully');
     } catch (error) {
-      console.error("Error storing token:", error);
+      console.error("Error storing tokens:", error);
       throw error;
     }
   };
 
-  const removeToken = async () => {
+  const removeTokens = async () => {
     try {
       if (Platform.OS === "web") {
-        localStorage.removeItem("userToken");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
       } else {
-        await SecureStore.deleteItemAsync("userToken");
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
       }
     } catch (error) {
-      console.error("Error removing token:", error);
+      console.error("Error removing tokens:", error);
       throw error;
     }
   };
 
-  const signIn = async (newToken: string) => {
-    setAuthState({
-      ...authState,
-      isLoading: true
-    });
+  // Session refresh
+  const refreshSession = async () => {
     try {
-      await storeToken(newToken);
-      setAuthState({
-        ...authState,
-        token: newToken,
-        error: null
+      const refreshToken = Platform.OS === "web"
+        ? localStorage.getItem("refreshToken")
+        : await SecureStore.getItemAsync("refreshToken");
+
+      if (!refreshToken) {
+        console.log("No refresh token found, signing out");
+        await signOut();
+        return;
+      }
+
+      // Try to get user info from the existing token first
+      try {
+        const payload = JSON.parse(atob(refreshToken.split('.')[1]));
+        const user: AuthUser = {
+          id: payload.userId,
+          email: payload.email,
+          role: payload.role || 'user'
+        };
+
+        // Use the same token if it's still valid
+        const tokens: AuthTokens = {
+          accessToken: refreshToken,
+          refreshToken: refreshToken
+        };
+
+        await storeTokens(tokens);
+        dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
+        return;
+      } catch (e) {
+        console.log("Could not parse existing token, trying refresh");
+      }
+
+      // If we can't use the existing token, try to refresh
+      const response = await fetch(`${API_URL}/api/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh session');
+      }
+
+      const data = await response.json();
+      const tokens: AuthTokens = {
+        accessToken: data.token,
+        refreshToken: data.token
+      };
+
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      const user: AuthUser = {
+        id: payload.userId,
+        email: payload.email,
+        role: payload.role || 'user'
+      };
+
+      await storeTokens(tokens);
+      dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
     } catch (error) {
-      setAuthState({
-        ...authState,
-        error: error as Error
-      });
-      throw error;
-    } finally {
-      setAuthState({
-        ...authState,
-        isLoading: false
-      });
+      console.error('Session refresh failed:', error);
+      await signOut();  // Sign out on refresh failure
     }
   };
 
+  // Auto refresh session
+  useEffect(() => {
+    const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes
+    if (state.tokens?.accessToken) {
+      const intervalId = setInterval(refreshSession, REFRESH_INTERVAL);
+      return () => clearInterval(intervalId);
+    }
+  }, [state.tokens?.accessToken]);
+
+  // Sign in
+  const signIn = async (email: string, password: string) => {
+    dispatch({ type: 'AUTH_START' });
+    try {
+      const url = `${API_URL}/api/login`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const responseText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(responseText);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error('Invalid response format from server');
+      }
+
+      if (!data.token) {
+        throw new Error('Invalid response format: missing token');
+      }
+
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      const user: AuthUser = {
+        id: payload.userId,
+        email: email,
+        role: 'user'
+      };
+
+      const tokens: AuthTokens = {
+        accessToken: data.token,
+        refreshToken: data.token
+      };
+
+      await storeTokens(tokens);
+      dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Sign out
   const signOut = async () => {
-    setAuthState({
-      ...authState,
-      isLoading: true
-    });
     try {
-      await removeToken();
-      setAuthState({
-        ...authState,
-        token: null,
-        error: null
-      });
+      await removeTokens();
+      dispatch({ type: 'SIGN_OUT' });
     } catch (error) {
-      setAuthState({
-        ...authState,
-        error: error as Error
-      });
+      dispatch({ type: 'AUTH_ERROR', payload: error as Error });
       throw error;
-    } finally {
-      setAuthState({
-        ...authState,
-        isLoading: false
-      });
     }
   };
 
+  // Guest mode
   const continueAsGuest = () => {
-    setAuthState({
-      ...authState,
-      isGuestMode: true,
-      error: null
-    });
+    dispatch({ type: 'SET_GUEST_MODE' });
   };
 
+  // Role-based access control
+  const hasPermission = (requiredRole: UserRole): boolean => {
+    if (state.isGuestMode) return false;
+    if (!state.user) return false;
+
+    const roleHierarchy: Record<UserRole, number> = {
+      user: 1,
+      business_owner: 2,
+      admin: 3,
+    };
+
+    return roleHierarchy[state.user.role] >= roleHierarchy[requiredRole];
+  };
+
+  // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      setAuthState({
-        ...authState,
-        isLoading: true
-      });
+      dispatch({ type: 'AUTH_START' });
       try {
-        const storedToken = Platform.OS === "web" 
-          ? localStorage.getItem("userToken")
-          : await SecureStore.getItemAsync("userToken");
-        
-        if (storedToken) {
-          setAuthState({
-            ...authState,
-            token: storedToken,
-            error: null
-          });
+        const accessToken = Platform.OS === "web"
+          ? localStorage.getItem("accessToken")
+          : await SecureStore.getItemAsync("accessToken");
+
+        if (accessToken) {
+          await refreshSession();
+        } else {
+          dispatch({ type: 'SIGN_OUT' });
         }
       } catch (error) {
-        setAuthState({
-          ...authState,
-          error: error as Error
-        });
-      } finally {
-        setAuthState({
-          ...authState,
-          isLoading: false
-        });
+        console.error('Auth initialization failed:', error);
+        dispatch({ type: 'SIGN_OUT' });
       }
     };
 
@@ -150,14 +323,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        ...authState,
-        signIn,
-        signOut,
-        continueAsGuest
-      }}
-    >
+    <AuthContext.Provider value={{
+      ...state,
+      signIn,
+      signOut,
+      refreshSession,
+      continueAsGuest,
+      hasPermission,
+    }}>
       {children}
     </AuthContext.Provider>
   );

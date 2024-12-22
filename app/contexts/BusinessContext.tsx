@@ -1,14 +1,13 @@
 import React, {
   createContext,
   useContext,
-  useState,
+  useReducer,
   useEffect,
   ReactNode,
 } from "react";
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import { ErrorMessage } from "@/app/ui/error-message";
 
 export type Business = {
   id?: number;
@@ -29,11 +28,86 @@ export type Business = {
   longitude?: number | null;
 };
 
-type BusinessContextType = {
+interface BusinessState {
   businesses: Business[];
   isLoading: boolean;
   error: Error | null;
+}
+
+// Action types
+type BusinessAction =
+  | { type: 'FETCH_BUSINESSES_START' }
+  | { type: 'FETCH_BUSINESSES_SUCCESS'; payload: Business[] }
+  | { type: 'FETCH_BUSINESSES_ERROR'; payload: Error }
+  | { type: 'ADD_BUSINESS'; payload: Business }
+  | { type: 'UPDATE_BUSINESS'; payload: Business }
+  | { type: 'DELETE_BUSINESS'; payload: number };
+
+// Initial state
+const initialState: BusinessState = {
+  businesses: [],
+  isLoading: false,
+  error: null,
+};
+
+// Reducer function
+function businessReducer(state: BusinessState, action: BusinessAction): BusinessState {
+  switch (action.type) {
+    case 'FETCH_BUSINESSES_START':
+      return {
+        ...state,
+        isLoading: true,
+        error: null,
+      };
+    
+    case 'FETCH_BUSINESSES_SUCCESS':
+      return {
+        ...state,
+        businesses: action.payload,
+        isLoading: false,
+        error: null,
+      };
+    
+    case 'FETCH_BUSINESSES_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      };
+    
+    case 'ADD_BUSINESS':
+      return {
+        ...state,
+        businesses: [...state.businesses, action.payload],
+      };
+    
+    case 'UPDATE_BUSINESS':
+      return {
+        ...state,
+        businesses: state.businesses.map(business => 
+          business.id === action.payload.id ? action.payload : business
+        ),
+      };
+    
+    case 'DELETE_BUSINESS':
+      return {
+        ...state,
+        businesses: state.businesses.filter(business => 
+          business.id !== action.payload
+        ),
+      };
+    
+    default:
+      return state;
+  }
+}
+
+// Context type with actions
+type BusinessContextType = BusinessState & {
   refreshBusinesses: () => Promise<void>;
+  addBusiness: (business: Business) => void;
+  updateBusiness: (business: Business) => void;
+  deleteBusiness: (businessId: number) => void;
 };
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
@@ -41,12 +115,10 @@ const BusinessContext = createContext<BusinessContextType | undefined>(
 );
 
 export const BusinessProvider = ({ children }: { children: ReactNode }) => {
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [state, dispatch] = useReducer(businessReducer, initialState);
 
   const fetchBusinesses = async () => {
-    setIsLoading(true);
+    dispatch({ type: 'FETCH_BUSINESSES_START' });
     try {
       let token;
       if (Platform.OS === "web") {
@@ -68,8 +140,6 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -77,29 +147,43 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
       const validBusinesses = json.filter(
         (business: Business) => business.id !== undefined
       );
-      setBusinesses(validBusinesses);
+      
+      dispatch({ 
+        type: 'FETCH_BUSINESSES_SUCCESS', 
+        payload: validBusinesses 
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError(error as Error);
-    } finally {
-      setIsLoading(false);
+      dispatch({ 
+        type: 'FETCH_BUSINESSES_ERROR', 
+        payload: error as Error 
+      });
     }
+  };
+
+  const addBusiness = (business: Business) => {
+    dispatch({ type: 'ADD_BUSINESS', payload: business });
+  };
+
+  const updateBusiness = (business: Business) => {
+    dispatch({ type: 'UPDATE_BUSINESS', payload: business });
+  };
+
+  const deleteBusiness = (businessId: number) => {
+    dispatch({ type: 'DELETE_BUSINESS', payload: businessId });
   };
 
   useEffect(() => {
     fetchBusinesses();
   }, []);
 
-  if (error) {
-    return <ErrorMessage error={error} />;
-  }
-
   return (
-    <BusinessContext.Provider value={{ 
-      businesses, 
-      isLoading, 
-      error,
-      refreshBusinesses: fetchBusinesses 
+    <BusinessContext.Provider value={{
+      ...state,
+      refreshBusinesses: fetchBusinesses,
+      addBusiness,
+      updateBusiness,
+      deleteBusiness,
     }}>
       {children}
     </BusinessContext.Provider>
@@ -109,9 +193,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
 export const useBusinessContext = () => {
   const context = useContext(BusinessContext);
   if (!context) {
-    throw new Error(
-      "useBusinessContext must be used within a BusinessProvider"
-    );
+    throw new Error("useBusinessContext must be used within a BusinessProvider");
   }
   return context;
 };

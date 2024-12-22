@@ -1,120 +1,140 @@
-import { useState } from "react";
-import { Linking, Platform } from "react-native";
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { Icon, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
-import * as SecureStore from "expo-secure-store";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
 import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
-import { ErrorMessage } from "@/app/ui/error-message";
-import { API_URL } from "@/env";
 import * as CSS from "./styles";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 const LoginForm = () => {
   const router = useRouter();
-  const [loginError, setLoginError] = useState<Error | null>(null);
-  const { control, handleSubmit, watch } = useForm({
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const { signIn, continueAsGuest } = useAuth();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     defaultValues: {
       email: "",
       password: "",
     },
+    mode: "onBlur",
   });
 
-  const [status, setStatus] = useState("checked");
   const email = watch("email");
   const password = watch("password");
   const isButtonDisabled = !Boolean(email && password);
 
-  const onButtonToggle = () => {
-    setStatus(status === "checked" ? "unchecked" : "checked");
-  };
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      setLoginError(null); // Clear any previous errors
-      const response = await fetch(`${API_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        const token = responseData.token;
-
-        if (Platform.OS === "web") {
-          localStorage.setItem("userToken", token);
+      setLoginError(null);
+      await signIn(data.email, data.password);
+      router.push("/home");
+    } catch (err) {
+      if (err instanceof Error) {
+        const errorMessage = err.message.toLowerCase();
+        if (errorMessage.includes("user not found")) {
+          setLoginError("No account found with this email");
+        } else if (errorMessage.includes("invalid password")) {
+          setLoginError("Incorrect password");
+        } else if (errorMessage.includes("authentication failed")) {
+          setLoginError("Invalid email or password");
+        } else if (errorMessage.includes("no authentication token")) {
+          setLoginError("Login failed. Please try again");
+        } else if (errorMessage.includes("invalid response format")) {
+          setLoginError("Server error. Please try again later");
         } else {
-          await SecureStore.setItemAsync("userToken", token);
+          setLoginError(err.message);
         }
-
-        router.push("/home");
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        setLoginError("An unexpected error occurred");
       }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      setLoginError(error instanceof Error ? error : new Error('An unexpected error occurred'));
     }
   };
 
-  const { continueAsGuest } = useAuth();
-
   const handleContinueAsGuest = () => {
-    continueAsGuest();
-    router.push("/home");
+    try {
+      continueAsGuest();
+      router.push("/home");
+    } catch (err) {
+      setLoginError("Failed to continue as guest. Please try again");
+    }
   };
 
   return (
-    // <ScrollView>
     <CSS.Container>
       <CSS.Body>
         {loginError && (
-          <ErrorMessage error={loginError} />
+          <CSS.ErrorContainer>
+            <CSS.ErrorText>{loginError}</CSS.ErrorText>
+          </CSS.ErrorContainer>
         )}
-        
+
         <Controller
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: "Email is required",
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{ borderRadius: 12 }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Email"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              left={<TextInput.Icon color={Colors.light.text} icon="email" />}
-            />
+            <>
+              <CSS.StyledTextInput
+                outlineStyle={{ borderRadius: 12 }}
+                textColor={Colors.light.text}
+                mode="outlined"
+                activeOutlineColor={Colors.light.text}
+                value={value}
+                placeholder="Email"
+                placeholderTextColor={Colors.light.text}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={!!errors.email}
+                left={<TextInput.Icon color={Colors.light.text} icon="email" />}
+              />
+              {errors.email && (
+                <CSS.ErrorText>{errors.email.message}</CSS.ErrorText>
+              )}
+            </>
           )}
           name="email"
         />
 
         <Controller
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: "Password is required",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{ borderRadius: 12 }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Password"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              secureTextEntry
-              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
-            />
+            <>
+              <CSS.StyledTextInput
+                outlineStyle={{ borderRadius: 12 }}
+                textColor={Colors.light.text}
+                mode="outlined"
+                activeOutlineColor={Colors.light.text}
+                value={value}
+                placeholder="Password"
+                placeholderTextColor={Colors.light.text}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={!!errors.password}
+                secureTextEntry
+                left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
+              />
+              {errors.password && (
+                <CSS.ErrorText>{errors.password.message}</CSS.ErrorText>
+              )}
+            </>
           )}
           name="password"
         />
@@ -161,7 +181,6 @@ const LoginForm = () => {
         </CSS.FooterText>
       </CSS.Footer>
     </CSS.Container>
-    // </ScrollView>
   );
 };
 
