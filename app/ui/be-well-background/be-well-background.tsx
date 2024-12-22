@@ -35,7 +35,7 @@ export const BeWellBackground = ({
     return (
       <CSS.StyledSafeAreaView>
         {scrollable ? (
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={combinedStyle}
             refreshControl={refreshControl}
           >
@@ -47,7 +47,7 @@ export const BeWellBackground = ({
       </CSS.StyledSafeAreaView>
     );
   } catch (err) {
-    setError(err instanceof Error ? err : new Error('Layout error'));
+    setError(err instanceof Error ? err : new Error("Layout error"));
     return <ErrorMessage error={error} />;
   }
 };

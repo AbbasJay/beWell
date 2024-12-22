@@ -17,7 +17,7 @@ export const BeWellTabBar = () => {
     try {
       setActiveRoute(currentRoute);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Navigation error'));
+      setError(err instanceof Error ? err : new Error("Navigation error"));
     }
   }, [currentRoute]);
 

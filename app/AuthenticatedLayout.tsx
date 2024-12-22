@@ -13,21 +13,20 @@ interface AuthenticatedLayoutProps {
 }
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-
   const { tokens, isLoading, isGuestMode } = useAuth();
   const currentRoute = usePathname();
 
-  const tabBarRoutes = ["/", "/logIn", "/signUp", 'home'];
+  const tabBarRoutes = ["/", "/logIn", "/signUp", "home"];
 
   // Routes that don't require authentication
   const publicRoutes = ["/", "/logIn", "/signUp"];
-  
+
   // Routes where we don't show the navigation bar
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
 
   const shouldHideNavigationBar = () => {
-    return hideNavigationBarRoutes.some(route => {
-      const routePattern = route.replace('[id]', '[^/]+');
+    return hideNavigationBarRoutes.some((route) => {
+      const routePattern = route.replace("[id]", "[^/]+");
       const regex = new RegExp(`^${routePattern}$`);
       return regex.test(currentRoute);
     });
@@ -61,10 +60,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           }}
         />
       )}
-      
+
       {children}
 
       {!tabBarRoutes.includes(currentRoute) && <BeWellTabBar />}
     </View>
   );
-} 
+}

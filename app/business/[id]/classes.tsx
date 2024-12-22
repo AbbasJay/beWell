@@ -5,14 +5,21 @@ import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
-import { ClassesProvider, useClassesContext, Class } from "@/app/contexts/ClassesContext";
+import {
+  ClassesProvider,
+  useClassesContext,
+  Class,
+} from "@/app/contexts/ClassesContext";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
 import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { ClassesCard } from "@/app/ui/classes-card";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
-import { formattedStartDate, formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
+import {
+  formattedStartDate,
+  formatDuration,
+} from "@/app/utils/helper-functions/format-time-and-dates";
 import * as CSS from "./styles";
 
 export default function BusinessClassesScreen() {
@@ -57,7 +64,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const { refreshNotifications } = useNotificationsContext();
   const { sendNotification } = useNotifications();
   const [error, setError] = useState<Error | null>(null);
-  
+
   if (isLoading) return <LoadingSpinner />;
   if (classesError) {
     setError(classesError);
@@ -72,15 +79,18 @@ function BusinessClasses({ business }: BusinessClassesProps) {
 
   const handleBookClass = async () => {
     if (!selectedClass) return;
-    
+
     setIsBooking(true);
     try {
       await sendNotification(selectedClass);
       await refreshNotifications();
       setModalVisible(false);
     } catch (err) {
-      console.error('Error booking class:', err instanceof Error ? err.message : 'Unknown error');
-      setError(err instanceof Error ? err : new Error('Failed to book class'));
+      console.error(
+        "Error booking class:",
+        err instanceof Error ? err.message : "Unknown error"
+      );
+      setError(err instanceof Error ? err : new Error("Failed to book class"));
     } finally {
       setIsBooking(false);
     }
@@ -90,17 +100,10 @@ function BusinessClasses({ business }: BusinessClassesProps) {
     <BeWellBackground scrollable>
       {error && <ErrorMessage error={error} />}
       <CSS.BusinessCardContainer>
-        <BusinessCard 
-          item={business} 
-          width="100%" 
-          height="200px" 
-          disabled 
-        />
+        <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
 
-      {classes.length > 0 && (
-        <CSS.HeaderText>Available Classes</CSS.HeaderText>
-      )}
+      {classes.length > 0 && <CSS.HeaderText>Available Classes</CSS.HeaderText>}
 
       {classes.map((classItem) => (
         <TouchableOpacity

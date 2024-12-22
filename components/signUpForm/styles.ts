@@ -1,5 +1,5 @@
 import styled from "styled-components/native";
-import { TextInput, Button, Text } from "react-native-paper";
+import { TextInput, Button } from "react-native-paper";
 import { Platform, TouchableOpacity } from "react-native";
 import { Colors } from "@/constants/Colors";
 
