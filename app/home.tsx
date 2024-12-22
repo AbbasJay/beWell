@@ -3,13 +3,9 @@ import {
   Dimensions,
   FlatList,
   Platform,
-  ScrollView,
   TouchableOpacity,
   View,
-  Text,
-  Touchable,
   Animated,
-  Easing,
 } from "react-native";
 import {
   Business,
@@ -18,12 +14,9 @@ import {
 } from "./contexts/BusinessContext";
 import { router } from "expo-router";
 import Map from "../components/map";
+import FilterMenu from "@/components/filterMenu";
 import { BusinessCard } from "./ui/business-card/business-card";
-import Slider from "@react-native-community/slider";
-import { Chip } from "react-native-paper";
-
 import {
-  Container,
   FlatListContainer,
   FullWidthContainer,
   ScrollSeparator,
@@ -31,9 +24,7 @@ import {
 
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
-import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
-import Button from "./ui/button/button";
 import * as Location from "expo-location";
 
 const { width: viewportWidth } = Dimensions.get("window");
@@ -41,21 +32,16 @@ const { width: viewportWidth } = Dimensions.get("window");
 export default function HomePage() {
   const { businesses } = useBusinessContext();
   const { updateFilters } = useFilterBusinessContext();
+
   const [isMapView, setIsMapView] = useState(false);
   const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
 
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
-  const animatedValue = useRef(new Animated.Value(1)).current;
-
   const [rating, setRating] = useState(1);
   const [distance, setDistance] = useState(5);
-  const categories = ["gym", "classes"];
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  const translateY = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 600], // 0 = fully visible, 600 = off-screen
-  });
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([
+    "gym",
+  ]);
 
   const toggleListView = () => {
     setIsMapView(!isMapView);
@@ -72,24 +58,8 @@ export default function HomePage() {
       rating,
       selectedCategories
     );
-    console.log(
-      "Filters applied with",
-      distance,
-      location.current,
-      rating,
-      selectedCategories
-    );
+    setIsFilterMenuVisible(false);
   };
-
-  //use effect here to trigger the animation
-  useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: isFilterMenuVisible ? 0 : 1,
-      duration: 200,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start();
-  }, [isFilterMenuVisible, animatedValue]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -124,106 +94,23 @@ export default function HomePage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Animated.View
-        style={{
-          position: "absolute",
-          transform: [{ translateY }],
-          bottom: 0,
-          zIndex: 15,
-          width: "100%",
-          height: "75%",
-          backgroundColor: "white",
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            alignSelf: "flex-start",
-            padding: 20,
-            borderRadius: 5,
-            elevation: 6,
-            shadowColor: "#000",
-            shadowOpacity: 0.1,
-            shadowRadius: 6,
-            shadowOffset: {
-              width: 1,
-              height: 10,
-            },
-          }}
-          onPress={toggleFilterMenu}
-        >
-          <MaterialIcons name="clear" size={24} color="black" />
-        </TouchableOpacity>
-
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text>Min Rating {rating}/5</Text>
-          <Slider
-            style={{ width: 200, height: 40 }}
-            minimumValue={0}
-            maximumValue={5}
-            step={1}
-            value={rating}
-            onValueChange={(value) => setRating(value)}
-            minimumTrackTintColor="#000000"
-            maximumTrackTintColor="#000000"
-          />
-          <Text>Max Distance {distance} km</Text>
-          <Slider
-            style={{ width: 200, height: 40 }}
-            minimumValue={1}
-            maximumValue={10}
-            step={1}
-            value={distance}
-            onValueChange={(value) => setDistance(value)}
-            minimumTrackTintColor="#000000"
-            maximumTrackTintColor="#000000"
-          ></Slider>
-          <Text>Type</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-evenly",
-              padding: 10,
-            }}
-          >
-            {categories.map((category) => (
-              <Chip
-                style={{ margin: 5 }}
-                key={category}
-                selected={selectedCategories.includes(category)}
-                onPress={() => {
-                  setSelectedCategories((prev) =>
-                    prev.includes(category)
-                      ? prev.filter((item) => item !== category)
-                      : [...prev, category]
-                  );
-                }}
-              >
-                {category}
-              </Chip>
-            ))}
-          </View>
-          <View style={{ top: 10 }}>
-            <Button
-              fullWidth
-              variant="secondary"
-              title="Apply Filters"
-              onPress={applyFilters}
-            />
-          </View>
-        </View>
-      </Animated.View>
+      <FilterMenu
+        rating={rating}
+        isVisible={isFilterMenuVisible}
+        toggleFilterMenu={toggleFilterMenu}
+        setRating={setRating}
+        distance={distance}
+        setDistance={setDistance}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+        applyFilters={applyFilters}
+      />
 
       {isMapView ? (
         <Map
           businesses={businesses}
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
-          filterMenuVisible={isFilterMenuVisible}
         />
       ) : (
         <>

@@ -11,7 +11,6 @@ import {
   Text,
   Platform,
   Dimensions,
-  GestureResponderEvent,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { Business } from "../../app/contexts/BusinessContext";
@@ -19,7 +18,6 @@ import { router } from "expo-router";
 import Carousel from "react-native-reanimated-carousel";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-import { set } from "react-hook-form";
 
 const INITIAL_REGION = {
   //london
@@ -35,6 +33,13 @@ const provider = Platform.select({
   ios: PROVIDER_DEFAULT,
   android: PROVIDER_GOOGLE,
 });
+
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
 
 interface MapComponentProps {
   toggleListView: () => void;
@@ -54,48 +59,48 @@ const Map: React.FC<MapComponentProps> = ({
   }
 
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<any>(INITIAL_REGION);
-  const [center, setCenter] = useState<any>(INITIAL_REGION);
+  const [location, setLocation] = useState<Region>();
+  const [center, setCenter] = useState<Region>();
 
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+
       if (status == "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+
+        const { latitude, longitude } = loc.coords;
+
+        const user_location = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+
+        setLocation(user_location);
+        setCenter(user_location);
       } else {
         setLocation(INITIAL_REGION);
         setCenter(INITIAL_REGION);
-        return;
       }
-      const loc = await Location.getCurrentPositionAsync({});
-
-      const { latitude, longitude } = loc.coords;
-
-      const user_location = {
-        latitude,
-        longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      };
-
-      setLocation(user_location);
-      setCenter(user_location);
     })();
   }, []);
 
   const focusMap = () => {
-    mapRef.current?.animateToRegion(location, 1000);
+    mapRef.current?.animateToRegion(location!, 1000);
   };
 
   const zoomIn = () => {
     mapRef.current?.animateToRegion(
       {
         //cuurent location
-        latitude: center.latitude,
-        longitude: center.longitude,
-        latitudeDelta: center.latitudeDelta / 2,
-        longitudeDelta: center.longitudeDelta / 2,
+        latitude: center!.latitude,
+        longitude: center!.longitude,
+        latitudeDelta: center!.latitudeDelta / 2,
+        longitudeDelta: center!.longitudeDelta / 2,
       },
       1000
     );
@@ -105,10 +110,10 @@ const Map: React.FC<MapComponentProps> = ({
     mapRef.current?.animateToRegion(
       {
         //cuurent location
-        latitude: center.latitude,
-        longitude: center.longitude,
-        latitudeDelta: center.latitudeDelta * 2,
-        longitudeDelta: center.longitudeDelta * 2,
+        latitude: center!.latitude,
+        longitude: center!.longitude,
+        latitudeDelta: center!.latitudeDelta * 2,
+        longitudeDelta: center!.longitudeDelta * 2,
       },
       1000
     );
@@ -228,9 +233,6 @@ const Map: React.FC<MapComponentProps> = ({
         )}
       </MapView>
 
-      {/* Carousel */}
-      {/* <GestureHandlerRootView>
-        <GestureDetector gesture={carouselGesture}> */}
       <View style={styles.outerView}>
         <Carousel
           data={businesses}
@@ -241,8 +243,6 @@ const Map: React.FC<MapComponentProps> = ({
           pointerEvents="auto"
         />
       </View>
-      {/* </GestureDetector>
-      </GestureHandlerRootView> */}
     </View>
   );
 };
