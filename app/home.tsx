@@ -33,19 +33,20 @@ const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
   const { businesses, isLoading, error } = useBusinessContext();
+
+  // THIS IS CAUSING THE ERROR ON LOGIN OR CONSTANT RE-RENDERING
+  // if (isLoading) return <LoadingSpinner />;
+  // if (error) return <ErrorMessage error={error} />;
+
   const { updateFilters } = useFilterBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
   const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
-
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const [rating, setRating] = useState(1);
   const [distance, setDistance] = useState(5);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
     "gym",
   ]);
-
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
 
   const toggleListView = () => {
     setIsMapView(!isMapView);
@@ -62,26 +63,26 @@ export default function HomePage() {
       rating,
       selectedCategories
     );
+
+    //console log the filters
+
+    console.log("Categories: ", selectedCategories);
+
     setIsFilterMenuVisible(false);
   };
 
   useEffect(() => {
     const fetchLocation = async () => {
       const loc = await Location.getCurrentPositionAsync();
-
       const { latitude, longitude } = loc.coords;
-
       location.current = { lat: latitude, lng: longitude };
-
       applyFilters();
     };
-
     fetchLocation();
   }, []);
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
-
     return (
       <BusinessCard
         item={{
@@ -114,7 +115,6 @@ export default function HomePage() {
         setSelectedCategories={setSelectedCategories}
         applyFilters={applyFilters}
       />
-
       {isMapView ? (
         <Map
           businesses={businesses}

@@ -4,6 +4,7 @@ import React, {
   useReducer,
   useEffect,
   ReactNode,
+  useState,
 } from "react";
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
@@ -138,6 +139,13 @@ const FilterBusinessContext = createContext<
 
 export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(businessReducer, initialState);
+  const [distance, setDistance] = useState<Number>(5000);
+  const [location, setLocation] = useState<LocationType>({
+    lat: 51.4086295,
+    lng: -0.7214513,
+  }); //actually get that from expo-location
+  const [minRating, setMinRating] = useState<Number>(4); // 4 out of 5
+  const [serviceTypes, setServiceTypes] = useState<String[]>(["classes"]);
 
   const fetchBusinesses = async () => {
     dispatch({ type: "FETCH_BUSINESSES_START" });
@@ -152,6 +160,9 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
       if (!token) {
         throw new Error("No authentication token found");
       }
+
+      console.log("On request:");
+      console.log("Service types: " + serviceTypes);
 
       const response = await fetch(`${API_URL}/api/businesses/filter`, {
         method: "POST",
@@ -204,14 +215,6 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: "DELETE_BUSINESS", payload: businessId });
   };
 
-  const [distance, setDistance] = useState<Number>(5000);
-  const [location, setLocation] = useState<LocationType>({
-    lat: 51.4086295,
-    lng: -0.7214513,
-  }); //actually get that from expo-location
-  const [minRating, setMinRating] = useState<Number>(4); // 4 out of 5
-  const [serviceTypes, setServiceTypes] = useState<String[]>(["classes"]);
-
   const updateFilters = (
     newDistance: Number,
     newLocation: LocationType,
@@ -222,6 +225,11 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     setLocation(newLocation);
     setMinRating(newMinRating);
     setServiceTypes(newServiceTypes);
+
+    //log the new filters
+    console.log("New filters:");
+    console.log("Service types: " + newServiceTypes);
+    console.log("Type of service types: " + typeof newServiceTypes);
   };
 
   useEffect(() => {

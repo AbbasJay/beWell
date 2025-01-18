@@ -44,14 +44,12 @@ type Region = {
 interface MapComponentProps {
   toggleListView: () => void;
   toggleFilterMenu: () => void;
-  filterMenuVisible: boolean;
   businesses: Business[];
 }
 
 const Map: React.FC<MapComponentProps> = ({
   toggleListView,
   toggleFilterMenu,
-  filterMenuVisible,
   businesses,
 }) => {
   if (Platform.OS === "web") {
