@@ -32,7 +32,7 @@ const { width: viewportWidth } = Dimensions.get("window");
 const provider = Platform.select({
   ios: PROVIDER_DEFAULT,
   android: PROVIDER_GOOGLE,
-});
+}) as typeof PROVIDER_GOOGLE;
 
 type Region = {
   latitude: number;
@@ -240,7 +240,6 @@ const Map: React.FC<MapComponentProps> = ({
           width={viewportWidth * 0.8}
           onSnapToItem={onSnapToItem}
           style={styles.carouselContainer}
-          pointerEvents="auto"
         />
       </View>
     </View>

@@ -1,7 +1,7 @@
 import React, {
   createContext,
   useContext,
-  useState,
+  useReducer,
   useEffect,
   ReactNode,
 } from "react";
@@ -25,10 +25,90 @@ export type Class = {
   createdAt: Date;
 };
 
-type ClassesContextType = {
+// State interface
+interface ClassesState {
   classes: Class[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+// Extended interface for context that includes methods
+interface ClassesContextType extends ClassesState {
+  refreshClasses: () => Promise<void>;
+  updateSlotsLeft: (classId: number, slotsLeft: number) => void;
+}
+
+// Action types
+type ClassesAction =
+  | { type: 'FETCH_CLASSES_START' }
+  | { type: 'FETCH_CLASSES_SUCCESS'; payload: Class[] }
+  | { type: 'FETCH_CLASSES_ERROR'; payload: Error }
+  | { type: 'ADD_CLASS'; payload: Class }
+  | { type: 'UPDATE_CLASS'; payload: Class }
+  | { type: 'UPDATE_SLOTS_LEFT'; payload: { classId: number; slotsLeft: number } };
+
+// Initial state
+const initialState: ClassesState = {
+  classes: [],
+  isLoading: false,
+  error: null,
 };
 
+// Reducer function
+function classesReducer(state: ClassesState, action: ClassesAction): ClassesState {
+  switch (action.type) {
+    case 'FETCH_CLASSES_START':
+      return {
+        ...state,
+        isLoading: true,
+        error: null,
+      };
+    
+    case 'FETCH_CLASSES_SUCCESS':
+      return {
+        ...state,
+        classes: action.payload,
+        isLoading: false,
+        error: null,
+      };
+    
+    case 'FETCH_CLASSES_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      };
+    
+    case 'ADD_CLASS':
+      return {
+        ...state,
+        classes: [...state.classes, action.payload],
+      };
+    
+    case 'UPDATE_CLASS':
+      return {
+        ...state,
+        classes: state.classes.map(classItem => 
+          classItem.id === action.payload.id ? action.payload : classItem
+        ),
+      };
+    
+    case 'UPDATE_SLOTS_LEFT':
+      return {
+        ...state,
+        classes: state.classes.map(classItem => 
+          classItem.id === action.payload.classId 
+            ? { ...classItem, slotsLeft: action.payload.slotsLeft }
+            : classItem
+        ),
+      };
+    
+    default:
+      return state;
+  }
+}
+
+// Update context creation to use ClassesContextType
 const ClassesContext = createContext<ClassesContextType | undefined>(undefined);
 
 export const ClassesProvider = ({
@@ -38,47 +118,62 @@ export const ClassesProvider = ({
   children: ReactNode;
   businessId: number;
 }) => {
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [state, dispatch] = useReducer(classesReducer, initialState);
+
+  const fetchClasses = async () => {
+    dispatch({ type: 'FETCH_CLASSES_START' });
+    try {
+      let token;
+      if (Platform.OS === "web") {
+        token = localStorage.getItem("userToken");
+      } else {
+        token = await SecureStore.getItemAsync("userToken");
+      }
+
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`${API_URL}/api/classes/${businessId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      dispatch({ type: 'FETCH_CLASSES_SUCCESS', payload: json });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      dispatch({ 
+        type: 'FETCH_CLASSES_ERROR', 
+        payload: error as Error 
+      });
+    }
+  };
+
+  const updateSlotsLeft = (classId: number, slotsLeft: number) => {
+    dispatch({ 
+      type: 'UPDATE_SLOTS_LEFT', 
+      payload: { classId, slotsLeft } 
+    });
+  };
 
   useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        let token;
-        if (Platform.OS === "web") {
-          token = localStorage.getItem("userToken");
-        } else {
-          token = await SecureStore.getItemAsync("userToken");
-        }
-
-        if (!token) {
-          throw new Error("No authentication token found");
-        }
-
-        const response = await fetch(`${API_URL}/api/classes/${businessId}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response:", errorText);
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        setClasses(json);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
     fetchClasses();
   }, [businessId]);
 
   return (
-    <ClassesContext.Provider value={{ classes }}>
+    <ClassesContext.Provider value={{
+      ...state,
+      refreshClasses: fetchClasses,
+      updateSlotsLeft,
+    }}>
       {children}
     </ClassesContext.Provider>
   );

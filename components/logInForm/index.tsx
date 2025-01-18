@@ -1,129 +1,136 @@
-import { useState } from "react";
-import { Linking, Platform, ScrollView } from "react-native";
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { Icon, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
-import * as SecureStore from "expo-secure-store";
-
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useTheme } from "@/hooks/themeContext";
-
-import * as CSS from "./styles";
-import { API_URL } from "@/env";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
+import * as CSS from "./styles";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 const LoginForm = () => {
   const router = useRouter();
-  const { control, handleSubmit, watch } = useForm({
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const { signIn, continueAsGuest } = useAuth();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     defaultValues: {
       email: "",
       password: "",
     },
+    mode: "onBlur",
   });
-
-  const [status, setStatus] = useState("checked");
-
-  const { theme, setTheme } = useTheme();
-  // const colors = useThemeColor();
 
   const email = watch("email");
   const password = watch("password");
   const isButtonDisabled = !Boolean(email && password);
 
-  const onButtonToggle = () => {
-    setStatus(status === "checked" ? "unchecked" : "checked");
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setLoginError(null);
+      await signIn(data.email, data.password);
+      router.push("/home");
+    } catch (err) {
+      if (err instanceof Error) {
+        const errorMessage = err.message.toLowerCase();
+        if (errorMessage.includes("user not found")) {
+          setLoginError("No account found with this email");
+        } else if (errorMessage.includes("invalid password")) {
+          setLoginError("Incorrect password");
+        } else if (errorMessage.includes("authentication failed")) {
+          setLoginError("Invalid email or password");
+        } else if (errorMessage.includes("no authentication token")) {
+          setLoginError("Login failed. Please try again");
+        } else if (errorMessage.includes("invalid response format")) {
+          setLoginError("Server error. Please try again later");
+        } else {
+          setLoginError(err.message);
+        }
+      } else {
+        setLoginError("An unexpected error occurred");
+      }
+    }
   };
 
-  // const toggleTheme = () => {
-  //   setTheme(theme === "light" ? "dark" : "light");
-  // };
-
-  const onSubmit = async (data: any) => {
+  const handleContinueAsGuest = () => {
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        const token = responseData.token;
-
-        if (Platform.OS === "web") {
-          localStorage.setItem("userToken", token);
-        } else {
-          await SecureStore.setItemAsync("userToken", token);
-        }
-
-        router.push("/home");
-      } else {
-        console.error("Login failed:", response.statusText);
-        // Handle login failure
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      // Handle error
+      continueAsGuest();
+      router.push("/home");
+    } catch (err) {
+      setLoginError("Failed to continue as guest. Please try again");
     }
   };
 
   return (
-    // <ScrollView>
     <CSS.Container>
-      {/* <CSS.Logo>
-        <CSS.StyledText fontSize="40px" colours={colors}>
-          LOGO
-        </CSS.StyledText>
-      </CSS.Logo> */}
-
       <CSS.Body>
-        {/* <CSS.ThemeToggle onPress={toggleTheme}>
-          <CSS.ThemeToggleText colours={colors}>
-            Toggle Theme (Current: {theme})
-          </CSS.ThemeToggleText>
-        </CSS.ThemeToggle> */}
+        {loginError && (
+          <CSS.ErrorContainer>
+            <CSS.ErrorText>{loginError}</CSS.ErrorText>
+          </CSS.ErrorContainer>
+        )}
 
         <Controller
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: "Email is required",
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{ borderRadius: 12 }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Email"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              left={<TextInput.Icon color={Colors.light.text} icon="email" />}
-            />
+            <>
+              <CSS.StyledTextInput
+                outlineStyle={{ borderRadius: 12 }}
+                textColor={Colors.light.text}
+                mode="outlined"
+                activeOutlineColor={Colors.light.text}
+                value={value}
+                placeholder="Email"
+                placeholderTextColor={Colors.light.text}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={!!errors.email}
+                left={<TextInput.Icon color={Colors.light.text} icon="email" />}
+              />
+              {errors.email && (
+                <CSS.ErrorText>{errors.email.message}</CSS.ErrorText>
+              )}
+            </>
           )}
           name="email"
         />
 
         <Controller
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: "Password is required",
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{ borderRadius: 12 }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Password"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              secureTextEntry
-              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
-            />
+            <>
+              <CSS.StyledTextInput
+                outlineStyle={{ borderRadius: 12 }}
+                textColor={Colors.light.text}
+                mode="outlined"
+                activeOutlineColor={Colors.light.text}
+                value={value}
+                placeholder="Password"
+                placeholderTextColor={Colors.light.text}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={!!errors.password}
+                secureTextEntry
+                left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
+              />
+              {errors.password && (
+                <CSS.ErrorText>{errors.password.message}</CSS.ErrorText>
+              )}
+            </>
           )}
           name="password"
         />
@@ -165,12 +172,11 @@ const LoginForm = () => {
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText onPress={() => router.push("/home")}>
+        <CSS.FooterText onPress={handleContinueAsGuest}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>
     </CSS.Container>
-    // </ScrollView>
   );
 };
 

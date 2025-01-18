@@ -11,15 +11,17 @@ interface NotificationListItemProps {
   messageAlert?: string;
   notification: Notification;
   business?: Business;
+  onPress?: () => void;
 }
 
 export default function NotificationListItem({
   messageAlert,
   notification,
   business,
+  onPress,
 }: NotificationListItemProps) {
   return (
-    <CSS.Container>
+    <CSS.Container onPress={onPress}>
       <CSS.LeftSection>
         <CSS.SampleImage
           source={require("@/assets/images/home-gym.webp")}

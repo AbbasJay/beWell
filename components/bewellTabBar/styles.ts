@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity } from "react-native";
+import { Platform } from "react-native";
 import styled from "styled-components/native";
 
 export const Content = styled.View`
@@ -9,6 +9,7 @@ export const TabBar = styled.View`
   flex-direction: row;
   justify-content: space-between;
   padding: ${Platform.OS === "ios" ? "0 0 20px 0" : "10px"};
+  margin-top: 8px;
 `;
 
 export const Tab = styled.TouchableOpacity`

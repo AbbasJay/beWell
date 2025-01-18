@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import styled from "styled-components/native";
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity`
   align-items: center;
   flex-direction: row;
   padding: 8px 8px 24px 8px;

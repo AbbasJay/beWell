@@ -1,134 +1,128 @@
-import React, { useEffect, useState } from "react";
-import {
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  View,
-  Modal,
-  Text,
-} from "react-native";
-import Button from "@/app/ui/button/button";
+import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { Class } from "@/app/contexts/ClassesContext";
-import { ClassesCard } from "@/app/ui/classes-card";
-import * as SecureStore from "expo-secure-store";
-import { API_URL } from "@/env";
-import { useBusinessContext } from "../../contexts/BusinessContext";
-import * as CSS from "./styles";
-import { Colors } from "@/constants/Colors";
-import { BusinessCard } from "@/app/ui/business-card/business-card";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
+import {
+  ClassesProvider,
+  useClassesContext,
+  Class,
+} from "@/app/contexts/ClassesContext";
 import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
-import { formattedStartDate } from "@/app/utils/helper-functions/format-time-and-dates";
-import { formatDuration } from "@/app/utils/helper-functions/format-time-and-dates";
+import { BusinessCard } from "@/app/ui/business-card/business-card";
+import { ClassesCard } from "@/app/ui/classes-card";
+import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { ErrorMessage } from "@/app/ui/error-message";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
-import { Chase } from "react-native-animated-spinkit";
+import {
+  formattedStartDate,
+  formatDuration,
+} from "@/app/utils/helper-functions/format-time-and-dates";
+import * as CSS from "./styles";
 
-export default function Business() {
+export default function BusinessClassesScreen() {
   const { businesses } = useBusinessContext();
-  const { id } = useLocalSearchParams();
-  const business = businesses.find((b) => b.id === Number(id));
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const { refreshNotifications } = useNotificationsContext();
-  const { sendNotification } = useNotifications();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const [error, setError] = useState<Error | null>(null);
+  const businessId = Number(id);
 
-  if (!business) {
-    return <CSS.DetailText>No business data available</CSS.DetailText>;
+  // Handle invalid ID
+  if (isNaN(businessId)) {
+    setError(new Error("Invalid business ID"));
+    return <ErrorMessage error={error} />;
   }
 
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        let token;
-        if (Platform.OS === "web") {
-          token = localStorage.getItem("userToken");
-        } else {
-          token = await SecureStore.getItemAsync("userToken");
-        }
-        if (!token) {
-          throw new Error("No authentication token found");
-        }
-        const response = await fetch(`${API_URL}/api/classes/${business.id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response:", errorText);
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const json = await response.json();
-        setClasses(json);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchClasses();
-  }, [business.id]);
+  const business = businesses.find((b) => b.id === businessId);
 
-  const descriptionLimit = 200;
-  const isDescriptionLong =
-    business.description && business.description.length > descriptionLimit;
+  if (!business) {
+    setError(new Error("Business not found"));
+    return <ErrorMessage error={error} />;
+  }
 
-  const handleClassPress = (item: Class) => {
-    setSelectedClass(item);
-    setShowConfirmation(false);
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+
+  return (
+    <ClassesProvider businessId={businessId}>
+      <BusinessClasses business={business} />
+    </ClassesProvider>
+  );
+}
+
+interface BusinessClassesProps {
+  business: Business;
+}
+
+function BusinessClasses({ business }: BusinessClassesProps) {
+  const { classes, isLoading, error: classesError } = useClassesContext();
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
+  const { refreshNotifications } = useNotificationsContext();
+  const { sendNotification } = useNotifications();
+  const [error, setError] = useState<Error | null>(null);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (classesError) {
+    setError(classesError);
+    return <ErrorMessage error={error} />;
+  }
+
+  const handleClassPress = (classItem: Class) => {
+    setError(null); // Clear any previous errors
+    setSelectedClass(classItem);
     setModalVisible(true);
   };
 
-  const handleConfirm = async () => {
-    setShowConfirmation(true);
+  const handleBookClass = async () => {
+    if (!selectedClass) return;
 
-    if (selectedClass) {
-      await sendNotification(selectedClass, 19); // todo: this needs to be user id
+    setIsBooking(true);
+    try {
+      await sendNotification(selectedClass);
       await refreshNotifications();
+      setModalVisible(false);
+    } catch (err) {
+      console.error(
+        "Error booking class:",
+        err instanceof Error ? err.message : "Unknown error"
+      );
+      setError(err instanceof Error ? err : new Error("Failed to book class"));
+    } finally {
+      setIsBooking(false);
     }
   };
 
   return (
     <BeWellBackground scrollable>
+      {error && <ErrorMessage error={error} />}
       <CSS.BusinessCardContainer>
         <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
 
-      {classes.length > 0 && <CSS.HeaderText>Classes</CSS.HeaderText>}
+      {classes.length > 0 && <CSS.HeaderText>Available Classes</CSS.HeaderText>}
 
-      {isLoading ? (
-        <View
-          style={{ alignItems: "center", justifyContent: "center", flex: 2 }}
+      {classes.map((classItem) => (
+        <TouchableOpacity
+          key={classItem.id}
+          onPress={() => handleClassPress(classItem)}
         >
-          <Chase size={48} color={Colors.dark.secondary} />
-        </View>
-      ) : (
-        classes.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            onPress={() => handleClassPress(item)}
-          >
-            <ClassesCard item={item} />
-          </TouchableOpacity>
-        ))
-      )}
+          <ClassesCard item={classItem} />
+        </TouchableOpacity>
+      ))}
 
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
-        confirmation={showConfirmation}
-        onConfirm={handleConfirm}
-        title={selectedClass?.name || ""}
-        description={selectedClass?.description || ""}
-        instructor={selectedClass?.instructor || ""}
-        address={`${business.address}, ${selectedClass?.location || ""}`}
+        confirmation={isBooking}
+        onConfirm={handleBookClass}
+        title={selectedClass?.name ?? ""}
+        description={selectedClass?.description ?? ""}
+        instructor={selectedClass?.instructor ?? ""}
+        address={`${business.address}, ${selectedClass?.location ?? ""}`}
         date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
         duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
       />

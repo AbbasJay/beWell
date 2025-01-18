@@ -88,3 +88,17 @@ export const FooterText = styled.Text`
   text-align: center;
   color: ${Colors.light.text};
 `;
+
+export const ErrorContainer = styled.View`
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+`;
+
+export const ErrorText = styled.Text`
+  color: #d32f2f;
+  font-size: 14px;
+  text-align: center;
+`;

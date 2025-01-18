@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, TouchableOpacity } from "react-native";
 import { BeWellClassCardConfirmation } from "./be-well-class-card-confirmation";
 import * as CSS from "./styles";
@@ -10,8 +10,8 @@ import { BeWellText, BeWellTextVariant } from "../be-well-text/be-well-text";
 interface BeWellClassCardConfirmationModalProps {
   visible: boolean;
   onRequestClose: () => void;
-  confirmation?: boolean;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
+  confirmation: boolean;
   title: string;
   description: string;
   instructor: string;
@@ -20,27 +20,42 @@ interface BeWellClassCardConfirmationModalProps {
   duration: string;
 }
 
-export const BeWellClassCardConfirmationModal = ({
+export const BeWellClassCardConfirmationModal: React.FC<
+  BeWellClassCardConfirmationModalProps
+> = ({
   visible,
   onRequestClose,
-  confirmation,
   onConfirm,
+  confirmation,
   title,
   description,
   instructor,
   address,
   date,
   duration,
-}: BeWellClassCardConfirmationModalProps) => {
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await onConfirm();
+      setIsLoading(false);
+      onRequestClose();
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       transparent={true}
       visible={visible}
       onRequestClose={onRequestClose}
     >
-      <CSS.ModalBackground>
-        <CSS.ModalContainer>
+      <CSS.ModalContainer>
+        <CSS.ModalContent>
           <CSS.ModalTopSection>
             <BeWellText variant={BeWellTextVariant.Headline3}>
               {title}
@@ -49,18 +64,17 @@ export const BeWellClassCardConfirmationModal = ({
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
           </CSS.ModalTopSection>
+
           {!confirmation ? (
-            <>
-              <BeWellClassCardConfirmation
-                title={title}
-                description={description}
-                address={address}
-                date={date}
-                duration={duration}
-                instructor={instructor}
-                confirmation={confirmation}
-              />
-            </>
+            <BeWellClassCardConfirmation
+              title={title}
+              description={description}
+              address={address}
+              date={date}
+              duration={duration}
+              instructor={instructor}
+              confirmation={confirmation}
+            />
           ) : (
             <CSS.ConfirmContainer>
               <MaterialIcons
@@ -73,16 +87,18 @@ export const BeWellClassCardConfirmationModal = ({
               </BeWellText>
             </CSS.ConfirmContainer>
           )}
+
           <CSS.ButtonContainer>
             <Button
               fullWidth
               variant="secondary"
-              title={confirmation ? "Close" : "Confirm"}
-              onPress={confirmation ? onRequestClose : onConfirm}
+              title={isLoading ? "Confirming..." : "Confirm"}
+              onPress={handleConfirm}
+              disabled={isLoading}
             />
           </CSS.ButtonContainer>
-        </CSS.ModalContainer>
-      </CSS.ModalBackground>
+        </CSS.ModalContent>
+      </CSS.ModalContainer>
     </Modal>
   );
 };

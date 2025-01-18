@@ -10,6 +10,8 @@ import { useTheme } from "@/hooks/themeContext";
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
 import { Colors } from "@/constants/Colors";
+import { ErrorMessage } from "@/app/ui/error-message";
+
 
 const SignUp = () => {
   const {
@@ -46,7 +48,13 @@ const SignUp = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
+  const [signUpError, setSignUpError] = useState<Error | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async (data: any) => {
+    setSignUpError(null);
+    setIsSubmitting(true);
+    
     try {
       const response = await fetch(`${API_URL}/api/register`, {
         method: "POST",
@@ -58,24 +66,26 @@ const SignUp = () => {
         }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to register");
+        throw new Error(responseData.error || "Failed to register");
       }
 
-      if (response.ok) {
-        router.push("/home");
-      } else {
-        console.log("Signup failed");
-      }
+      router.push("/home");
     } catch (error) {
       console.error("Error signing up:", error);
+      setSignUpError(error instanceof Error ? error : new Error('An unexpected error occurred'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <CSS.Container>
       <CSS.Body>
+        {signUpError && <ErrorMessage error={signUpError} />}
+
         {/* <CSS.ThemeToggle onPress={toggleTheme}>
           <CSS.ThemeToggleText colours={colors}>
             Toggle Theme (Current: {theme})
@@ -178,7 +188,7 @@ const SignUp = () => {
           <Button
             variant="secondary"
             title="Sign Up"
-            disabled={isButtonDisabled}
+            disabled={isButtonDisabled || isSubmitting}
             onPress={handleSubmit(onSubmit)}
           />
         </CSS.ButtonContainer>

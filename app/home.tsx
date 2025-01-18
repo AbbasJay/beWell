@@ -26,13 +26,14 @@ import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { ErrorMessage } from "@/app/ui/error-message";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function HomePage() {
-  const { businesses } = useBusinessContext();
+  const { businesses, isLoading, error } = useBusinessContext();
   const { updateFilters } = useFilterBusinessContext();
-
   const [isMapView, setIsMapView] = useState(false);
   const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
 
@@ -42,6 +43,9 @@ export default function HomePage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
     "gym",
   ]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
 
   const toggleListView = () => {
     setIsMapView(!isMapView);
@@ -87,7 +91,12 @@ export default function HomePage() {
           phoneNumber: item.phoneNumber,
           description: "",
         }}
-        onPress={() => router.push(`/business/${businessId}/classes`)}
+        onPress={() =>
+          router.push({
+            pathname: "/business/[id]/classes",
+            params: { id: businessId },
+          })
+        }
       />
     );
   };
