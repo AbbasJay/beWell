@@ -11,13 +11,13 @@ interface BeWellClassCardConfirmationModalProps {
   visible: boolean;
   onRequestClose: () => void;
   onConfirm: () => Promise<void>;
-  confirmation: boolean;
   title: string;
   description: string;
   instructor: string;
   address: string;
   date: string;
   duration: string;
+  showLoginPrompt?: boolean;
 }
 
 export const BeWellClassCardConfirmationModal: React.FC<
@@ -26,13 +26,13 @@ export const BeWellClassCardConfirmationModal: React.FC<
   visible,
   onRequestClose,
   onConfirm,
-  confirmation,
   title,
   description,
   instructor,
   address,
   date,
   duration,
+  showLoginPrompt = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -65,7 +65,18 @@ export const BeWellClassCardConfirmationModal: React.FC<
             </TouchableOpacity>
           </CSS.ModalTopSection>
 
-          {!confirmation ? (
+          {showLoginPrompt ? (
+            <CSS.ConfirmContainer>
+              <MaterialIcons
+                name="account-circle"
+                size={100}
+                color={theme.status.warning}
+              />
+              <BeWellText variant={BeWellTextVariant.TextMediumBold} textCenter>
+                Please sign in to book this class
+              </BeWellText>
+            </CSS.ConfirmContainer>
+          ) : (
             <BeWellClassCardConfirmation
               title={title}
               description={description}
@@ -73,26 +84,20 @@ export const BeWellClassCardConfirmationModal: React.FC<
               date={date}
               duration={duration}
               instructor={instructor}
-              confirmation={confirmation}
             />
-          ) : (
-            <CSS.ConfirmContainer>
-              <MaterialIcons
-                name="check-circle"
-                size={100}
-                color={theme.status.success}
-              />
-              <BeWellText variant={BeWellTextVariant.TextMediumBold} textCenter>
-                Thank you for joining the class! Enjoy!
-              </BeWellText>
-            </CSS.ConfirmContainer>
           )}
 
           <CSS.ButtonContainer>
             <Button
               fullWidth
               variant="secondary"
-              title={isLoading ? "Confirming..." : "Confirm"}
+              title={
+                showLoginPrompt
+                  ? "Sign In"
+                  : isLoading
+                  ? "Confirming..."
+                  : "Confirm"
+              }
               onPress={handleConfirm}
               disabled={isLoading}
             />

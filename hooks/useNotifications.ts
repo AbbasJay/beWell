@@ -10,9 +10,14 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
 
+  const resetNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
   const fetchNotifications = useCallback(async () => {
     if (!user?.id) {
       console.log("No user ID available");
+      resetNotifications();
       return;
     }
 
@@ -26,6 +31,7 @@ export const useNotifications = () => {
 
       if (!token) {
         console.log("No token found in useNotifications");
+        resetNotifications();
         throw new Error("No authentication token found");
       }
 
@@ -50,7 +56,7 @@ export const useNotifications = () => {
       console.error("Error in useNotifications:", error);
       throw error;
     }
-  }, [user?.id]);
+  }, [user?.id, resetNotifications]);
 
   const sendNotification = async (classData: Class) => {
     if (!user?.id) {
@@ -97,5 +103,10 @@ export const useNotifications = () => {
     }
   };
 
-  return { notifications, fetchNotifications, sendNotification };
+  return {
+    notifications,
+    fetchNotifications,
+    sendNotification,
+    resetNotifications,
+  };
 };

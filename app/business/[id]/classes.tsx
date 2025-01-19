@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -16,6 +16,7 @@ import { ClassesCard } from "@/app/ui/classes-card";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
+import { useToast } from "@/app/contexts/ToastContext";
 import {
   formattedStartDate,
   formatDuration,
@@ -63,7 +64,10 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const [isBooking, setIsBooking] = useState(false);
   const { refreshNotifications } = useNotificationsContext();
   const { sendNotification } = useNotifications();
+  const { user } = useAuth();
   const [error, setError] = useState<Error | null>(null);
+  const router = useRouter();
+  const { showToast } = useToast();
 
   if (isLoading) return <LoadingSpinner />;
   if (classesError) {
@@ -80,17 +84,25 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const handleBookClass = async () => {
     if (!selectedClass) return;
 
+    if (!user) {
+      setModalVisible(false);
+      router.push("/logIn");
+      return;
+    }
+
     setIsBooking(true);
     try {
       await sendNotification(selectedClass);
       await refreshNotifications();
       setModalVisible(false);
+      showToast(`Successfully booked ${selectedClass.name}!`, "success");
     } catch (err) {
       console.error(
         "Error booking class:",
         err instanceof Error ? err.message : "Unknown error"
       );
       setError(err instanceof Error ? err : new Error("Failed to book class"));
+      showToast("Failed to book class", "error");
     } finally {
       setIsBooking(false);
     }
@@ -117,7 +129,6 @@ function BusinessClasses({ business }: BusinessClassesProps) {
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
-        confirmation={isBooking}
         onConfirm={handleBookClass}
         title={selectedClass?.name ?? ""}
         description={selectedClass?.description ?? ""}
@@ -125,6 +136,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
         address={`${business.address}, ${selectedClass?.location ?? ""}`}
         date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
         duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
+        showLoginPrompt={!user}
       />
     </BeWellBackground>
   );

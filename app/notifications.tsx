@@ -1,16 +1,31 @@
-import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList } from "react-native";
-import { useNotificationsContext, Notification } from "@/app/contexts/NotificationsContext";
+import React, { useState, useCallback, useMemo } from "react";
+import { StyleSheet, View, FlatList } from "react-native";
+import {
+  useNotificationsContext,
+  Notification,
+} from "@/app/contexts/NotificationsContext";
 import NotificationListItem from "./ui/notification-list-item/notification-list-item";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { useBusinessContext } from "./contexts/BusinessContext";
 import { ErrorMessage } from "@/app/ui/error-message";
+import { useAuth } from "./contexts/auth/AuthContext";
+import { BeWellText } from "./ui/be-well-text/be-well-text";
+import Button from "./ui/button/button";
+import { router } from "expo-router";
 
 const NotificationsDisplay: React.FC = () => {
-  const { notifications, refreshNotifications, markAsRead } = useNotificationsContext();
+  const { notifications, refreshNotifications, markAsRead } =
+    useNotificationsContext();
   const { businesses } = useBusinessContext();
+  const { user } = useAuth();
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const sortedNotifications = useMemo(() => {
+    return [...notifications].sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [notifications]);
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -18,19 +33,44 @@ const NotificationsDisplay: React.FC = () => {
     try {
       await refreshNotifications();
     } catch (error) {
-      setError(error instanceof Error ? error : new Error('Failed to refresh notifications'));
+      setError(
+        error instanceof Error
+          ? error
+          : new Error("Failed to refresh notifications")
+      );
     } finally {
       setIsRefreshing(false);
     }
   }, [refreshNotifications]);
 
-  const handleNotificationPress = useCallback((notification: Notification) => {
-    if (!notification.read) {
-      markAsRead(notification.id);
-    }
-  }, [markAsRead]);
+  const handleNotificationPress = useCallback(
+    (notification: Notification) => {
+      if (!notification.read) {
+        markAsRead(notification.id);
+      }
+    },
+    [markAsRead]
+  );
 
+  const handleLoginPress = () => {
+    router.push("/logIn");
+  };
 
+  if (!user) {
+    return (
+      <BeWellBackground contentContainerStyle={styles.container}>
+        <View style={styles.loginPrompt}>
+          <BeWellText style={styles.loginTitle}>
+            Sign in to View Notifications
+          </BeWellText>
+          <BeWellText style={styles.loginDescription}>
+            Please sign in to view and manage your notifications
+          </BeWellText>
+          <Button onPress={handleLoginPress} title="Sign In" />
+        </View>
+      </BeWellBackground>
+    );
+  }
 
   return (
     <BeWellBackground contentContainerStyle={styles.container}>
@@ -38,10 +78,9 @@ const NotificationsDisplay: React.FC = () => {
         <ErrorMessage error={error} />
       ) : (
         <FlatList
-          data={notifications}
+          data={sortedNotifications}
           refreshing={isRefreshing}
           onRefresh={onRefresh}
-
           renderItem={({ item }) => (
             <NotificationListItem
               notification={item}
@@ -63,22 +102,23 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  header: {
+  loginPrompt: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  loginTitle: {
+    marginBottom: 12,
+    textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",
   },
-  unreadCount: {
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  notification: {
-    gap: 40,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  loginDescription: {
+    marginBottom: 24,
+    textAlign: "center",
+    opacity: 0.8,
+    fontSize: 16,
   },
 });
 

@@ -19,7 +19,7 @@ export default function RootLayout() {
             <Stack.Screen name="signUp" />
             <Stack.Screen name="home" />
             <Stack.Screen name="notifications" />
-            <Stack.Screen name="components" />
+            <Stack.Screen name="settings" />
             <Stack.Screen name="business/[id]/classes" />
           </Stack>
         </AuthenticatedLayout>
