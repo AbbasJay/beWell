@@ -1,10 +1,16 @@
-import React, { createContext, ReactNode, useContext, useReducer, useEffect } from 'react';
-import { Platform } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
-import { API_URL } from '@/env';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useReducer,
+  useEffect,
+} from "react";
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { API_URL } from "@/env";
 
 // Types
-type UserRole = 'user' | 'admin' | 'business_owner';
+type UserRole = "user" | "admin" | "business_owner";
 
 interface AuthUser {
   id: number;
@@ -27,12 +33,12 @@ interface AuthState {
 
 // Action types
 type AuthAction =
-  | { type: 'AUTH_START' }
-  | { type: 'AUTH_SUCCESS'; payload: { user: AuthUser; tokens: AuthTokens } }
-  | { type: 'AUTH_ERROR'; payload: Error }
-  | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
-  | { type: 'SET_GUEST_MODE' }
-  | { type: 'SIGN_OUT' };
+  | { type: "AUTH_START" }
+  | { type: "AUTH_SUCCESS"; payload: { user: AuthUser; tokens: AuthTokens } }
+  | { type: "AUTH_ERROR"; payload: Error }
+  | { type: "REFRESH_TOKEN_SUCCESS"; payload: AuthTokens }
+  | { type: "SET_GUEST_MODE" }
+  | { type: "SIGN_OUT" };
 
 // Context type
 interface AuthContextType extends AuthState {
@@ -54,14 +60,14 @@ const initialState: AuthState = {
 // Reducer
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
-    case 'AUTH_START':
+    case "AUTH_START":
       return {
         ...state,
         isLoading: true,
         error: null,
       };
-    
-    case 'AUTH_SUCCESS':
+
+    case "AUTH_SUCCESS":
       return {
         ...state,
         user: action.payload.user,
@@ -70,43 +76,47 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         error: null,
         isGuestMode: false,
       };
-    
-    case 'AUTH_ERROR':
+
+    case "AUTH_ERROR":
       return {
         ...state,
         isLoading: false,
         error: action.payload,
       };
-    
-    case 'REFRESH_TOKEN_SUCCESS':
+
+    case "REFRESH_TOKEN_SUCCESS":
       return {
         ...state,
         tokens: action.payload,
         error: null,
         isLoading: false,
       };
-    
-    case 'SET_GUEST_MODE':
+
+    case "SET_GUEST_MODE":
       return {
         ...initialState,
         isGuestMode: true,
         isLoading: false,
       };
-    
-    case 'SIGN_OUT':
+
+    case "SIGN_OUT":
       return {
         ...initialState,
         isLoading: false,
       };
-    
+
     default:
       return state;
   }
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // Token storage helpers
@@ -119,7 +129,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         await SecureStore.setItemAsync("accessToken", tokens.accessToken);
         await SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
       }
-      console.log('Tokens stored successfully');
+      console.log("Tokens stored successfully");
     } catch (error) {
       console.error("Error storing tokens:", error);
       throw error;
@@ -144,9 +154,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Session refresh
   const refreshSession = async () => {
     try {
-      const refreshToken = Platform.OS === "web"
-        ? localStorage.getItem("refreshToken")
-        : await SecureStore.getItemAsync("refreshToken");
+      const refreshToken =
+        Platform.OS === "web"
+          ? localStorage.getItem("refreshToken")
+          : await SecureStore.getItemAsync("refreshToken");
 
       if (!refreshToken) {
         console.log("No refresh token found, signing out");
@@ -156,21 +167,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Try to get user info from the existing token first
       try {
-        const payload = JSON.parse(atob(refreshToken.split('.')[1]));
+        const payload = JSON.parse(atob(refreshToken.split(".")[1]));
         const user: AuthUser = {
           id: payload.userId,
           email: payload.email,
-          role: payload.role || 'user'
+          role: payload.role || "user",
         };
 
         // Use the same token if it's still valid
         const tokens: AuthTokens = {
           accessToken: refreshToken,
-          refreshToken: refreshToken
+          refreshToken: refreshToken,
         };
 
         await storeTokens(tokens);
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
+        dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
         return;
       } catch (e) {
         console.log("Could not parse existing token, trying refresh");
@@ -178,35 +189,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // If we can't use the existing token, try to refresh
       const response = await fetch(`${API_URL}/api/refresh`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ refreshToken }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to refresh session');
+        throw new Error("Failed to refresh session");
       }
 
       const data = await response.json();
       const tokens: AuthTokens = {
         accessToken: data.token,
-        refreshToken: data.token
+        refreshToken: data.token,
       };
 
-      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      const payload = JSON.parse(atob(data.token.split(".")[1]));
       const user: AuthUser = {
         id: payload.userId,
         email: payload.email,
-        role: payload.role || 'user'
+        role: payload.role || "user",
       };
 
       await storeTokens(tokens);
-      dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
+      dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
     } catch (error) {
-      console.error('Session refresh failed:', error);
-      await signOut();  // Sign out on refresh failure
+      console.error("Session refresh failed:", error);
+      await signOut(); // Sign out on refresh failure
     }
   };
 
@@ -221,17 +232,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Sign in
   const signIn = async (email: string, password: string) => {
-    dispatch({ type: 'AUTH_START' });
+    dispatch({ type: "AUTH_START" });
     try {
       const url = `${API_URL}/api/login`;
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
+
+      console.log("url", url);
+      console.log("body", JSON.stringify({ email, password }));
 
       const responseText = await response.text();
 
@@ -243,27 +257,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         data = JSON.parse(responseText);
       } catch (e) {
-        throw new Error('Invalid response format from server');
+        throw new Error("Invalid response format from server");
       }
 
       if (!data.token) {
-        throw new Error('Invalid response format: missing token');
+        throw new Error("Invalid response format: missing token");
       }
 
-      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      const payload = JSON.parse(atob(data.token.split(".")[1]));
       const user: AuthUser = {
         id: payload.userId,
         email: email,
-        role: 'user'
+        role: "user",
       };
 
       const tokens: AuthTokens = {
         accessToken: data.token,
-        refreshToken: data.token
+        refreshToken: data.token,
       };
 
       await storeTokens(tokens);
-      dispatch({ type: 'AUTH_SUCCESS', payload: { user, tokens } });
+      dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
     } catch (error) {
       throw error;
     }
@@ -273,16 +287,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const signOut = async () => {
     try {
       await removeTokens();
-      dispatch({ type: 'SIGN_OUT' });
+      dispatch({ type: "SIGN_OUT" });
     } catch (error) {
-      dispatch({ type: 'AUTH_ERROR', payload: error as Error });
+      dispatch({ type: "AUTH_ERROR", payload: error as Error });
       throw error;
     }
   };
 
   // Guest mode
   const continueAsGuest = () => {
-    dispatch({ type: 'SET_GUEST_MODE' });
+    dispatch({ type: "SET_GUEST_MODE" });
   };
 
   // Role-based access control
@@ -302,20 +316,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      dispatch({ type: 'AUTH_START' });
+      dispatch({ type: "AUTH_START" });
       try {
-        const accessToken = Platform.OS === "web"
-          ? localStorage.getItem("accessToken")
-          : await SecureStore.getItemAsync("accessToken");
+        const accessToken =
+          Platform.OS === "web"
+            ? localStorage.getItem("accessToken")
+            : await SecureStore.getItemAsync("accessToken");
 
         if (accessToken) {
           await refreshSession();
         } else {
-          dispatch({ type: 'SIGN_OUT' });
+          dispatch({ type: "SIGN_OUT" });
         }
       } catch (error) {
-        console.error('Auth initialization failed:', error);
-        dispatch({ type: 'SIGN_OUT' });
+        console.error("Auth initialization failed:", error);
+        dispatch({ type: "SIGN_OUT" });
       }
     };
 
@@ -323,14 +338,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   return (
-    <AuthContext.Provider value={{
-      ...state,
-      signIn,
-      signOut,
-      refreshSession,
-      continueAsGuest,
-      hasPermission,
-    }}>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        signIn,
+        signOut,
+        refreshSession,
+        continueAsGuest,
+        hasPermission,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -342,4 +359,4 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}; 
+};

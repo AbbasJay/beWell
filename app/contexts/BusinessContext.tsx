@@ -161,8 +161,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("No authentication token found");
       }
 
-      console.log("On request:");
-      console.log("Service types: " + serviceTypes);
+      console.log(token);
 
       const response = await fetch(`${API_URL}/api/businesses/filter`, {
         method: "POST",
@@ -225,104 +224,11 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     setLocation(newLocation);
     setMinRating(newMinRating);
     setServiceTypes(newServiceTypes);
-
-    //log the new filters
-    console.log("New filters:");
-    console.log("Service types: " + newServiceTypes);
-    console.log("Type of service types: " + typeof newServiceTypes);
   };
 
   useEffect(() => {
-    // const fetchBusinesses = async () => {
-    //   try {
-    //     let token;
-    //     if (Platform.OS === "web") {
-    //       token = localStorage.getItem("userToken");
-    //     } else {
-    //       token = await SecureStore.getItemAsync("userToken");
-    //     }
-
-    //     if (!token) {
-    //       throw new Error("No authentication token found");
-    //     }
-
-    //     const response = await fetch(`${API_URL}/api/businesses/filter`, {
-    //       method: "POST",
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify({
-    //         location: {
-    //           lat: location.lat,
-    //           lng: location.lng,
-    //         },
-    //         maxDistance: distance,
-    //         minRating: minRating,
-    //         types: serviceTypes,
-    //       }),
-    //     });
-
-    //     if (!response.ok) {
-    //       const errorText = await response.text();
-    //       console.error("Error response:", errorText);
-    //       throw new Error(
-    //         `HTTP error while fetching businesses! status: ${response.status}`
-    //       );
-    //     }
-
-    //     const json = await response.json();
-    //     const validBusinesses = json.filter(
-    //       (business: Business) => business.id !== undefined
-    //     );
-    //     setBusinesses(validBusinesses);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-
     fetchBusinesses();
   }, [distance, location, minRating, serviceTypes]);
-
-  // useEffect(() => {
-  //   const fetchBusinesses = async () => {
-  //     try {
-  //       let token;
-  //       if (Platform.OS === "web") {
-  //         token = localStorage.getItem("userToken");
-  //       } else {
-  //         token = await SecureStore.getItemAsync("userToken");
-  //       }
-
-  //       if (!token) {
-  //         throw new Error("No authentication token found");
-  //       }
-
-  //       const response = await fetch(`${API_URL}/api/businesses?all=true`, {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorText = await response.text();
-  //         console.error("Error response:", errorText);
-  //         throw new Error(`HTTP error! status: ${response.status}`);
-  //       }
-
-  //       const json = await response.json();
-  //       const validBusinesses = json.filter(
-  //         (business: Business) => business.id !== undefined
-  //       );
-  //       setBusinesses(validBusinesses);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  //   fetchBusinesses();
-  // }, []);
 
   return (
     <BusinessContext.Provider
