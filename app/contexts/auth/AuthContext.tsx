@@ -169,11 +169,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         const payload = JSON.parse(atob(refreshToken.split(".")[1]));
         const user: AuthUser = {
-          id: payload.userId,
+          id: payload.id,
           email: payload.email,
           role: payload.role || "user",
         };
-
+        console.log("user", user);
         // Use the same token if it's still valid
         const tokens: AuthTokens = {
           accessToken: refreshToken,
@@ -208,7 +208,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       const payload = JSON.parse(atob(data.token.split(".")[1]));
       const user: AuthUser = {
-        id: payload.userId,
+        id: payload.id,
         email: payload.email,
         role: payload.role || "user",
       };
@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const signIn = async (email: string, password: string) => {
     dispatch({ type: "AUTH_START" });
     try {
-      const url = `${API_URL}/api/login`;
+      const url = `${API_URL}/api/mobile/auth/login`;
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -266,11 +266,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       const payload = JSON.parse(atob(data.token.split(".")[1]));
       const user: AuthUser = {
-        id: payload.userId,
+        id: payload.id,
         email: email,
         role: "user",
       };
-
+      console.log("user", user);
       const tokens: AuthTokens = {
         accessToken: data.token,
         refreshToken: data.token,

@@ -10,7 +10,6 @@ interface BeWellClassCardConfirmationProps {
   address: string;
   date?: string;
   duration?: string;
-  confirmation?: boolean;
 }
 
 export const BeWellClassCardConfirmation = ({
@@ -20,7 +19,6 @@ export const BeWellClassCardConfirmation = ({
   address,
   date,
   duration,
-  confirmation,
 }: BeWellClassCardConfirmationProps) => {
   return (
     <CSS.Container>

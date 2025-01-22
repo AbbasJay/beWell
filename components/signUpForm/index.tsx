@@ -12,7 +12,6 @@ import { API_URL } from "@/env";
 import { Colors } from "@/constants/Colors";
 import { ErrorMessage } from "@/app/ui/error-message";
 
-
 const SignUp = () => {
   const {
     control,
@@ -53,15 +52,21 @@ const SignUp = () => {
 
   const onSubmit = async (data: any) => {
     setSignUpError(null);
+
+    if (data.password !== data.confirmPassword) {
+      setSignUpError(new Error("Passwords do not match"));
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch(`${API_URL}/api/register`, {
+      const response = await fetch(`${API_URL}/api/mobile/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: data.userName,
-          email: data.emailText,
+          name: data.name,
+          email: data.emailText.toLowerCase(),
           password: data.password,
         }),
       });
@@ -75,7 +80,11 @@ const SignUp = () => {
       router.push("/home");
     } catch (error) {
       console.error("Error signing up:", error);
-      setSignUpError(error instanceof Error ? error : new Error('An unexpected error occurred'));
+      setSignUpError(
+        error instanceof Error
+          ? error
+          : new Error("An unexpected error occurred")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -156,16 +165,19 @@ const SignUp = () => {
               placeholder="Password"
               placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
+              secureTextEntry
               left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="password"
         />
 
-        {/* <Controller
+        <Controller
           control={control}
           rules={{
-            required: true,
+            required: "Confirm password is required",
+            validate: (value) =>
+              value === formValues.password || "Passwords do not match",
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <CSS.StyledTextInput
@@ -179,10 +191,21 @@ const SignUp = () => {
               placeholderTextColor={colors.text}
               onChangeText={onChange}
               left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
+              secureTextEntry
+              error={Boolean(errors.confirmPassword)}
             />
           )}
           name="confirmPassword"
-        /> */}
+        />
+        {errors.confirmPassword && (
+          <ErrorMessage
+            error={
+              new Error(
+                errors.confirmPassword.message || "Confirm password is required"
+              )
+            }
+          />
+        )}
 
         <CSS.ButtonContainer>
           <Button

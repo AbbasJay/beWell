@@ -59,7 +59,7 @@ export const BeWellTabBar = () => {
         </CSS.Tab>
         <CSS.Tab
           onPress={() => {
-            router.push("/components");
+            router.push("/settings");
           }}
         >
           <CSS.IconContainer>
