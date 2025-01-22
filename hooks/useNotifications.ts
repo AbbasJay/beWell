@@ -16,7 +16,7 @@ export const useNotifications = () => {
 
   const fetchNotifications = useCallback(async () => {
     if (!user?.id) {
-      console.log("No user ID available");
+      console.log("No user ID available - fetchNotifications");
       resetNotifications();
       return;
     }
@@ -35,14 +35,13 @@ export const useNotifications = () => {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/notifications/${user.id}`, {
+      const response = await fetch(`${API_URL}/api/mobile/notifications`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Error response:", errorText);
@@ -51,6 +50,7 @@ export const useNotifications = () => {
 
       const data = await response.json();
       setNotifications(data);
+
       return data;
     } catch (error) {
       console.error("Error in useNotifications:", error);
@@ -60,7 +60,7 @@ export const useNotifications = () => {
 
   const sendNotification = async (classData: Class) => {
     if (!user?.id) {
-      console.log("No user ID available");
+      console.log("No user ID available - sendNotification");
       return;
     }
 
@@ -85,14 +85,17 @@ export const useNotifications = () => {
         read: false,
       };
 
-      const response = await fetch(`${API_URL}/api/notifications/${user.id}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(notification),
-      });
+      const response = await fetch(
+        `${API_URL}/api/mobile/classes/${classData.id}/book`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(notification),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -12,7 +12,6 @@ import { API_URL } from "@/env";
 import { Colors } from "@/constants/Colors";
 import { ErrorMessage } from "@/app/ui/error-message";
 
-
 const SignUp = () => {
   const {
     control,
@@ -54,9 +53,9 @@ const SignUp = () => {
   const onSubmit = async (data: any) => {
     setSignUpError(null);
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch(`${API_URL}/api/register`, {
+      const response = await fetch(`${API_URL}/api/mobile/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,7 +74,11 @@ const SignUp = () => {
       router.push("/home");
     } catch (error) {
       console.error("Error signing up:", error);
-      setSignUpError(error instanceof Error ? error : new Error('An unexpected error occurred'));
+      setSignUpError(
+        error instanceof Error
+          ? error
+          : new Error("An unexpected error occurred")
+      );
     } finally {
       setIsSubmitting(false);
     }

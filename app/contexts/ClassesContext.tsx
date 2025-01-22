@@ -40,12 +40,15 @@ interface ClassesContextType extends ClassesState {
 
 // Action types
 type ClassesAction =
-  | { type: 'FETCH_CLASSES_START' }
-  | { type: 'FETCH_CLASSES_SUCCESS'; payload: Class[] }
-  | { type: 'FETCH_CLASSES_ERROR'; payload: Error }
-  | { type: 'ADD_CLASS'; payload: Class }
-  | { type: 'UPDATE_CLASS'; payload: Class }
-  | { type: 'UPDATE_SLOTS_LEFT'; payload: { classId: number; slotsLeft: number } };
+  | { type: "FETCH_CLASSES_START" }
+  | { type: "FETCH_CLASSES_SUCCESS"; payload: Class[] }
+  | { type: "FETCH_CLASSES_ERROR"; payload: Error }
+  | { type: "ADD_CLASS"; payload: Class }
+  | { type: "UPDATE_CLASS"; payload: Class }
+  | {
+      type: "UPDATE_SLOTS_LEFT";
+      payload: { classId: number; slotsLeft: number };
+    };
 
 // Initial state
 const initialState: ClassesState = {
@@ -55,54 +58,57 @@ const initialState: ClassesState = {
 };
 
 // Reducer function
-function classesReducer(state: ClassesState, action: ClassesAction): ClassesState {
+function classesReducer(
+  state: ClassesState,
+  action: ClassesAction
+): ClassesState {
   switch (action.type) {
-    case 'FETCH_CLASSES_START':
+    case "FETCH_CLASSES_START":
       return {
         ...state,
         isLoading: true,
         error: null,
       };
-    
-    case 'FETCH_CLASSES_SUCCESS':
+
+    case "FETCH_CLASSES_SUCCESS":
       return {
         ...state,
         classes: action.payload,
         isLoading: false,
         error: null,
       };
-    
-    case 'FETCH_CLASSES_ERROR':
+
+    case "FETCH_CLASSES_ERROR":
       return {
         ...state,
         isLoading: false,
         error: action.payload,
       };
-    
-    case 'ADD_CLASS':
+
+    case "ADD_CLASS":
       return {
         ...state,
         classes: [...state.classes, action.payload],
       };
-    
-    case 'UPDATE_CLASS':
+
+    case "UPDATE_CLASS":
       return {
         ...state,
-        classes: state.classes.map(classItem => 
+        classes: state.classes.map((classItem) =>
           classItem.id === action.payload.id ? action.payload : classItem
         ),
       };
-    
-    case 'UPDATE_SLOTS_LEFT':
+
+    case "UPDATE_SLOTS_LEFT":
       return {
         ...state,
-        classes: state.classes.map(classItem => 
-          classItem.id === action.payload.classId 
+        classes: state.classes.map((classItem) =>
+          classItem.id === action.payload.classId
             ? { ...classItem, slotsLeft: action.payload.slotsLeft }
             : classItem
         ),
       };
-    
+
     default:
       return state;
   }
@@ -121,7 +127,7 @@ export const ClassesProvider = ({
   const [state, dispatch] = useReducer(classesReducer, initialState);
 
   const fetchClasses = async () => {
-    dispatch({ type: 'FETCH_CLASSES_START' });
+    dispatch({ type: "FETCH_CLASSES_START" });
     try {
       let token;
       if (Platform.OS === "web") {
@@ -134,7 +140,7 @@ export const ClassesProvider = ({
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/classes/${businessId}`, {
+      const response = await fetch(`${API_URL}/api/mobile/classes`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,20 +153,20 @@ export const ClassesProvider = ({
       }
 
       const json = await response.json();
-      dispatch({ type: 'FETCH_CLASSES_SUCCESS', payload: json });
+      dispatch({ type: "FETCH_CLASSES_SUCCESS", payload: json });
     } catch (error) {
       console.error("Error fetching data:", error);
-      dispatch({ 
-        type: 'FETCH_CLASSES_ERROR', 
-        payload: error as Error 
+      dispatch({
+        type: "FETCH_CLASSES_ERROR",
+        payload: error as Error,
       });
     }
   };
 
   const updateSlotsLeft = (classId: number, slotsLeft: number) => {
-    dispatch({ 
-      type: 'UPDATE_SLOTS_LEFT', 
-      payload: { classId, slotsLeft } 
+    dispatch({
+      type: "UPDATE_SLOTS_LEFT",
+      payload: { classId, slotsLeft },
     });
   };
 
@@ -169,11 +175,13 @@ export const ClassesProvider = ({
   }, [businessId]);
 
   return (
-    <ClassesContext.Provider value={{
-      ...state,
-      refreshClasses: fetchClasses,
-      updateSlotsLeft,
-    }}>
+    <ClassesContext.Provider
+      value={{
+        ...state,
+        refreshClasses: fetchClasses,
+        updateSlotsLeft,
+      }}
+    >
       {children}
     </ClassesContext.Provider>
   );

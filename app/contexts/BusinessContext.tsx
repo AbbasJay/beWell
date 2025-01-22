@@ -36,12 +36,12 @@ interface BusinessState {
 
 // Action types
 type BusinessAction =
-  | { type: 'FETCH_BUSINESSES_START' }
-  | { type: 'FETCH_BUSINESSES_SUCCESS'; payload: Business[] }
-  | { type: 'FETCH_BUSINESSES_ERROR'; payload: Error }
-  | { type: 'ADD_BUSINESS'; payload: Business }
-  | { type: 'UPDATE_BUSINESS'; payload: Business }
-  | { type: 'DELETE_BUSINESS'; payload: number };
+  | { type: "FETCH_BUSINESSES_START" }
+  | { type: "FETCH_BUSINESSES_SUCCESS"; payload: Business[] }
+  | { type: "FETCH_BUSINESSES_ERROR"; payload: Error }
+  | { type: "ADD_BUSINESS"; payload: Business }
+  | { type: "UPDATE_BUSINESS"; payload: Business }
+  | { type: "DELETE_BUSINESS"; payload: number };
 
 // Initial state
 const initialState: BusinessState = {
@@ -51,52 +51,55 @@ const initialState: BusinessState = {
 };
 
 // Reducer function
-function businessReducer(state: BusinessState, action: BusinessAction): BusinessState {
+function businessReducer(
+  state: BusinessState,
+  action: BusinessAction
+): BusinessState {
   switch (action.type) {
-    case 'FETCH_BUSINESSES_START':
+    case "FETCH_BUSINESSES_START":
       return {
         ...state,
         isLoading: true,
         error: null,
       };
-    
-    case 'FETCH_BUSINESSES_SUCCESS':
+
+    case "FETCH_BUSINESSES_SUCCESS":
       return {
         ...state,
         businesses: action.payload,
         isLoading: false,
         error: null,
       };
-    
-    case 'FETCH_BUSINESSES_ERROR':
+
+    case "FETCH_BUSINESSES_ERROR":
       return {
         ...state,
         isLoading: false,
         error: action.payload,
       };
-    
-    case 'ADD_BUSINESS':
+
+    case "ADD_BUSINESS":
       return {
         ...state,
         businesses: [...state.businesses, action.payload],
       };
-    
-    case 'UPDATE_BUSINESS':
+
+    case "UPDATE_BUSINESS":
       return {
         ...state,
-        businesses: state.businesses.map(business => 
+        businesses: state.businesses.map((business) =>
           business.id === action.payload.id ? action.payload : business
         ),
       };
-    
-    case 'DELETE_BUSINESS':
+
+    case "DELETE_BUSINESS":
       return {
         ...state,
-        businesses: state.businesses.filter(business => 
-          business.id !== action.payload
+        businesses: state.businesses.filter(
+          (business) => business.id !== action.payload
         ),
       };
-    
+
     default:
       return state;
   }
@@ -118,7 +121,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(businessReducer, initialState);
 
   const fetchBusinesses = async () => {
-    dispatch({ type: 'FETCH_BUSINESSES_START' });
+    dispatch({ type: "FETCH_BUSINESSES_START" });
     try {
       let token;
       if (Platform.OS === "web") {
@@ -131,7 +134,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/businesses?all=true`, {
+      const response = await fetch(`${API_URL}/api/mobile/businesses`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,30 +150,30 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
       const validBusinesses = json.filter(
         (business: Business) => business.id !== undefined
       );
-      
-      dispatch({ 
-        type: 'FETCH_BUSINESSES_SUCCESS', 
-        payload: validBusinesses 
+
+      dispatch({
+        type: "FETCH_BUSINESSES_SUCCESS",
+        payload: validBusinesses,
       });
     } catch (error) {
       console.error("Error fetching data:", error);
-      dispatch({ 
-        type: 'FETCH_BUSINESSES_ERROR', 
-        payload: error as Error 
+      dispatch({
+        type: "FETCH_BUSINESSES_ERROR",
+        payload: error as Error,
       });
     }
   };
 
   const addBusiness = (business: Business) => {
-    dispatch({ type: 'ADD_BUSINESS', payload: business });
+    dispatch({ type: "ADD_BUSINESS", payload: business });
   };
 
   const updateBusiness = (business: Business) => {
-    dispatch({ type: 'UPDATE_BUSINESS', payload: business });
+    dispatch({ type: "UPDATE_BUSINESS", payload: business });
   };
 
   const deleteBusiness = (businessId: number) => {
-    dispatch({ type: 'DELETE_BUSINESS', payload: businessId });
+    dispatch({ type: "DELETE_BUSINESS", payload: businessId });
   };
 
   useEffect(() => {
@@ -178,13 +181,15 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <BusinessContext.Provider value={{
-      ...state,
-      refreshBusinesses: fetchBusinesses,
-      addBusiness,
-      updateBusiness,
-      deleteBusiness,
-    }}>
+    <BusinessContext.Provider
+      value={{
+        ...state,
+        refreshBusinesses: fetchBusinesses,
+        addBusiness,
+        updateBusiness,
+        deleteBusiness,
+      }}
+    >
       {children}
     </BusinessContext.Provider>
   );
@@ -193,7 +198,9 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
 export const useBusinessContext = () => {
   const context = useContext(BusinessContext);
   if (!context) {
-    throw new Error("useBusinessContext must be used within a BusinessProvider");
+    throw new Error(
+      "useBusinessContext must be used within a BusinessProvider"
+    );
   }
   return context;
 };
