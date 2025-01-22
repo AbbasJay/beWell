@@ -52,6 +52,12 @@ const SignUp = () => {
 
   const onSubmit = async (data: any) => {
     setSignUpError(null);
+
+    if (data.password !== data.confirmPassword) {
+      setSignUpError(new Error("Passwords do not match"));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -59,8 +65,8 @@ const SignUp = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: data.userName,
-          email: data.emailText,
+          name: data.name,
+          email: data.emailText.toLowerCase(),
           password: data.password,
         }),
       });
@@ -159,16 +165,19 @@ const SignUp = () => {
               placeholder="Password"
               placeholderTextColor={Colors.light.text}
               onChangeText={onChange}
+              secureTextEntry
               left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
             />
           )}
           name="password"
         />
 
-        {/* <Controller
+        <Controller
           control={control}
           rules={{
-            required: true,
+            required: "Confirm password is required",
+            validate: (value) =>
+              value === formValues.password || "Passwords do not match",
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <CSS.StyledTextInput
@@ -182,10 +191,21 @@ const SignUp = () => {
               placeholderTextColor={colors.text}
               onChangeText={onChange}
               left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
+              secureTextEntry
+              error={Boolean(errors.confirmPassword)}
             />
           )}
           name="confirmPassword"
-        /> */}
+        />
+        {errors.confirmPassword && (
+          <ErrorMessage
+            error={
+              new Error(
+                errors.confirmPassword.message || "Confirm password is required"
+              )
+            }
+          />
+        )}
 
         <CSS.ButtonContainer>
           <Button
