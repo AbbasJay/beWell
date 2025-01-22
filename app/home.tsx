@@ -26,8 +26,6 @@ import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import { LoadingSpinner } from "@/app/ui/loading-spinner";
-import { ErrorMessage } from "@/app/ui/error-message";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -63,10 +61,6 @@ export default function HomePage() {
       rating,
       selectedCategories
     );
-
-    //console log the filters
-
-    console.log("Categories: ", selectedCategories);
 
     setIsFilterMenuVisible(false);
   };
@@ -120,6 +114,7 @@ export default function HomePage() {
           businesses={businesses}
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
+          isVisible={isMapView}
         />
       ) : (
         <>

@@ -48,12 +48,14 @@ type Region = {
 interface MapComponentProps {
   toggleListView: () => void;
   toggleFilterMenu: () => void;
+  isVisible: boolean;
   businesses: Business[];
 }
 
 const Map: React.FC<MapComponentProps> = ({
   toggleListView,
   toggleFilterMenu,
+  isVisible,
   businesses,
 }) => {
   if (Platform.OS === "web") {
@@ -63,6 +65,7 @@ const Map: React.FC<MapComponentProps> = ({
   const mapRef = useRef<MapView>(null);
   const [location, setLocation] = useState<Region>();
   const [center, setCenter] = useState<Region>();
+  const [mapReady, setMapReady] = useState(false); // Track if the map is ready
 
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
@@ -90,6 +93,26 @@ const Map: React.FC<MapComponentProps> = ({
       }
     })();
   }, []);
+
+  // // zoom in on the first element in the carousel
+  // useEffect(() => {
+  //   if (isVisible && businesses.length > 0 && mapReady) {
+  //     const firstBusiness = businesses[0];
+  //     const { latitude, longitude } = firstBusiness;
+
+  //     if (latitude && longitude) {
+  //       mapRef.current?.animateToRegion(
+  //         {
+  //           latitude: latitude,
+  //           longitude: longitude,
+  //           latitudeDelta: 0.01,
+  //           longitudeDelta: 0.01,
+  //         },
+  //         1000
+  //       );
+  //     }
+  //   }
+  // }, [isVisible, mapReady, businesses]);
 
   const focusMap = () => {
     mapRef.current?.animateToRegion(location!, 1000);
@@ -196,11 +219,12 @@ const Map: React.FC<MapComponentProps> = ({
         initialRegion={location}
         provider={provider}
         showsMyLocationButton={false}
-        showsUserLocation={true}
+        showsUserLocation={false}
         ref={mapRef}
         onRegionChangeComplete={(region) => {
           setCenter(region);
         }}
+        onMapReady={() => setMapReady(true)}
       >
         {businesses.map(
           (

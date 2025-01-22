@@ -244,9 +244,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("url", url);
-      console.log("body", JSON.stringify({ email, password }));
-
       const responseText = await response.text();
 
       if (!response.ok) {

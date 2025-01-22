@@ -161,9 +161,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("No authentication token found");
       }
 
-      console.log(token);
-
-      const response = await fetch(`${API_URL}/api/businesses/filter`, {
+      const response = await fetch(`${API_URL}/api/mobile/businesses/filter`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
