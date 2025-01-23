@@ -96,7 +96,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
         <Slider
           style={{ width: 200, height: 40 }}
           minimumValue={1}
-          maximumValue={10}
+          maximumValue={200}
           step={1}
           value={distance}
           onValueChange={(value) => setDistance(value)}
