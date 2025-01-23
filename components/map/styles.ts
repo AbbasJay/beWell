@@ -1,21 +1,6 @@
-
-// import styled from "styled-components/native";
-// import MapView from "react-native-maps";
-
-// export const Container = styled.View<{ colours: { background: string } }>`
-//   flex: 1;
-//   background-color: ${(props) => props.colours.background};
-// `;
-
-// export const Map = styled(MapView)`
-//   width: '100%';
-//   height: '100%';
-// `;
-
 import styled from "styled-components/native";
 import MapView from "react-native-maps";
 import Carousel from "react-native-reanimated-carousel";
-import { Dimensions } from "react-native";
 
 export const Container = styled.View`
   flex: 1;
@@ -77,5 +62,5 @@ export const Button = styled.TouchableOpacity`
   shadow-offset: {
     width: 1px;
     height: 10px;
-  };
+  }
 `;
