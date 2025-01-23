@@ -4,22 +4,24 @@ import MapView, {
   PROVIDER_DEFAULT,
 } from "react-native-maps";
 
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
-  Platform,
-  Dimensions,
-  GestureResponderEvent,
-} from "react-native";
+import { Text, Platform, Dimensions } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
-import Carousel from "react-native-reanimated-carousel";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-import { set } from "react-hook-form";
+
+import {
+  Container,
+  Card,
+  CardTitle,
+  CardAddress,
+  StyledMapView,
+  CarouselContainer,
+  ButtonContainer,
+  Button,
+  StyledCarousel,
+} from "./styles";
 
 const INITIAL_REGION = {
   //london
@@ -36,59 +38,94 @@ const provider = Platform.select({
   android: PROVIDER_GOOGLE,
 }) as typeof PROVIDER_GOOGLE;
 
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
 interface MapComponentProps {
   toggleListView: () => void;
+  toggleFilterMenu: () => void;
+  isVisible: boolean;
   businesses: Business[];
 }
 
-const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
+const Map: React.FC<MapComponentProps> = ({
+  toggleListView,
+  toggleFilterMenu,
+  isVisible,
+  businesses,
+}) => {
   if (Platform.OS === "web") {
     return <Text>Map View is not supported on web</Text>;
   }
 
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<any>(INITIAL_REGION);
-  const [center, setCenter] = useState<any>(INITIAL_REGION);
+  const [location, setLocation] = useState<Region>();
+  const [center, setCenter] = useState<Region>();
+  const [mapReady, setMapReady] = useState(false); // Track if the map is ready
 
   businesses = businesses.filter((b) => b.latitude && b.longitude);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+
       if (status == "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+
+        const { latitude, longitude } = loc.coords;
+
+        const user_location = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+
+        setLocation(user_location);
+        setCenter(user_location);
       } else {
         setLocation(INITIAL_REGION);
         setCenter(INITIAL_REGION);
-        return;
       }
-      const loc = await Location.getCurrentPositionAsync({});
-
-      const { latitude, longitude } = loc.coords;
-
-      const user_location = {
-        latitude,
-        longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      };
-
-      setLocation(user_location);
-      setCenter(user_location);
     })();
   }, []);
 
+  // // zoom in on the first element in the carousel
+  // useEffect(() => {
+  //   if (isVisible && businesses.length > 0 && mapReady) {
+  //     const firstBusiness = businesses[0];
+  //     const { latitude, longitude } = firstBusiness;
+
+  //     if (latitude && longitude) {
+  //       mapRef.current?.animateToRegion(
+  //         {
+  //           latitude: latitude,
+  //           longitude: longitude,
+  //           latitudeDelta: 0.01,
+  //           longitudeDelta: 0.01,
+  //         },
+  //         1000
+  //       );
+  //     }
+  //   }
+  // }, [isVisible, mapReady, businesses]);
+
   const focusMap = () => {
-    mapRef.current?.animateToRegion(location, 1000);
+    mapRef.current?.animateToRegion(location!, 1000);
   };
 
   const zoomIn = () => {
     mapRef.current?.animateToRegion(
       {
         //cuurent location
-        latitude: center.latitude,
-        longitude: center.longitude,
-        latitudeDelta: center.latitudeDelta / 2,
-        longitudeDelta: center.longitudeDelta / 2,
+        latitude: center!.latitude,
+        longitude: center!.longitude,
+        latitudeDelta: center!.latitudeDelta / 2,
+        longitudeDelta: center!.longitudeDelta / 2,
       },
       1000
     );
@@ -98,26 +135,23 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
     mapRef.current?.animateToRegion(
       {
         //cuurent location
-        latitude: center.latitude,
-        longitude: center.longitude,
-        latitudeDelta: center.latitudeDelta * 2,
-        longitudeDelta: center.longitudeDelta * 2,
+        latitude: center!.latitude,
+        longitude: center!.longitude,
+        latitudeDelta: center!.latitudeDelta * 2,
+        longitudeDelta: center!.longitudeDelta * 2,
       },
       1000
     );
   };
 
   const renderCarouselItem = ({ item }: { item: Business }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => router.push(`/business/${item.id}/classes`)}
-    >
-      <Text style={styles.cardTitle}>{item.name}</Text>
-      <Text style={styles.cardAddress}>{item.address}</Text>
-      <Text style={styles.cardAddress}>
+    <Card onPress={() => router.push(`/business/${item.id}/classes`)}>
+      <CardTitle>{item.name}</CardTitle>
+      <CardAddress>{item.address}</CardAddress>
+      <CardAddress>
         {item.city}, {item.state}
-      </Text>
-    </TouchableOpacity>
+      </CardAddress>
+    </Card>
   );
 
   const onSnapToItem = (index: number) => {
@@ -161,32 +195,36 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={focusMap}>
+    <Container>
+      {/* Buttons */}
+      <ButtonContainer>
+        <Button onPress={focusMap}>
           <MaterialIcons name="my-location" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={toggleListView}>
+        </Button>
+        <Button onPress={toggleListView}>
           <MaterialIcons name="list" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={zoomOut}>
+        </Button>
+        <Button onPress={toggleFilterMenu}>
+          <MaterialIcons name="filter-alt" size={24} color="black" />
+        </Button>
+        <Button onPress={zoomOut}>
           <MaterialIcons name="arrow-upward" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={zoomIn}>
+        </Button>
+        <Button onPress={zoomIn}>
           <MaterialIcons name="arrow-downward" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+        </Button>
+      </ButtonContainer>
 
-      <MapView
-        style={styles.map}
+      <StyledMapView
         initialRegion={location}
         provider={provider}
         showsMyLocationButton={false}
-        showsUserLocation={true}
+        showsUserLocation={false}
         ref={mapRef}
         onRegionChangeComplete={(region) => {
           setCenter(region);
         }}
+        onMapReady={() => setMapReady(true)}
       >
         {businesses.map(
           (
@@ -215,86 +253,18 @@ const Map: React.FC<MapComponentProps> = ({ toggleListView, businesses }) => {
               ></Marker>
             )
         )}
-      </MapView>
+      </StyledMapView>
 
-      {/* Carousel */}
-      {/* <GestureHandlerRootView>
-        <GestureDetector gesture={carouselGesture}> */}
-      <View style={styles.outerView} pointerEvents="auto">
-        <Carousel
+      <CarouselContainer>
+        <StyledCarousel
           data={businesses}
           renderItem={renderCarouselItem}
           width={viewportWidth * 0.8}
           onSnapToItem={onSnapToItem}
-          style={styles.carouselContainer}
         />
-      </View>
-      {/* </GestureDetector>
-      </GestureHandlerRootView> */}
-    </View>
+      </CarouselContainer>
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-  outerView: {
-    position: "absolute",
-    bottom: 20,
-    width: "100%",
-  },
-  carouselContainer: {
-    width: "100%",
-    height: 100,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginHorizontal: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  cardAddress: {
-    fontSize: 14,
-    color: "#555",
-  },
-
-  buttonContainer: {
-    position: "absolute",
-    top: 60,
-    right: 20,
-    gap: 10,
-    zIndex: 10,
-  },
-
-  button: {
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 5,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: {
-      width: 1,
-      height: 10,
-    },
-  },
-});
 
 export default Map;

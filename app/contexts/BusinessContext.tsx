@@ -4,10 +4,12 @@ import React, {
   useReducer,
   useEffect,
   ReactNode,
+  useState,
 } from "react";
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import * as Location from "expo-location";
 
 export type Business = {
   id?: number;
@@ -113,12 +115,37 @@ type BusinessContextType = BusinessState & {
   deleteBusiness: (businessId: number) => void;
 };
 
+type FilterBusinessContextType = {
+  updateFilters: (
+    newDistance: Number,
+    newLocation: LocationType,
+    newMinRating: Number,
+    newServiceTypes: String[]
+  ) => void;
+};
+
+type LocationType = {
+  lat: Number;
+  lng: Number;
+};
+
 const BusinessContext = createContext<BusinessContextType | undefined>(
   undefined
 );
 
+const FilterBusinessContext = createContext<
+  FilterBusinessContextType | undefined
+>(undefined);
+
 export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(businessReducer, initialState);
+  const [distance, setDistance] = useState<Number>(5000);
+  const [location, setLocation] = useState<LocationType>({
+    lat: 51.4086295,
+    lng: -0.7214513,
+  }); //actually get that from expo-location
+  const [minRating, setMinRating] = useState<Number>(4); // 4 out of 5
+  const [serviceTypes, setServiceTypes] = useState<String[]>(["classes"]);
 
   const fetchBusinesses = async () => {
     dispatch({ type: "FETCH_BUSINESSES_START" });
@@ -134,12 +161,21 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/mobile/businesses`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/api/mobile/businesses/filter`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          location: {
+            lat: location.lat,
+            lng: location.lng,
+          },
+          maxDistance: distance,
+          minRating: minRating,
+          types: serviceTypes,
+        }),
       });
 
       if (!response.ok) {
@@ -176,9 +212,21 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: "DELETE_BUSINESS", payload: businessId });
   };
 
+  const updateFilters = (
+    newDistance: Number,
+    newLocation: LocationType,
+    newMinRating: Number,
+    newServiceTypes: String[]
+  ) => {
+    setDistance(newDistance);
+    setLocation(newLocation);
+    setMinRating(newMinRating);
+    setServiceTypes(newServiceTypes);
+  };
+
   useEffect(() => {
     fetchBusinesses();
-  }, []);
+  }, [distance, location, minRating, serviceTypes]);
 
   return (
     <BusinessContext.Provider
@@ -190,7 +238,9 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         deleteBusiness,
       }}
     >
-      {children}
+      <FilterBusinessContext.Provider value={{ updateFilters }}>
+        {children}
+      </FilterBusinessContext.Provider>
     </BusinessContext.Provider>
   );
 };
@@ -200,6 +250,16 @@ export const useBusinessContext = () => {
   if (!context) {
     throw new Error(
       "useBusinessContext must be used within a BusinessProvider"
+    );
+  }
+  return context;
+};
+
+export const useFilterBusinessContext = () => {
+  const context = useContext(FilterBusinessContext);
+  if (!context) {
+    throw new Error(
+      "useFilterBusinessContext must be used within a FilterBusinessProvider"
     );
   }
   return context;

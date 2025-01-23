@@ -1,4 +1,4 @@
-// export const API_URL = "http://192.168.185.129:3000";
+//export const API_URL = "http://localhost:3000";
 export const API_URL = "https://be-well-web.vercel.app";
 
 // notes
