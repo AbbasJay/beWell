@@ -65,9 +65,7 @@ const Map: React.FC<MapComponentProps> = ({
   const mapRef = useRef<MapView>(null);
   const [location, setLocation] = useState<Region>();
   const [center, setCenter] = useState<Region>();
-  const [mapReady, setMapReady] = useState(false); // Track if the map is ready
-
-  businesses = businesses.filter((b) => b.latitude && b.longitude);
+  const [firstBusinessLocation, setFirstBusinessLocation] = useState<Region>();
 
   useEffect(() => {
     (async () => {
@@ -86,33 +84,25 @@ const Map: React.FC<MapComponentProps> = ({
         };
 
         setLocation(user_location);
-        setCenter(user_location);
       } else {
         setLocation(INITIAL_REGION);
-        setCenter(INITIAL_REGION);
       }
     })();
   }, []);
 
-  // // zoom in on the first element in the carousel
-  // useEffect(() => {
-  //   if (isVisible && businesses.length > 0 && mapReady) {
-  //     const firstBusiness = businesses[0];
-  //     const { latitude, longitude } = firstBusiness;
+  useEffect(() => {
+    const firstBusiness_location = {
+      latitude: businesses[0].latitude!,
+      longitude: businesses[0].longitude!,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    };
+    setFirstBusinessLocation(firstBusiness_location);
+  }, [businesses]);
 
-  //     if (latitude && longitude) {
-  //       mapRef.current?.animateToRegion(
-  //         {
-  //           latitude: latitude,
-  //           longitude: longitude,
-  //           latitudeDelta: 0.01,
-  //           longitudeDelta: 0.01,
-  //         },
-  //         1000
-  //       );
-  //     }
-  //   }
-  // }, [isVisible, mapReady, businesses]);
+  useEffect(() => {
+    mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
+  }, [firstBusinessLocation]);
 
   const focusMap = () => {
     mapRef.current?.animateToRegion(location!, 1000);
@@ -216,7 +206,7 @@ const Map: React.FC<MapComponentProps> = ({
       </ButtonContainer>
 
       <StyledMapView
-        initialRegion={location}
+        initialRegion={center}
         provider={provider}
         showsMyLocationButton={false}
         showsUserLocation={false}
@@ -224,7 +214,6 @@ const Map: React.FC<MapComponentProps> = ({
         onRegionChangeComplete={(region) => {
           setCenter(region);
         }}
-        onMapReady={() => setMapReady(true)}
       >
         {businesses.map(
           (
