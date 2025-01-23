@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
@@ -28,22 +28,30 @@ export default function BusinessClassesScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [error, setError] = useState<Error | null>(null);
   const businessId = Number(id);
+  const [business, setBusiness] = useState<Business | null>(null);
 
-  // Handle invalid ID
-  if (isNaN(businessId)) {
-    setError(new Error("Invalid business ID"));
-    return <ErrorMessage error={error} />;
-  }
+  useEffect(() => {
+    if (isNaN(businessId)) {
+      setError(new Error("Invalid business ID"));
+      return;
+    }
 
-  const business = businesses.find((b) => b.id === businessId);
+    const foundBusiness = businesses.find((b) => b.id === businessId);
+    if (!foundBusiness) {
+      setError(new Error("Business not found"));
+      return;
+    }
 
-  if (!business) {
-    setError(new Error("Business not found"));
-    return <ErrorMessage error={error} />;
-  }
+    setBusiness(foundBusiness);
+    setError(null);
+  }, [businessId, businesses]);
 
   if (error) {
     return <ErrorMessage error={error} />;
+  }
+
+  if (!business) {
+    return <LoadingSpinner />;
   }
 
   return (
