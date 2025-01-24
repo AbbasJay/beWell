@@ -35,7 +35,6 @@ export default function BusinessClassesScreen() {
       setError(new Error("Invalid business ID"));
       return;
     }
-
     const foundBusiness = businesses.find((b) => b.id === businessId);
     if (!foundBusiness) {
       setError(new Error("Business not found"));
@@ -52,6 +51,11 @@ export default function BusinessClassesScreen() {
 
   if (!business) {
     return <LoadingSpinner />;
+  }
+
+  const business = businesses.find((b) => b.id === businessId);
+  if (!business) {
+    return null;
   }
 
   return (
@@ -77,14 +81,20 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
+  useEffect(() => {
+    if (classesError) {
+      setError(classesError);
+    }
+  }, [classesError]);
+
+  useEffect(() => {
+    return () => setError(null);
+  }, []);
+
   if (isLoading) return <LoadingSpinner />;
-  if (classesError) {
-    setError(classesError);
-    return <ErrorMessage error={error} />;
-  }
+  if (error) return <ErrorMessage error={error} />;
 
   const handleClassPress = (classItem: Class) => {
-    setError(null); // Clear any previous errors
     setSelectedClass(classItem);
     setModalVisible(true);
   };
@@ -118,7 +128,6 @@ function BusinessClasses({ business }: BusinessClassesProps) {
 
   return (
     <BeWellBackground scrollable>
-      {error && <ErrorMessage error={error} />}
       <CSS.BusinessCardContainer>
         <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
