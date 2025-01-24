@@ -140,13 +140,16 @@ export const ClassesProvider = ({
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/mobile/classes`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${API_URL}/api/mobile/classes?businessId=${businessId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
@@ -29,21 +29,28 @@ export default function BusinessClassesScreen() {
   const [error, setError] = useState<Error | null>(null);
   const businessId = Number(id);
 
-  // Handle invalid ID
-  if (isNaN(businessId)) {
-    setError(new Error("Invalid business ID"));
+  useEffect(() => {
+    if (isNaN(businessId)) {
+      setError(new Error("Invalid business ID"));
+      return;
+    }
+
+    const business = businesses.find((b) => b.id === businessId);
+    if (!business) {
+      setError(new Error("Business not found"));
+      return;
+    }
+
+    setError(null);
+  }, [businessId, businesses]);
+
+  if (error) {
     return <ErrorMessage error={error} />;
   }
 
   const business = businesses.find((b) => b.id === businessId);
-
   if (!business) {
-    setError(new Error("Business not found"));
-    return <ErrorMessage error={error} />;
-  }
-
-  if (error) {
-    return <ErrorMessage error={error} />;
+    return null;
   }
 
   return (
@@ -69,14 +76,20 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
+  useEffect(() => {
+    if (classesError) {
+      setError(classesError);
+    }
+  }, [classesError]);
+
+  useEffect(() => {
+    return () => setError(null);
+  }, []);
+
   if (isLoading) return <LoadingSpinner />;
-  if (classesError) {
-    setError(classesError);
-    return <ErrorMessage error={error} />;
-  }
+  if (error) return <ErrorMessage error={error} />;
 
   const handleClassPress = (classItem: Class) => {
-    setError(null); // Clear any previous errors
     setSelectedClass(classItem);
     setModalVisible(true);
   };
@@ -110,7 +123,6 @@ function BusinessClasses({ business }: BusinessClassesProps) {
 
   return (
     <BeWellBackground scrollable>
-      {error && <ErrorMessage error={error} />}
       <CSS.BusinessCardContainer>
         <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
