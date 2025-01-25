@@ -35,7 +35,6 @@ export default function BusinessClassesScreen() {
       setError(new Error("Invalid business ID"));
       return;
     }
-
     const foundBusiness = businesses.find((b) => b.id === businessId);
     if (!foundBusiness) {
       setError(new Error("Business not found"));
