@@ -129,14 +129,19 @@ function BusinessClasses({ business }: BusinessClassesProps) {
 
       {classes.length > 0 && <CSS.HeaderText>Available Classes</CSS.HeaderText>}
 
-      {classes.map((classItem) => (
-        <TouchableOpacity
-          key={classItem.id}
-          onPress={() => handleClassPress(classItem)}
-        >
-          <ClassesCard item={classItem} />
-        </TouchableOpacity>
-      ))}
+      {classes
+        .sort((a, b) => (b.slotsLeft > 0 ? 1 : -1))
+        .map((classItem) => (
+          <TouchableOpacity
+            key={classItem.id}
+            onPress={() =>
+              classItem.slotsLeft > 0 ? handleClassPress(classItem) : null
+            }
+            disabled={classItem.slotsLeft === 0}
+          >
+            <ClassesCard item={classItem} isFull={classItem.slotsLeft === 0} />
+          </TouchableOpacity>
+        ))}
 
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
@@ -148,6 +153,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
         address={`${business.address}, ${selectedClass?.location ?? ""}`}
         date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
         duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
+        slotsLeft={selectedClass?.slotsLeft ?? 0}
         showLoginPrompt={!user}
       />
     </BeWellBackground>

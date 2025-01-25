@@ -17,6 +17,7 @@ interface BeWellClassCardConfirmationModalProps {
   address: string;
   date: string;
   duration: string;
+  slotsLeft: number;
   showLoginPrompt?: boolean;
 }
 
@@ -32,6 +33,7 @@ export const BeWellClassCardConfirmationModal: React.FC<
   address,
   date,
   duration,
+  slotsLeft,
   showLoginPrompt = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -84,6 +86,7 @@ export const BeWellClassCardConfirmationModal: React.FC<
               date={date}
               duration={duration}
               instructor={instructor}
+              slotsLeft={slotsLeft}
             />
           )}
 
