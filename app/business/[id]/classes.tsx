@@ -77,14 +77,20 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
+  useEffect(() => {
+    if (classesError) {
+      setError(classesError);
+    }
+  }, [classesError]);
+
+  useEffect(() => {
+    return () => setError(null);
+  }, []);
+
   if (isLoading) return <LoadingSpinner />;
-  if (classesError) {
-    setError(classesError);
-    return <ErrorMessage error={error} />;
-  }
+  if (error) return <ErrorMessage error={error} />;
 
   const handleClassPress = (classItem: Class) => {
-    setError(null); // Clear any previous errors
     setSelectedClass(classItem);
     setModalVisible(true);
   };
@@ -118,21 +124,25 @@ function BusinessClasses({ business }: BusinessClassesProps) {
 
   return (
     <BeWellBackground scrollable>
-      {error && <ErrorMessage error={error} />}
       <CSS.BusinessCardContainer>
         <BusinessCard item={business} width="100%" height="200px" disabled />
       </CSS.BusinessCardContainer>
 
       {classes.length > 0 && <CSS.HeaderText>Available Classes</CSS.HeaderText>}
 
-      {classes.map((classItem) => (
-        <TouchableOpacity
-          key={classItem.id}
-          onPress={() => handleClassPress(classItem)}
-        >
-          <ClassesCard item={classItem} />
-        </TouchableOpacity>
-      ))}
+      {classes
+        .sort((a, b) => (b.slotsLeft > 0 ? 1 : -1))
+        .map((classItem) => (
+          <TouchableOpacity
+            key={classItem.id}
+            onPress={() =>
+              classItem.slotsLeft > 0 ? handleClassPress(classItem) : null
+            }
+            disabled={classItem.slotsLeft === 0}
+          >
+            <ClassesCard item={classItem} isFull={classItem.slotsLeft === 0} />
+          </TouchableOpacity>
+        ))}
 
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
@@ -144,6 +154,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
         address={`${business.address}, ${selectedClass?.location ?? ""}`}
         date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
         duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
+        slotsLeft={selectedClass?.slotsLeft ?? 0}
         showLoginPrompt={!user}
       />
     </BeWellBackground>

@@ -9,7 +9,12 @@ import {
 import { useState } from "react";
 import { ErrorMessage } from "@/app/ui/error-message";
 
-export const ClassesCard = ({ item }: { item: Class }) => {
+interface ClassesCardProps {
+  item: Class;
+  isFull?: boolean;
+}
+
+export const ClassesCard = ({ item, isFull = false }: ClassesCardProps) => {
   const [error, setError] = useState<Error | null>(null);
 
   if (!item) {
@@ -20,7 +25,7 @@ export const ClassesCard = ({ item }: { item: Class }) => {
   return (
     <CSS.Container key={item.id}>
       {error && <ErrorMessage error={error} />}
-      <CSS.Card>
+      <CSS.Card style={{ opacity: isFull ? 0.5 : 1 }}>
         <CSS.CardIcon>
           <BeWellIcons name="myIcon" width={50} height={50} />
         </CSS.CardIcon>
@@ -37,6 +42,12 @@ export const ClassesCard = ({ item }: { item: Class }) => {
           <CSS.IconTextWrapper>
             <MaterialIcons name="timer" size={14} color="grey" />
             <CSS.CardTitle>{formatDuration(item.duration)}</CSS.CardTitle>
+          </CSS.IconTextWrapper>
+          <CSS.IconTextWrapper>
+            <MaterialIcons name="person" size={14} color="grey" />
+            <CSS.CardTitle>
+              {isFull ? "Class Full" : `${item.slotsLeft} slots available`}
+            </CSS.CardTitle>
           </CSS.IconTextWrapper>
           {/* <CSS.CardText>
             <CSS.CardTitle>Price:</CSS.CardTitle> {item.price}

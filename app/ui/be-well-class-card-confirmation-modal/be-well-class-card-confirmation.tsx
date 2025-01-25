@@ -10,6 +10,7 @@ interface BeWellClassCardConfirmationProps {
   address: string;
   date?: string;
   duration?: string;
+  slotsLeft: number;
 }
 
 export const BeWellClassCardConfirmation = ({
@@ -19,6 +20,7 @@ export const BeWellClassCardConfirmation = ({
   address,
   date,
   duration,
+  slotsLeft,
 }: BeWellClassCardConfirmationProps) => {
   return (
     <CSS.Container>
@@ -34,6 +36,15 @@ export const BeWellClassCardConfirmation = ({
         </BeWellText>
         <BeWellText variant={BeWellTextVariant.TextSmall}>
           {description}
+        </BeWellText>
+      </CSS.DetailTextWrapper>
+
+      <CSS.DetailTextWrapper>
+        <BeWellText variant={BeWellTextVariant.TextMediumBold}>
+          Slots Available:
+        </BeWellText>
+        <BeWellText variant={BeWellTextVariant.TextSmall}>
+          {slotsLeft}
         </BeWellText>
       </CSS.DetailTextWrapper>
 

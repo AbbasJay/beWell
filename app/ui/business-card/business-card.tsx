@@ -34,7 +34,11 @@ export const BusinessCard = ({
             <CSS.ImageWrapper></CSS.ImageWrapper>
             <CSS.SampleImage
               height={height}
-              source={require("@/assets/images/home-gym.webp")}
+              source={
+                item.photo
+                  ? { uri: item.photo }
+                  : require("@/assets/images/home-gym.webp")
+              }
               resizeMode="cover"
             />
             <CSS.ContentWrapper>

@@ -9,7 +9,6 @@ import React, {
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import * as Location from "expo-location";
 
 export type Business = {
   id?: number;
@@ -28,6 +27,7 @@ export type Business = {
   createdAt?: string;
   latitude?: number | null;
   longitude?: number | null;
+  photo?: string | null;
 };
 
 interface BusinessState {
