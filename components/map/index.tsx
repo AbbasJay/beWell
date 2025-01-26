@@ -11,6 +11,9 @@ import { router } from "expo-router";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { Searchbar } from "react-native-paper";
+import { Colors } from "../../constants/Colors";
+
 import {
   Container,
   Card,
@@ -21,6 +24,7 @@ import {
   ButtonContainer,
   Button,
   StyledCarousel,
+  SearchBarContainer,
 } from "./styles";
 
 const INITIAL_REGION = {
@@ -66,6 +70,7 @@ const Map: React.FC<MapComponentProps> = ({
   const [location, setLocation] = useState<Region>();
   const [center, setCenter] = useState<Region>();
   const [firstBusinessLocation, setFirstBusinessLocation] = useState<Region>();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -205,6 +210,17 @@ const Map: React.FC<MapComponentProps> = ({
         </Button>
       </ButtonContainer>
 
+      <SearchBarContainer>
+        <Searchbar
+          placeholder="Search"
+          onChangeText={(text) => {
+            setSearchQuery(text);
+          }}
+          value={searchQuery}
+          style={{ margin: 10, backgroundColor: Colors.light.background }}
+        />
+      </SearchBarContainer>
+
       <StyledMapView
         initialRegion={center}
         provider={provider}
@@ -243,7 +259,6 @@ const Map: React.FC<MapComponentProps> = ({
             )
         )}
       </StyledMapView>
-
       <CarouselContainer>
         <StyledCarousel
           data={businesses}
