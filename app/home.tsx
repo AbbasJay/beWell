@@ -20,6 +20,7 @@ import {
   FlatListContainer,
   FullWidthContainer,
   ScrollSeparator,
+  SearchBarContainer,
 } from "./homeStyles";
 
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
@@ -27,7 +28,15 @@ import { HeaderText } from "./homeStyles";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
 const { width: viewportWidth } = Dimensions.get("window");
+
+const INITIAL_REGION = {
+  //london
+  lat: 51.5176,
+  lng: 0.1145,
+};
 
 export default function HomePage() {
   const { businesses, isLoading, error } = useBusinessContext();
@@ -38,7 +47,7 @@ export default function HomePage() {
 
   const { updateFilters } = useFilterBusinessContext();
   const [isMapView, setIsMapView] = useState(false);
-  const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
+  const [location, setLocation] = useState(INITIAL_REGION);
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const [rating, setRating] = useState(1);
   const [distance, setDistance] = useState(5);
@@ -57,23 +66,45 @@ export default function HomePage() {
   const applyFilters = () => {
     updateFilters(
       distance * 1000,
-      { lat: location.current.lat, lng: location.current.lng },
+      { lat: location.lat, lng: location.lng },
       rating,
       selectedCategories
     );
+
+    console.log("selectedCategories", selectedCategories);
 
     setIsFilterMenuVisible(false);
   };
 
   useEffect(() => {
-    const fetchLocation = async () => {
-      const loc = await Location.getCurrentPositionAsync();
-      const { latitude, longitude } = loc.coords;
-      location.current = { lat: latitude, lng: longitude };
-      applyFilters();
-    };
-    fetchLocation();
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status == "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+
+        const { latitude, longitude } = loc.coords;
+
+        const user_location = {
+          lat: latitude,
+          lng: longitude,
+        };
+
+        setLocation(user_location);
+      } else {
+        setLocation(INITIAL_REGION);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    updateFilters(
+      distance * 1000,
+      { lat: location.lat, lng: location.lng },
+      rating,
+      selectedCategories
+    );
+  }, [distance, location, rating, selectedCategories]);
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
@@ -98,6 +129,33 @@ export default function HomePage() {
 
   return (
     <View style={{ flex: 1 }}>
+      <SearchBarContainer>
+        <GooglePlacesAutocomplete
+          placeholder="Search"
+          GooglePlacesDetailsQuery={{ fields: "geometry" }}
+          fetchDetails={true}
+          //restrict the search to the UK
+
+          onPress={(data, details = null) => {
+            if (!details) return;
+
+            const searchLocation = {
+              lat: details!.geometry.location.lat,
+              lng: details!.geometry.location.lng,
+            };
+
+            //mapRef.current?.animateToRegion(searchLocation, 1000);
+
+            setLocation(searchLocation);
+          }}
+          onFail={(error) => console.error(error)}
+          query={{
+            key: "",
+            language: "en",
+            components: "country:uk",
+          }}
+        />
+      </SearchBarContainer>
       <FilterMenu
         rating={rating}
         isVisible={isFilterMenuVisible}
@@ -114,7 +172,7 @@ export default function HomePage() {
           businesses={businesses}
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
-          isVisible={isMapView}
+          location={location}
         />
       ) : (
         <>

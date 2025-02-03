@@ -14,6 +14,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Searchbar } from "react-native-paper";
 import { Colors } from "../../constants/Colors";
 
+import axios from "axios";
+import { API_URL } from "@/env";
+
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
 import {
   Container,
   Card,
@@ -27,20 +32,14 @@ import {
   SearchBarContainer,
 } from "./styles";
 
-const INITIAL_REGION = {
-  //london
-  latitude: 51.5176,
-  longitude: 0.1145,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
-
 const { width: viewportWidth } = Dimensions.get("window");
 
 const provider = Platform.select({
   ios: PROVIDER_DEFAULT,
   android: PROVIDER_GOOGLE,
 }) as typeof PROVIDER_GOOGLE;
+
+const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 type Region = {
   latitude: number;
@@ -52,50 +51,38 @@ type Region = {
 interface MapComponentProps {
   toggleListView: () => void;
   toggleFilterMenu: () => void;
-  isVisible: boolean;
   businesses: Business[];
+  location: { lat: number; lng: number };
 }
 
 const Map: React.FC<MapComponentProps> = ({
   toggleListView,
   toggleFilterMenu,
-  isVisible,
   businesses,
+  location,
 }) => {
   if (Platform.OS === "web") {
     return <Text>Map View is not supported on web</Text>;
   }
 
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<Region>();
   const [center, setCenter] = useState<Region>();
   const [firstBusinessLocation, setFirstBusinessLocation] = useState<Region>();
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+    if (businesses.length === 0) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: location.lat,
+          longitude: location.lng,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        1000
+      );
+      return;
+    }
 
-      if (status == "granted") {
-        const loc = await Location.getCurrentPositionAsync({});
-
-        const { latitude, longitude } = loc.coords;
-
-        const user_location = {
-          latitude,
-          longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        };
-
-        setLocation(user_location);
-      } else {
-        setLocation(INITIAL_REGION);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
     const firstBusiness_location = {
       latitude: businesses[0].latitude!,
       longitude: businesses[0].longitude!,
@@ -108,10 +95,6 @@ const Map: React.FC<MapComponentProps> = ({
   useEffect(() => {
     mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
   }, [firstBusinessLocation]);
-
-  const focusMap = () => {
-    mapRef.current?.animateToRegion(location!, 1000);
-  };
 
   const zoomIn = () => {
     mapRef.current?.animateToRegion(
@@ -193,9 +176,6 @@ const Map: React.FC<MapComponentProps> = ({
     <Container>
       {/* Buttons */}
       <ButtonContainer>
-        <Button onPress={focusMap}>
-          <MaterialIcons name="my-location" size={24} color="black" />
-        </Button>
         <Button onPress={toggleListView}>
           <MaterialIcons name="list" size={24} color="black" />
         </Button>
@@ -210,16 +190,35 @@ const Map: React.FC<MapComponentProps> = ({
         </Button>
       </ButtonContainer>
 
-      <SearchBarContainer>
-        <Searchbar
+      {/* <SearchBarContainer>
+        <GooglePlacesAutocomplete
           placeholder="Search"
-          onChangeText={(text) => {
-            setSearchQuery(text);
+          GooglePlacesDetailsQuery={{ fields: "geometry" }}
+          fetchDetails={true}
+          //restrict the search to the UK
+
+          onPress={(data, details = null) => {
+            if (!details) return;
+
+            const searchLocation = {
+              latitude: details!.geometry.location.lat,
+              longitude: details!.geometry.location.lng,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            };
+
+            mapRef.current?.animateToRegion(searchLocation, 1000);
+
+            updateLocation(searchLocation.latitude, searchLocation.longitude);
           }}
-          value={searchQuery}
-          style={{ margin: 10, backgroundColor: Colors.light.background }}
+          onFail={(error) => console.error(error)}
+          query={{
+            key: "",
+            language: "en",
+            components: "country:uk",
+          }}
         />
-      </SearchBarContainer>
+      </SearchBarContainer> */}
 
       <StyledMapView
         initialRegion={center}
