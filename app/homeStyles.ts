@@ -7,7 +7,7 @@ export const FlatListContainer = styled.View`
 `;
 
 export const FullWidthContainer = styled.View`
-  margin: 0 -12px;
+  margin: 60px -12px;
   width: auto;
   margin-bottom: 12px;
 `;

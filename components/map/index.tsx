@@ -8,16 +8,8 @@ import { Text, Platform, Dimensions } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
-import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-
-import { Searchbar } from "react-native-paper";
-import { Colors } from "../../constants/Colors";
-
-import axios from "axios";
-import { API_URL } from "@/env";
-
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { Keyboard } from "react-native";
 
 import {
   Container,
@@ -38,8 +30,6 @@ const provider = Platform.select({
   ios: PROVIDER_DEFAULT,
   android: PROVIDER_GOOGLE,
 }) as typeof PROVIDER_GOOGLE;
-
-const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 type Region = {
   latitude: number;
@@ -93,7 +83,9 @@ const Map: React.FC<MapComponentProps> = ({
   }, [businesses]);
 
   useEffect(() => {
-    mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
+    if (firstBusinessLocation) {
+      mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
+    }
   }, [firstBusinessLocation]);
 
   const zoomIn = () => {
@@ -190,36 +182,6 @@ const Map: React.FC<MapComponentProps> = ({
         </Button>
       </ButtonContainer>
 
-      {/* <SearchBarContainer>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          GooglePlacesDetailsQuery={{ fields: "geometry" }}
-          fetchDetails={true}
-          //restrict the search to the UK
-
-          onPress={(data, details = null) => {
-            if (!details) return;
-
-            const searchLocation = {
-              latitude: details!.geometry.location.lat,
-              longitude: details!.geometry.location.lng,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            };
-
-            mapRef.current?.animateToRegion(searchLocation, 1000);
-
-            updateLocation(searchLocation.latitude, searchLocation.longitude);
-          }}
-          onFail={(error) => console.error(error)}
-          query={{
-            key: "",
-            language: "en",
-            components: "country:uk",
-          }}
-        />
-      </SearchBarContainer> */}
-
       <StyledMapView
         initialRegion={center}
         provider={provider}
@@ -229,6 +191,7 @@ const Map: React.FC<MapComponentProps> = ({
         onRegionChangeComplete={(region) => {
           setCenter(region);
         }}
+        onPress={() => Keyboard.dismiss()}
       >
         {businesses.map(
           (

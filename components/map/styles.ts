@@ -65,10 +65,17 @@ export const Button = styled.TouchableOpacity`
   }
 `;
 
-export const SearchBarContainer = styled.View`
+export const SearchBarContainerMap = styled.View`
   position: absolute;
   top: 60px;
   width: 100%;
   padding-horizontal: 20px;
   z-index: 10;
+`;
+
+export const SearchBarContainerList = styled.View`
+  
+  width: 100%;
+  padding-horizontal: 20px;
+  
 `;

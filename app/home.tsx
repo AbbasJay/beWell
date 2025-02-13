@@ -27,8 +27,8 @@ import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { HeaderText } from "./homeStyles";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import Constants from "expo-constants";
+import SearchBar from "@/components/searchBar";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -37,6 +37,13 @@ const INITIAL_REGION = {
   lat: 51.5176,
   lng: 0.1145,
 };
+
+const GOOGLE_MAPS_API_KEY =
+  Platform.OS === "ios"
+    ? Constants.expoConfig?.ios?.config?.googleMapsApiKey || ""
+    : Platform.OS === "android"
+    ? Constants.expoConfig?.android?.config?.googleMaps?.apiKey || ""
+    : "";
 
 export default function HomePage() {
   const { businesses, isLoading, error } = useBusinessContext();
@@ -95,6 +102,17 @@ export default function HomePage() {
         setLocation(INITIAL_REGION);
       }
     })();
+
+    console.log("App Ownership:", Constants.appOwnership);
+    if (Platform.OS === "ios") {
+      console.log("iOS Bundle Identifier:", Constants.expoConfig);
+    } else if (Platform.OS === "android") {
+      console.log("Android Package Name:", Constants.easConfig);
+    } else {
+      console.log("Unknown Platform");
+    }
+
+    console.log("API_KEY", GOOGLE_MAPS_API_KEY);
   }, []);
 
   useEffect(() => {
@@ -127,35 +145,29 @@ export default function HomePage() {
     );
   };
 
+  // const onPlaceSelected = React.useCallback((place: PlaceDetails) => {
+  //   console.log(place);
+
+  //   if (!place.coordinate) return;
+
+  //   const searchLocation = {
+  //     lat: place.coordinate.latitude,
+  //     lng: place.coordinate.longitude,
+  //   };
+
+  //   setLocation(searchLocation);
+  // }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <SearchBarContainer>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          GooglePlacesDetailsQuery={{ fields: "geometry" }}
-          fetchDetails={true}
-          //restrict the search to the UK
-
-          onPress={(data, details = null) => {
-            if (!details) return;
-
-            const searchLocation = {
-              lat: details!.geometry.location.lat,
-              lng: details!.geometry.location.lng,
-            };
-
-            //mapRef.current?.animateToRegion(searchLocation, 1000);
-
-            setLocation(searchLocation);
-          }}
-          onFail={(error) => console.error(error)}
-          query={{
-            key: "",
-            language: "en",
-            components: "country:uk",
-          }}
+        <SearchBar
+          updateLocation={(lat: number, lng: number) =>
+            setLocation({ lat: lat, lng: lng })
+          }
         />
       </SearchBarContainer>
+
       <FilterMenu
         rating={rating}
         isVisible={isFilterMenuVisible}
