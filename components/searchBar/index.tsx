@@ -1,9 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
 import * as ExpoGooglePlaces from "expo-google-places";
 import { SearchBar } from "@rneui/themed";
-import { View } from "react-native";
 import { ResultsContainer, ResultItem, ResultText } from "./styles";
+import { Keyboard } from "react-native";
+import { set } from "react-hook-form";
+
 interface SearchBarProps {
   updateLocation: (lat: number, lng: number) => void;
 }
@@ -14,11 +15,14 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
     ExpoGooglePlaces.AutocompletePrediction[]
   >([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [placeholder, setPlaceholder] = useState<string>("Search");
 
   const [placeId, setPlaceId] = useState<string>();
 
   const [placeDetails, setPlaceDetails] =
     useState<Pick<ExpoGooglePlaces.Place, "coordinate">>();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const updateSearch = (search: string) => {
     setSearch(search);
@@ -32,8 +36,6 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
           countries: ["uk"],
         }
       );
-      // Do something with the predictions like set them
-      // into a state and render them in a list
       setSearchResults(predictions);
     } catch (error) {
       console.log("Error fetching predictions", error);
@@ -53,15 +55,41 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
     }
   };
 
+  const handleResultPress = (placeID: string, address: string) => {
+    setPlaceId(placeID);
+    setSearchResults([]);
+    setSearch("");
+    setPlaceholder(address);
+    Keyboard.dismiss();
+  };
+
+  const handleClear = () => {
+    setSearch("");
+    setPlaceholder("Search");
+    console.log(placeholder);
+  };
+
+  // Debounced API call for fetching predictions
   useEffect(() => {
-    // fetch search results
-    if (search.length > 2) {
-      fetchPredictions(search);
+    const debounceTimeout = setTimeout(() => {
+      if (search.length > 2) {
+        fetchPredictions(search);
+      }
+    }, 1000); // Delay of 500ms
+
+    if (search.length > 2 && !loading) {
+      setLoading(true);
     }
+
+    return () => clearTimeout(debounceTimeout);
   }, [search]);
 
   useEffect(() => {
     console.log(searchResults);
+
+    if (loading) {
+      setLoading(false);
+    }
   }, [searchResults]);
 
   useEffect(() => {
@@ -83,10 +111,12 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
   return (
     <>
       <SearchBar
-        placeholder="Search"
+        placeholder={placeholder}
         value={search}
         onChangeText={(text) => updateSearch(text)}
-        onClear={() => setSearch("")}
+        onClear={() => {
+          handleClear();
+        }}
         lightTheme={true}
         round={true}
         containerStyle={{
@@ -104,17 +134,20 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
       />
       {isFocused && searchResults.length > 0 && (
         <ResultsContainer>
-          {searchResults.map((result, index) => (
-            <ResultItem
-              onPress={() => {
-                setPlaceId(result.placeID);
-                setSearchResults([]);
-                setSearch("");
-              }}
-            >
-              <ResultText key={index}>{result.primaryText}</ResultText>
-            </ResultItem>
-          ))}
+          {loading ? (
+            <ResultText>Searching...</ResultText>
+          ) : (
+            searchResults.map((result, index) => (
+              <ResultItem
+                key={index}
+                onPress={() =>
+                  handleResultPress(result.placeID, result.fullText)
+                }
+              >
+                <ResultText>{result.fullText}</ResultText>
+              </ResultItem>
+            ))
+          )}
         </ResultsContainer>
       )}
     </>

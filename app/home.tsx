@@ -145,19 +145,6 @@ export default function HomePage() {
     );
   };
 
-  // const onPlaceSelected = React.useCallback((place: PlaceDetails) => {
-  //   console.log(place);
-
-  //   if (!place.coordinate) return;
-
-  //   const searchLocation = {
-  //     lat: place.coordinate.latitude,
-  //     lng: place.coordinate.longitude,
-  //   };
-
-  //   setLocation(searchLocation);
-  // }, []);
-
   return (
     <View style={{ flex: 1 }}>
       <SearchBarContainer>

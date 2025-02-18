@@ -21,7 +21,6 @@ import {
   ButtonContainer,
   Button,
   StyledCarousel,
-  SearchBarContainer,
 } from "./styles";
 
 const { width: viewportWidth } = Dimensions.get("window");
@@ -144,7 +143,10 @@ const Map: React.FC<MapComponentProps> = ({
     }
   };
 
-  const onMarkerPress = (marker: { latitude: number; longitude: number }) => {
+  const handleMarkerPress = (marker: {
+    latitude: number;
+    longitude: number;
+  }) => {
     if (
       typeof marker.latitude === "string" &&
       typeof marker.longitude === "string"
@@ -166,7 +168,6 @@ const Map: React.FC<MapComponentProps> = ({
 
   return (
     <Container>
-      {/* Buttons */}
       <ButtonContainer>
         <Button onPress={toggleListView}>
           <MaterialIcons name="list" size={24} color="black" />
@@ -194,9 +195,7 @@ const Map: React.FC<MapComponentProps> = ({
         onPress={() => Keyboard.dismiss()}
       >
         {businesses.map(
-          (
-            marker //filter out the markers that have null atitude or longitude
-          ) =>
+          (marker) =>
             marker.latitude &&
             marker.longitude && (
               <Marker
@@ -212,7 +211,7 @@ const Map: React.FC<MapComponentProps> = ({
                       : marker.longitude,
                 }}
                 onPress={() =>
-                  onMarkerPress({
+                  handleMarkerPress({
                     latitude: marker.latitude!,
                     longitude: marker.longitude!,
                   })
