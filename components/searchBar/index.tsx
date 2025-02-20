@@ -69,6 +69,11 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
     console.log(placeholder);
   };
 
+  const handleFocus = () => {
+    setIsFocused(true);
+    setPlaceholder("Search");
+  };
+
   // Debounced API call for fetching predictions
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
@@ -129,7 +134,7 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
           backgroundColor: "lightgrey", // or "transparent"
           borderRadius: 10,
         }}
-        onFocus={() => setIsFocused(true)}
+        onFocus={() => handleFocus()}
         onBlur={() => setIsFocused(false)}
       />
       {isFocused && searchResults.length > 0 && (
