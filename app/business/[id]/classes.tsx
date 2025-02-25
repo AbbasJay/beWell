@@ -28,19 +28,20 @@ export default function BusinessClassesScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [error, setError] = useState<Error | null>(null);
   const businessId = Number(id);
+  const [business, setBusiness] = useState<Business | null>(null);
 
   useEffect(() => {
     if (isNaN(businessId)) {
       setError(new Error("Invalid business ID"));
       return;
     }
-
-    const business = businesses.find((b) => b.id === businessId);
-    if (!business) {
+    const foundBusiness = businesses.find((b) => b.id === businessId);
+    if (!foundBusiness) {
       setError(new Error("Business not found"));
       return;
     }
 
+    setBusiness(foundBusiness);
     setError(null);
   }, [businessId, businesses]);
 
@@ -48,9 +49,8 @@ export default function BusinessClassesScreen() {
     return <ErrorMessage error={error} />;
   }
 
-  const business = businesses.find((b) => b.id === businessId);
   if (!business) {
-    return null;
+    return <LoadingSpinner />;
   }
 
   return (
