@@ -30,11 +30,6 @@ import {
   SearchBarContainer,
 } from "./homeStyles";
 
-<<<<<<< HEAD
-import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-import { HeaderText } from "./homeStyles";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as Location from "expo-location";
 import Constants from "expo-constants";
 import SearchBar from "@/components/searchBar";
 
@@ -52,11 +47,8 @@ const GOOGLE_MAPS_API_KEY =
     : Platform.OS === "android"
     ? Constants.expoConfig?.android?.config?.googleMaps?.apiKey || ""
     : "";
-=======
-const { width: viewportWidth } = Dimensions.get("window");
 
 const FILTER_STORAGE_KEY = "@be_well_filters";
->>>>>>> main
 
 export default function HomePage() {
   const { businesses, error: businessError } = useBusinessContext();
@@ -77,9 +69,25 @@ export default function HomePage() {
   useEffect(() => {
     const initialiseHomeScreen = async () => {
       try {
-        const locationData = await Location.getCurrentPositionAsync();
-        const { latitude, longitude } = locationData.coords;
-        location.current = { lat: latitude, lng: longitude };
+        let { status } = await Location.requestForegroundPermissionsAsync();
+
+        let initial_location = INITIAL_REGION;
+
+        if (status == "granted") {
+          const loc = await Location.getCurrentPositionAsync({});
+
+          const { latitude, longitude } = loc.coords;
+
+          const user_location = {
+            lat: latitude,
+            lng: longitude,
+          };
+
+          setLocation(user_location);
+          initial_location = user_location;
+        } else {
+          setLocation(INITIAL_REGION);
+        }
 
         const savedFilters = await AsyncStorage.getItem(FILTER_STORAGE_KEY);
         if (savedFilters) {
@@ -94,14 +102,14 @@ export default function HomePage() {
 
           await updateFilters(
             savedDistance * 1000,
-            { lat: latitude, lng: longitude },
+            { lat: initial_location.lat, lng: initial_location.lng },
             savedRating,
             savedCategories
           );
         } else {
           await updateFilters(
             distance * 1000,
-            { lat: latitude, lng: longitude },
+            { lat: initial_location.lat, lng: initial_location.lng },
             rating,
             selectedCategories
           );
@@ -181,17 +189,6 @@ export default function HomePage() {
         setLocation(INITIAL_REGION);
       }
     })();
-
-    console.log("App Ownership:", Constants.appOwnership);
-    if (Platform.OS === "ios") {
-      console.log("iOS Bundle Identifier:", Constants.expoConfig);
-    } else if (Platform.OS === "android") {
-      console.log("Android Package Name:", Constants.easConfig);
-    } else {
-      console.log("Unknown Platform");
-    }
-
-    console.log("API_KEY", GOOGLE_MAPS_API_KEY);
   }, []);
 
   useEffect(() => {
@@ -201,6 +198,7 @@ export default function HomePage() {
       rating,
       selectedCategories
     );
+    console.log("updating filters");
   }, [distance, location, rating, selectedCategories]);
 
   const renderItem = ({ item }: { item: Business }) => {
