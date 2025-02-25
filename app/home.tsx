@@ -70,12 +70,16 @@ export default function HomePage() {
     setIsFilterMenuVisible(!isFilterMenuVisible);
   };
 
-  const applyFilters = () => {
+  const applyFilters = (
+    filterDistance: number,
+    filterRating: number,
+    filterCategories: string[]
+  ) => {
     updateFilters(
-      distance * 1000,
+      filterDistance * 1000,
       { lat: location.lat, lng: location.lng },
-      rating,
-      selectedCategories
+      filterRating,
+      filterCategories
     );
 
     console.log("selectedCategories", selectedCategories);
