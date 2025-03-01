@@ -32,6 +32,7 @@ import {
 
 import Constants from "expo-constants";
 import SearchBar from "@/components/searchBar";
+import { calculate_distance } from "./utils/helper-functions/haversine-distance";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -203,6 +204,15 @@ export default function HomePage() {
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
+
+    const distance =
+      calculate_distance(
+        location.lat,
+        location.lng,
+        item.latitude!,
+        item.longitude!
+      ) / 1000;
+
     return (
       <BusinessCard
         item={{
@@ -218,6 +228,7 @@ export default function HomePage() {
             params: { id: businessId },
           })
         }
+        distance={distance}
       />
     );
   };

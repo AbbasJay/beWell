@@ -10,6 +10,7 @@ import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Keyboard } from "react-native";
+import { calculate_distance } from "@/app/utils/helper-functions/haversine-distance";
 
 import {
   Container,
@@ -21,6 +22,7 @@ import {
   ButtonContainer,
   Button,
   StyledCarousel,
+  CardTitleContainer,
 } from "./styles";
 
 const { width: viewportWidth } = Dimensions.get("window");
@@ -113,15 +115,28 @@ const Map: React.FC<MapComponentProps> = ({
     );
   };
 
-  const renderCarouselItem = ({ item }: { item: Business }) => (
-    <Card onPress={() => router.push(`/business/${item.id}/classes`)}>
-      <CardTitle>{item.name}</CardTitle>
-      <CardAddress>{item.address}</CardAddress>
-      <CardAddress>
-        {item.city}, {item.state}
-      </CardAddress>
-    </Card>
-  );
+  const renderCarouselItem = ({ item }: { item: Business }) => {
+    const distance =
+      calculate_distance(
+        location.lat,
+        location.lng,
+        item.latitude!,
+        item.longitude!
+      ) / 1000;
+
+    return (
+      <Card onPress={() => router.push(`/business/${item.id}/classes`)}>
+        <CardTitleContainer>
+          <CardTitle>{item.name}</CardTitle>
+          <Text>{distance.toFixed(1)} km</Text>
+        </CardTitleContainer>
+        <CardAddress>{item.address}</CardAddress>
+        <CardAddress>
+          {item.city}, {item.state}
+        </CardAddress>
+      </Card>
+    );
+  };
 
   const onSnapToItem = (index: number) => {
     let { latitude, longitude } = businesses[index];

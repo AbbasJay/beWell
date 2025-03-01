@@ -65,4 +65,9 @@ export const Button = styled.TouchableOpacity`
   }
 `;
 
+export const CardTitleContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
 

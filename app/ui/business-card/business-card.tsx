@@ -9,6 +9,7 @@ type BusinessCardProps = {
   width?: string;
   height?: string;
   isLoading?: boolean;
+  distance?: number;
 };
 
 export const BusinessCard = ({
@@ -18,6 +19,7 @@ export const BusinessCard = ({
   height,
   disabled,
   isLoading = false,
+  distance,
 }: BusinessCardProps) => {
   return (
     <CSS.Wrapper>
@@ -43,6 +45,7 @@ export const BusinessCard = ({
             />
             <CSS.ContentWrapper>
               <CSS.CardTitle>{item.name}</CSS.CardTitle>
+              <CSS.CardType>{distance?.toFixed(1)} km</CSS.CardType>
               <CSS.Info>{item.address}</CSS.Info>
               <CSS.Info>{item.phoneNumber}</CSS.Info>
               <CSS.Info>{item.type}</CSS.Info>
