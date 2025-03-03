@@ -166,8 +166,6 @@ export default function HomePage() {
       filterCategories
     );
 
-    console.log("selectedCategories", selectedCategories);
-
     setIsFilterMenuVisible(false);
   };
 
