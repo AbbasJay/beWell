@@ -54,6 +54,13 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
     }).start();
   }, [isVisible, animatedValue]);
 
+  const handleApplyFilters = () => {
+    setDistance(filterDistance);
+    setRating(filterRating);
+    setSelectedCategories(filterCategories);
+    applyFilters(filterDistance, filterRating, filterCategories);
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -144,7 +151,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
             variant="secondary"
             title="Apply Filters"
             onPress={() => {
-              applyFilters(filterDistance, filterRating, filterCategories);
+              handleApplyFilters();
             }}
           />
         </View>
