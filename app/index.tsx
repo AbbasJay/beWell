@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import styled from "styled-components/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ErrorMessage } from "@/app/ui/error-message";
+import "react-native-get-random-values"; //This solve the error when using Google Places Autocomplete
 
 const Index = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const Index = () => {
     try {
       router.push("/logIn");
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Navigation failed'));
+      setError(err instanceof Error ? err : new Error("Navigation failed"));
     }
   };
 

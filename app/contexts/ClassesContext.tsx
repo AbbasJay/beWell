@@ -131,9 +131,9 @@ export const ClassesProvider = ({
     try {
       let token;
       if (Platform.OS === "web") {
-        token = localStorage.getItem("userToken");
+        token = localStorage.getItem("accessToken");
       } else {
-        token = await SecureStore.getItemAsync("userToken");
+        token = await SecureStore.getItemAsync("accessToken");
       }
 
       if (!token) {

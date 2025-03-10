@@ -7,7 +7,7 @@ export const FlatListContainer = styled.View`
 `;
 
 export const FullWidthContainer = styled.View`
-  margin: 0 -12px;
+  margin: 60px -12px;
   width: auto;
   margin-bottom: 12px;
 `;
@@ -25,4 +25,12 @@ export const HeaderText = styled.Text`
 export const Title = styled.Text`
   font-size: 18px;
   font-weight: bold;
+`;
+
+export const SearchBarContainer = styled.View`
+  position: absolute;
+  top: 60px;
+  width: 100%;
+  padding-horizontal: 20px;
+  z-index: 10;
 `;

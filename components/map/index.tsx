@@ -8,8 +8,9 @@ import { Text, Platform, Dimensions } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { Business } from "../../app/contexts/BusinessContext";
 import { router } from "expo-router";
-import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Keyboard } from "react-native";
+import { calculate_distance } from "@/app/utils/helper-functions/haversine-distance";
 
 import {
   Container,
@@ -21,15 +22,8 @@ import {
   ButtonContainer,
   Button,
   StyledCarousel,
+  CardTitleContainer,
 } from "./styles";
-
-const INITIAL_REGION = {
-  //london
-  latitude: 51.5176,
-  longitude: 0.1145,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -48,49 +42,38 @@ type Region = {
 interface MapComponentProps {
   toggleListView: () => void;
   toggleFilterMenu: () => void;
-  isVisible: boolean;
   businesses: Business[];
+  location: { lat: number; lng: number };
 }
 
 const Map: React.FC<MapComponentProps> = ({
   toggleListView,
   toggleFilterMenu,
-  isVisible,
   businesses,
+  location,
 }) => {
   if (Platform.OS === "web") {
     return <Text>Map View is not supported on web</Text>;
   }
 
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<Region>();
   const [center, setCenter] = useState<Region>();
   const [firstBusinessLocation, setFirstBusinessLocation] = useState<Region>();
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+    if (businesses.length === 0) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: location.lat,
+          longitude: location.lng,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        1000
+      );
+      return;
+    }
 
-      if (status == "granted") {
-        const loc = await Location.getCurrentPositionAsync({});
-
-        const { latitude, longitude } = loc.coords;
-
-        const user_location = {
-          latitude,
-          longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        };
-
-        setLocation(user_location);
-      } else {
-        setLocation(INITIAL_REGION);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
     const firstBusiness_location = {
       latitude: businesses[0].latitude!,
       longitude: businesses[0].longitude!,
@@ -101,12 +84,10 @@ const Map: React.FC<MapComponentProps> = ({
   }, [businesses]);
 
   useEffect(() => {
-    mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
+    if (firstBusinessLocation) {
+      mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
+    }
   }, [firstBusinessLocation]);
-
-  const focusMap = () => {
-    mapRef.current?.animateToRegion(location!, 1000);
-  };
 
   const zoomIn = () => {
     mapRef.current?.animateToRegion(
@@ -134,15 +115,28 @@ const Map: React.FC<MapComponentProps> = ({
     );
   };
 
-  const renderCarouselItem = ({ item }: { item: Business }) => (
-    <Card onPress={() => router.push(`/business/${item.id}/classes`)}>
-      <CardTitle>{item.name}</CardTitle>
-      <CardAddress>{item.address}</CardAddress>
-      <CardAddress>
-        {item.city}, {item.state}
-      </CardAddress>
-    </Card>
-  );
+  const renderCarouselItem = ({ item }: { item: Business }) => {
+    const distance =
+      calculate_distance(
+        location.lat,
+        location.lng,
+        item.latitude!,
+        item.longitude!
+      ) / 1000;
+
+    return (
+      <Card onPress={() => router.push(`/business/${item.id}/classes`)}>
+        <CardTitleContainer>
+          <CardTitle>{item.name}</CardTitle>
+          <Text>{distance.toFixed(1)} km</Text>
+        </CardTitleContainer>
+        <CardAddress>{item.address}</CardAddress>
+        <CardAddress>
+          {item.city}, {item.state}
+        </CardAddress>
+      </Card>
+    );
+  };
 
   const onSnapToItem = (index: number) => {
     let { latitude, longitude } = businesses[index];
@@ -164,7 +158,10 @@ const Map: React.FC<MapComponentProps> = ({
     }
   };
 
-  const onMarkerPress = (marker: { latitude: number; longitude: number }) => {
+  const handleMarkerPress = (marker: {
+    latitude: number;
+    longitude: number;
+  }) => {
     if (
       typeof marker.latitude === "string" &&
       typeof marker.longitude === "string"
@@ -186,11 +183,7 @@ const Map: React.FC<MapComponentProps> = ({
 
   return (
     <Container>
-      {/* Buttons */}
       <ButtonContainer>
-        <Button onPress={focusMap}>
-          <MaterialIcons name="my-location" size={24} color="black" />
-        </Button>
         <Button onPress={toggleListView}>
           <MaterialIcons name="list" size={24} color="black" />
         </Button>
@@ -214,11 +207,10 @@ const Map: React.FC<MapComponentProps> = ({
         onRegionChangeComplete={(region) => {
           setCenter(region);
         }}
+        onPress={() => Keyboard.dismiss()}
       >
         {businesses.map(
-          (
-            marker //filter out the markers that have null atitude or longitude
-          ) =>
+          (marker) =>
             marker.latitude &&
             marker.longitude && (
               <Marker
@@ -234,7 +226,7 @@ const Map: React.FC<MapComponentProps> = ({
                       : marker.longitude,
                 }}
                 onPress={() =>
-                  onMarkerPress({
+                  handleMarkerPress({
                     latitude: marker.latitude!,
                     longitude: marker.longitude!,
                   })
@@ -243,7 +235,6 @@ const Map: React.FC<MapComponentProps> = ({
             )
         )}
       </StyledMapView>
-
       <CarouselContainer>
         <StyledCarousel
           data={businesses}

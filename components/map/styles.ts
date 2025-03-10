@@ -45,7 +45,7 @@ export const CardAddress = styled.Text`
 
 export const ButtonContainer = styled.View`
   position: absolute;
-  top: 60px;
+  top: 150px;
   right: 20px;
   gap: 10px;
   z-index: 10;
@@ -64,3 +64,10 @@ export const Button = styled.TouchableOpacity`
     height: 10px;
   }
 `;
+
+export const CardTitleContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+

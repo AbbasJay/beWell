@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { View, Text, Animated, Easing, TouchableOpacity } from "react-native";
 import { Chip } from "react-native-paper";
 import Slider from "@react-native-community/slider";
@@ -14,7 +14,11 @@ type FilterMenuProps = {
   setDistance: React.Dispatch<React.SetStateAction<number>>;
   setRating: React.Dispatch<React.SetStateAction<number>>;
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
-  applyFilters: () => void;
+  applyFilters: (
+    filterDistance: number,
+    rating: number,
+    filterCategories: string[]
+  ) => void;
 };
 
 const FilterMenu: React.FC<FilterMenuProps> = ({
@@ -35,6 +39,11 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
     inputRange: [0, 1],
     outputRange: [0, 600], // 0 = fully visible, 600 = off-screen
   });
+
+  const [filterRating, setFilterRating] = useState<number>(rating);
+  const [filterDistance, setFilterDistance] = useState<number>(distance);
+  const [filterCategories, setFilterCategories] =
+    useState<string[]>(selectedCategories);
 
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -81,25 +90,25 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
       </TouchableOpacity>
 
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Min Rating {rating}/5</Text>
+        <Text>Min Rating {filterRating}/5</Text>
         <Slider
           style={{ width: 200, height: 40 }}
           minimumValue={0}
           maximumValue={5}
           step={1}
-          value={rating}
-          onValueChange={(value) => setRating(value)}
+          value={filterRating}
+          onValueChange={(value) => setFilterRating(value)}
           minimumTrackTintColor="#000000"
           maximumTrackTintColor="#000000"
         />
-        <Text>Max Distance {distance} km</Text>
+        <Text>Max Distance {filterDistance} km</Text>
         <Slider
           style={{ width: 200, height: 40 }}
           minimumValue={1}
           maximumValue={200}
           step={1}
-          value={distance}
-          onValueChange={(value) => setDistance(value)}
+          value={filterDistance}
+          onValueChange={(value) => setFilterDistance(value)}
           minimumTrackTintColor="#000000"
           maximumTrackTintColor="#000000"
         ></Slider>
@@ -116,9 +125,9 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
             <Chip
               style={{ margin: 5 }}
               key={category}
-              selected={selectedCategories.includes(category)}
+              selected={filterCategories.includes(category)}
               onPress={() => {
-                setSelectedCategories((prev) =>
+                setFilterCategories((prev) =>
                   prev.includes(category)
                     ? prev.filter((item) => item !== category)
                     : [...prev, category]
@@ -134,7 +143,9 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
             fullWidth
             variant="secondary"
             title="Apply Filters"
-            onPress={applyFilters}
+            onPress={() => {
+              applyFilters(filterDistance, filterRating, filterCategories);
+            }}
           />
         </View>
       </View>

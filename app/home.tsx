@@ -27,9 +27,27 @@ import {
   FlatListContainer,
   FullWidthContainer,
   ScrollSeparator,
+  SearchBarContainer,
 } from "./homeStyles";
 
+import Constants from "expo-constants";
+import SearchBar from "@/components/searchBar";
+import { calculate_distance } from "./utils/helper-functions/haversine-distance";
+
 const { width: viewportWidth } = Dimensions.get("window");
+
+const INITIAL_REGION = {
+  //london
+  lat: 51.5176,
+  lng: 0.1145,
+};
+
+const GOOGLE_MAPS_API_KEY =
+  Platform.OS === "ios"
+    ? Constants.expoConfig?.ios?.config?.googleMapsApiKey || ""
+    : Platform.OS === "android"
+    ? Constants.expoConfig?.android?.config?.googleMaps?.apiKey || ""
+    : "";
 
 const FILTER_STORAGE_KEY = "@be_well_filters";
 
@@ -41,7 +59,7 @@ export default function HomePage() {
     null
   );
   const [isMapView, setIsMapView] = useState(false);
-  const location = useRef({ lat: 51.4086295, lng: -0.7214513 });
+  const [location, setLocation] = useState(INITIAL_REGION);
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const [rating, setRating] = useState(1);
   const [distance, setDistance] = useState(5);
@@ -52,9 +70,25 @@ export default function HomePage() {
   useEffect(() => {
     const initialiseHomeScreen = async () => {
       try {
-        const locationData = await Location.getCurrentPositionAsync();
-        const { latitude, longitude } = locationData.coords;
-        location.current = { lat: latitude, lng: longitude };
+        let { status } = await Location.requestForegroundPermissionsAsync();
+
+        let initial_location = INITIAL_REGION;
+
+        if (status == "granted") {
+          const loc = await Location.getCurrentPositionAsync({});
+
+          const { latitude, longitude } = loc.coords;
+
+          const user_location = {
+            lat: latitude,
+            lng: longitude,
+          };
+
+          setLocation(user_location);
+          initial_location = user_location;
+        } else {
+          setLocation(INITIAL_REGION);
+        }
 
         const savedFilters = await AsyncStorage.getItem(FILTER_STORAGE_KEY);
         if (savedFilters) {
@@ -69,14 +103,14 @@ export default function HomePage() {
 
           await updateFilters(
             savedDistance * 1000,
-            { lat: latitude, lng: longitude },
+            { lat: initial_location.lat, lng: initial_location.lng },
             savedRating,
             savedCategories
           );
         } else {
           await updateFilters(
             distance * 1000,
-            { lat: latitude, lng: longitude },
+            { lat: initial_location.lat, lng: initial_location.lng },
             rating,
             selectedCategories
           );
@@ -120,20 +154,65 @@ export default function HomePage() {
     setIsFilterMenuVisible(!isFilterMenuVisible);
   };
 
-  const applyFilters = async () => {
-    await updateFilters(
-      distance * 1000,
-      { lat: location.current.lat, lng: location.current.lng },
-      rating,
-      selectedCategories
+  const applyFilters = (
+    filterDistance: number,
+    filterRating: number,
+    filterCategories: string[]
+  ) => {
+    updateFilters(
+      filterDistance * 1000,
+      { lat: location.lat, lng: location.lng },
+      filterRating,
+      filterCategories
     );
 
-    await saveFilters();
+    console.log("selectedCategories", selectedCategories);
+
     setIsFilterMenuVisible(false);
   };
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status == "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+
+        const { latitude, longitude } = loc.coords;
+
+        const user_location = {
+          lat: latitude,
+          lng: longitude,
+        };
+
+        setLocation(user_location);
+      } else {
+        setLocation(INITIAL_REGION);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    updateFilters(
+      distance * 1000,
+      { lat: location.lat, lng: location.lng },
+      rating,
+      selectedCategories
+    );
+    console.log("updating filters");
+  }, [distance, location, rating, selectedCategories]);
+
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
+
+    const distance =
+      calculate_distance(
+        location.lat,
+        location.lng,
+        item.latitude!,
+        item.longitude!
+      ) / 1000;
+
     return (
       <BusinessCard
         item={{
@@ -149,6 +228,7 @@ export default function HomePage() {
             params: { id: businessId },
           })
         }
+        distance={distance}
       />
     );
   };
@@ -159,6 +239,14 @@ export default function HomePage() {
 
   return (
     <View style={{ flex: 1 }}>
+      <SearchBarContainer>
+        <SearchBar
+          updateLocation={(lat: number, lng: number) =>
+            setLocation({ lat: lat, lng: lng })
+          }
+        />
+      </SearchBarContainer>
+
       <FilterMenu
         rating={rating}
         isVisible={isFilterMenuVisible}
@@ -175,7 +263,7 @@ export default function HomePage() {
           businesses={businesses}
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
-          isVisible={isMapView}
+          location={location}
         />
       ) : (
         <>
