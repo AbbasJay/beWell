@@ -9,6 +9,7 @@ import React, {
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { useAuth } from "./auth/AuthContext";
 
 export type Business = {
   id?: number;
@@ -110,6 +111,7 @@ function businessReducer(
 // Context type with actions
 type BusinessContextType = BusinessState & {
   refreshBusinesses: () => Promise<void>;
+  forceRefresh: () => Promise<void>;
   addBusiness: (business: Business) => void;
   updateBusiness: (business: Business) => void;
   deleteBusiness: (businessId: number) => void;
@@ -120,8 +122,19 @@ type FilterBusinessContextType = {
     newDistance: Number,
     newLocation: LocationType,
     newMinRating: Number,
-    newServiceTypes: String[]
+    newServiceTypes: String[],
+    skipFetch?: boolean
   ) => void;
+  getCurrentFilters: () => {
+    distance: Number;
+    location: LocationType;
+    minRating: Number;
+    serviceTypes: String[];
+  };
+  endInitialization: () => void;
+  setHomeInitialized: (initialized: boolean) => void;
+  getHomeInitialized: () => boolean;
+  resetHomeInitialization: () => void;
 };
 
 type LocationType = {
@@ -139,47 +152,71 @@ const FilterBusinessContext = createContext<
 
 export const BusinessProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(businessReducer, initialState);
-  const [distance, setDistance] = useState<Number>(5000);
+  const [distance, setDistance] = useState<Number>(50000);
   const [location, setLocation] = useState<LocationType>({
     lat: 51.4086295,
     lng: -0.7214513,
   }); //actually get that from expo-location
-  const [minRating, setMinRating] = useState<Number>(4); // 4 out of 5
-  const [serviceTypes, setServiceTypes] = useState<String[]>(["classes"]);
+  const [minRating, setMinRating] = useState<Number>(1);
+  const [serviceTypes, setServiceTypes] = useState<String[]>([
+    "gym",
+    "classes",
+  ]);
+  const { user, isGuestMode } = useAuth();
+
+  // Cache for tracking last fetch parameters
+  const [lastFetchParams, setLastFetchParams] = useState<string>("");
+  const [hasInitialFetch, setHasInitialFetch] = useState(false);
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [isHomeInitialized, setIsHomeInitialized] = useState(false);
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   const fetchBusinesses = async () => {
     dispatch({ type: "FETCH_BUSINESSES_START" });
+
+    // Make API call for both guest and authenticated users
     try {
-      let token;
-      if (Platform.OS === "web") {
-        token = localStorage.getItem("accessToken");
-      } else {
-        token = await SecureStore.getItemAsync("accessToken");
+      let token = null;
+      if (user) {
+        // Get token for authenticated users
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("accessToken");
+        } else {
+          token = await SecureStore.getItemAsync("accessToken");
+        }
       }
 
-      if (!token) {
-        throw new Error("No authentication token found");
+      const headers: any = {
+        "Content-Type": "application/json",
+      };
+
+      // Add authorization header only if user is authenticated
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
+
+      const requestBody = {
+        location: {
+          lat: location.lat,
+          lng: location.lng,
+        },
+        maxDistance: distance,
+        minRating: minRating,
+        types: serviceTypes,
+      };
 
       const response = await fetch(`${API_URL}/api/mobile/businesses/filter`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          location: {
-            lat: location.lat,
-            lng: location.lng,
-          },
-          maxDistance: distance,
-          minRating: minRating,
-          types: serviceTypes,
-        }),
+        headers,
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
       const json = await response.json();
@@ -191,6 +228,9 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         type: "FETCH_BUSINESSES_SUCCESS",
         payload: validBusinesses,
       });
+
+      // Record the fetch time
+      setLastFetchTime(Date.now());
     } catch (error) {
       console.error("Error fetching data:", error);
       dispatch({
@@ -198,6 +238,12 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
         payload: error as Error,
       });
     }
+  };
+
+  const forceRefresh = async () => {
+    // Force a fresh fetch regardless of cache
+    setLastFetchParams(""); // Reset cache
+    await fetchBusinesses();
   };
 
   const addBusiness = (business: Business) => {
@@ -216,29 +262,99 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     newDistance: Number,
     newLocation: LocationType,
     newMinRating: Number,
-    newServiceTypes: String[]
+    newServiceTypes: String[],
+    skipFetch?: boolean
   ) => {
     setDistance(newDistance);
     setLocation(newLocation);
     setMinRating(newMinRating);
     setServiceTypes(newServiceTypes);
+
+    if (skipFetch) {
+      setIsInitializing(true);
+    }
   };
 
+  const getCurrentFilters = () => {
+    return {
+      distance,
+      location,
+      minRating,
+      serviceTypes,
+    };
+  };
+
+  const endInitialization = () => {
+    setIsInitializing(false);
+  };
+
+  const setHomeInitialized = (initialized: boolean) => {
+    setIsHomeInitialized(initialized);
+  };
+
+  const getHomeInitialized = () => {
+    return isHomeInitialized;
+  };
+
+  const resetHomeInitialization = () => {
+    setIsHomeInitialized(false);
+  };
+
+  // Smart fetch logic - only fetch if parameters actually changed
   useEffect(() => {
-    fetchBusinesses();
-  }, [distance, location, minRating, serviceTypes]);
+    if (!user && !isGuestMode) return; // Don't fetch if not authenticated or guest
+    if (isInitializing) return; // Don't fetch during initialization
+
+    const currentParams = JSON.stringify({
+      distance,
+      location,
+      minRating,
+      serviceTypes,
+      user: user?.id || "guest",
+      isGuestMode,
+    });
+
+    const isCacheExpired = Date.now() - lastFetchTime > CACHE_DURATION;
+    const paramsChanged = currentParams !== lastFetchParams;
+    const needsInitialFetch = !hasInitialFetch;
+
+    // Fetch if parameters changed, cache expired, or first time
+    if (paramsChanged || isCacheExpired || needsInitialFetch) {
+      setLastFetchParams(currentParams);
+      setHasInitialFetch(true);
+      fetchBusinesses();
+    }
+  }, [
+    distance,
+    location,
+    minRating,
+    serviceTypes,
+    user,
+    isGuestMode,
+    isInitializing,
+  ]);
 
   return (
     <BusinessContext.Provider
       value={{
         ...state,
         refreshBusinesses: fetchBusinesses,
+        forceRefresh,
         addBusiness,
         updateBusiness,
         deleteBusiness,
       }}
     >
-      <FilterBusinessContext.Provider value={{ updateFilters }}>
+      <FilterBusinessContext.Provider
+        value={{
+          updateFilters,
+          getCurrentFilters,
+          endInitialization,
+          setHomeInitialized,
+          getHomeInitialized,
+          resetHomeInitialization,
+        }}
+      >
         {children}
       </FilterBusinessContext.Provider>
     </BusinessContext.Provider>

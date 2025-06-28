@@ -8,6 +8,7 @@ import React, {
 import { API_URL } from "@/env";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { useAuth } from "./auth/AuthContext";
 
 export type Class = {
   id: number;
@@ -125,40 +126,51 @@ export const ClassesProvider = ({
   businessId: number;
 }) => {
   const [state, dispatch] = useReducer(classesReducer, initialState);
+  const { user, isGuestMode } = useAuth();
 
   const fetchClasses = async () => {
     dispatch({ type: "FETCH_CLASSES_START" });
+
+    // Make API call for both guest and authenticated users
     try {
-      let token;
-      if (Platform.OS === "web") {
-        token = localStorage.getItem("accessToken");
-      } else {
-        token = await SecureStore.getItemAsync("accessToken");
+      let token = null;
+      if (user) {
+        // Get token for authenticated users
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("accessToken");
+        } else {
+          token = await SecureStore.getItemAsync("accessToken");
+        }
       }
 
-      if (!token) {
-        throw new Error("No authentication token found");
+      const headers: any = {
+        "Content-Type": "application/json",
+      };
+
+      // Add authorization header only if user is authenticated
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
 
       const response = await fetch(
         `${API_URL}/api/mobile/classes?businessId=${businessId}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers,
         }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
       const json = await response.json();
       dispatch({ type: "FETCH_CLASSES_SUCCESS", payload: json });
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching classes:", error);
       dispatch({
         type: "FETCH_CLASSES_ERROR",
         payload: error as Error,
@@ -174,8 +186,9 @@ export const ClassesProvider = ({
   };
 
   useEffect(() => {
+    // Fetch classes for both guest and authenticated users
     fetchClasses();
-  }, [businessId]);
+  }, [businessId, user, isGuestMode]);
 
   return (
     <ClassesContext.Provider

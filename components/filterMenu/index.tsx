@@ -11,9 +11,6 @@ type FilterMenuProps = {
   distance: number;
   rating: number;
   selectedCategories: string[];
-  setDistance: React.Dispatch<React.SetStateAction<number>>;
-  setRating: React.Dispatch<React.SetStateAction<number>>;
-  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   applyFilters: (
     filterDistance: number,
     rating: number,
@@ -27,9 +24,6 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   distance,
   rating,
   selectedCategories,
-  setDistance,
-  setRating,
-  setSelectedCategories,
   applyFilters,
 }) => {
   const categories = ["gym", "classes"];
@@ -44,6 +38,19 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   const [filterDistance, setFilterDistance] = useState<number>(distance);
   const [filterCategories, setFilterCategories] =
     useState<string[]>(selectedCategories);
+
+  // Sync local state with parent state when props change
+  useEffect(() => {
+    setFilterRating(rating);
+  }, [rating]);
+
+  useEffect(() => {
+    setFilterDistance(distance);
+  }, [distance]);
+
+  useEffect(() => {
+    setFilterCategories(selectedCategories);
+  }, [selectedCategories]);
 
   useEffect(() => {
     Animated.timing(animatedValue, {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -23,6 +23,7 @@ import {
   useBusinessContext,
   useFilterBusinessContext,
 } from "./contexts/BusinessContext";
+import { useAuth } from "./contexts/auth/AuthContext";
 import {
   FlatListContainer,
   FullWidthContainer,
@@ -52,8 +53,25 @@ const GOOGLE_MAPS_API_KEY =
 const FILTER_STORAGE_KEY = "@be_well_filters";
 
 export default function HomePage() {
-  const { businesses, error: businessError } = useBusinessContext();
-  const { updateFilters } = useFilterBusinessContext();
+  const {
+    businesses,
+    error: businessError,
+    forceRefresh,
+  } = useBusinessContext();
+  const {
+    updateFilters,
+    getCurrentFilters,
+    endInitialization,
+    setHomeInitialized,
+    getHomeInitialized,
+    resetHomeInitialization,
+  } = useFilterBusinessContext();
+  const {
+    user,
+    isGuestMode,
+    isLoading: authLoading,
+    continueAsGuest,
+  } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [locationSetupError, setLocationSetupError] = useState<Error | null>(
     null
@@ -61,14 +79,39 @@ export default function HomePage() {
   const [isMapView, setIsMapView] = useState(false);
   const [location, setLocation] = useState(INITIAL_REGION);
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
-  const [rating, setRating] = useState(1);
-  const [distance, setDistance] = useState(5);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    "gym",
-  ]);
+
+  // Get current filter values from context
+  const currentFilters = getCurrentFilters();
+  const rating = useMemo(
+    () => Number(currentFilters.minRating),
+    [currentFilters.minRating]
+  );
+  const distance = useMemo(
+    () => Number(currentFilters.distance) / 1000,
+    [currentFilters.distance]
+  ); // Convert from meters to km
+  const selectedCategories = useMemo(
+    () => currentFilters.serviceTypes as string[],
+    [currentFilters.serviceTypes]
+  );
+
+  // Get initialization state from context
+  const isInitialized = getHomeInitialized();
 
   useEffect(() => {
     const initialiseHomeScreen = async () => {
+      // Skip initialization if already done
+      if (isInitialized) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Skip if not authenticated or in guest mode
+      if (!user && !isGuestMode) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -90,33 +133,39 @@ export default function HomePage() {
           setLocation(INITIAL_REGION);
         }
 
-        const savedFilters = await AsyncStorage.getItem(FILTER_STORAGE_KEY);
-        if (savedFilters) {
-          const {
-            rating: savedRating,
-            distance: savedDistance,
-            categories: savedCategories,
-          } = JSON.parse(savedFilters);
-          setRating(savedRating);
-          setDistance(savedDistance);
-          setSelectedCategories(savedCategories);
+        // Only fetch businesses if user is authenticated
+        if (user || isGuestMode) {
+          const savedFilters = await AsyncStorage.getItem(FILTER_STORAGE_KEY);
+          if (savedFilters) {
+            const {
+              rating: savedRating,
+              distance: savedDistance,
+              categories: savedCategories,
+            } = JSON.parse(savedFilters);
 
-          await updateFilters(
-            savedDistance * 1000,
-            { lat: initial_location.lat, lng: initial_location.lng },
-            savedRating,
-            savedCategories
-          );
-        } else {
-          await updateFilters(
-            distance * 1000,
-            { lat: initial_location.lat, lng: initial_location.lng },
-            rating,
-            selectedCategories
-          );
+            await updateFilters(
+              savedDistance * 1000,
+              { lat: initial_location.lat, lng: initial_location.lng },
+              savedRating,
+              savedCategories,
+              true // skipFetch during initialization
+            );
+          } else {
+            await updateFilters(
+              5000, // 5km default
+              { lat: initial_location.lat, lng: initial_location.lng },
+              1, // default rating
+              ["gym", "classes"], // default categories
+              true // skipFetch during initialization
+            );
+          }
         }
+
+        setHomeInitialized(true);
+
+        // End initialization to trigger first business fetch
+        endInitialization();
       } catch (error) {
-        console.error("Error loading home screen:", error);
         setLocationSetupError(
           error instanceof Error
             ? error
@@ -128,7 +177,7 @@ export default function HomePage() {
     };
 
     initialiseHomeScreen();
-  }, []);
+  }, [isInitialized]);
 
   const saveFilters = async () => {
     try {
@@ -154,53 +203,45 @@ export default function HomePage() {
     setIsFilterMenuVisible(!isFilterMenuVisible);
   };
 
-  const applyFilters = (
+  const handleRefresh = async () => {
+    try {
+      await forceRefresh();
+    } catch (error) {
+      console.error("Error refreshing businesses:", error);
+    }
+  };
+
+  const applyFilters = async (
     filterDistance: number,
     filterRating: number,
     filterCategories: string[]
   ) => {
+    // Update filters in context
     updateFilters(
       filterDistance * 1000,
       { lat: location.lat, lng: location.lng },
       filterRating,
-      filterCategories
+      filterCategories,
+      false // don't skip fetch for user-initiated filter changes
     );
 
-    console.log("selectedCategories", selectedCategories);
+    // Save filters to AsyncStorage
+    try {
+      const filtersToSave = {
+        rating: filterRating,
+        distance: filterDistance,
+        categories: filterCategories,
+      };
+      await AsyncStorage.setItem(
+        FILTER_STORAGE_KEY,
+        JSON.stringify(filtersToSave)
+      );
+    } catch (error) {
+      console.error("Error saving filters:", error);
+    }
 
     setIsFilterMenuVisible(false);
   };
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status == "granted") {
-        const loc = await Location.getCurrentPositionAsync({});
-
-        const { latitude, longitude } = loc.coords;
-
-        const user_location = {
-          lat: latitude,
-          lng: longitude,
-        };
-
-        setLocation(user_location);
-      } else {
-        setLocation(INITIAL_REGION);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    updateFilters(
-      distance * 1000,
-      { lat: location.lat, lng: location.lng },
-      rating,
-      selectedCategories
-    );
-    console.log("updating filters");
-  }, [distance, location, rating, selectedCategories]);
 
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
@@ -233,9 +274,83 @@ export default function HomePage() {
     );
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (authLoading || isLoading) return <LoadingSpinner />;
   if (locationSetupError) return <ErrorMessage error={locationSetupError} />;
   if (businessError) return <ErrorMessage error={businessError} />;
+
+  // Show login prompt if not authenticated
+  if (!user && !isGuestMode) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
+        <HeaderText>Welcome to Be Well</HeaderText>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#007AFF",
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 20,
+          }}
+          onPress={() => router.push("/logIn")}
+        >
+          <HeaderText style={{ color: "white" }}>Sign In</HeaderText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "transparent",
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 10,
+            borderWidth: 1,
+            borderColor: "#007AFF",
+          }}
+          onPress={() => router.push("/signUp")}
+        >
+          <HeaderText style={{ color: "#007AFF" }}>Sign Up</HeaderText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "transparent",
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 10,
+            borderWidth: 1,
+            borderColor: "#28a745",
+          }}
+          onPress={continueAsGuest}
+        >
+          <HeaderText style={{ color: "#28a745" }}>
+            Continue as Guest
+          </HeaderText>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Ensure businesses is an array to prevent filter errors
+  const safeBusinesses = businesses || [];
+
+  // Show message when no businesses are available
+  const renderNoBusinessesMessage = () => (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <HeaderText style={{ textAlign: "center", marginBottom: 20 }}>
+        "No businesses found in your area"
+      </HeaderText>
+    </View>
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -251,16 +366,13 @@ export default function HomePage() {
         rating={rating}
         isVisible={isFilterMenuVisible}
         toggleFilterMenu={toggleFilterMenu}
-        setRating={setRating}
         distance={distance}
-        setDistance={setDistance}
         selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
         applyFilters={applyFilters}
       />
       {isMapView ? (
         <Map
-          businesses={businesses}
+          businesses={safeBusinesses}
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
           location={location}
@@ -269,89 +381,99 @@ export default function HomePage() {
         <>
           <BeWellBackground scrollable>
             <FullWidthContainer>
-              <HeaderText style={{ marginLeft: 12 }}>
-                Studios Near You
-              </HeaderText>
-              <FlatListContainer
-                style={{
-                  marginBottom: 12,
-                }}
-              >
-                <FlatList
-                  data={businesses}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id?.toString() || ""}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  snapToAlignment="center"
-                  decelerationRate="fast"
-                  snapToInterval={viewportWidth - 30}
-                  contentContainerStyle={Platform.select({
-                    android: { paddingHorizontal: 12 },
-                  })}
-                  contentInset={Platform.select({
-                    ios: { left: 12, right: 12 },
-                  })}
-                  contentOffset={Platform.select({
-                    ios: { x: -12, y: 0 },
-                  })}
-                  ItemSeparatorComponent={() => <ScrollSeparator />}
-                />
-              </FlatListContainer>
-              <HeaderText style={{ marginLeft: 12 }}>Trending Now</HeaderText>
-              <FlatListContainer
-                style={{
-                  marginBottom: 12,
-                }}
-              >
-                <FlatList
-                  data={businesses}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id?.toString() || ""}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  snapToAlignment="center"
-                  decelerationRate="fast"
-                  snapToInterval={viewportWidth - 30}
-                  contentContainerStyle={Platform.select({
-                    android: { paddingHorizontal: 12 },
-                  })}
-                  contentInset={Platform.select({
-                    ios: { left: 12, right: 12 },
-                  })}
-                  contentOffset={Platform.select({
-                    ios: { x: -12, y: 0 },
-                  })}
-                  ItemSeparatorComponent={() => <ScrollSeparator />}
-                />
-              </FlatListContainer>
-              <HeaderText style={{ marginLeft: 12 }}>New Studios</HeaderText>
-              <FlatListContainer
-                style={{
-                  marginBottom: 12,
-                }}
-              >
-                <FlatList
-                  data={businesses}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id?.toString() || ""}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  snapToAlignment="center"
-                  decelerationRate="fast"
-                  snapToInterval={viewportWidth - 30}
-                  contentContainerStyle={Platform.select({
-                    android: { paddingHorizontal: 12 },
-                  })}
-                  contentInset={Platform.select({
-                    ios: { left: 12, right: 12 },
-                  })}
-                  contentOffset={Platform.select({
-                    ios: { x: -12, y: 0 },
-                  })}
-                  ItemSeparatorComponent={() => <ScrollSeparator />}
-                />
-              </FlatListContainer>
+              {safeBusinesses.length === 0 ? (
+                renderNoBusinessesMessage()
+              ) : (
+                <>
+                  <HeaderText style={{ marginLeft: 12 }}>
+                    Studios Near You
+                  </HeaderText>
+                  <FlatListContainer
+                    style={{
+                      marginBottom: 12,
+                    }}
+                  >
+                    <FlatList
+                      data={safeBusinesses}
+                      renderItem={renderItem}
+                      keyExtractor={(item) => item.id?.toString() || ""}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      snapToAlignment="center"
+                      decelerationRate="fast"
+                      snapToInterval={viewportWidth - 30}
+                      contentContainerStyle={Platform.select({
+                        android: { paddingHorizontal: 12 },
+                      })}
+                      contentInset={Platform.select({
+                        ios: { left: 12, right: 12 },
+                      })}
+                      contentOffset={Platform.select({
+                        ios: { x: -12, y: 0 },
+                      })}
+                      ItemSeparatorComponent={() => <ScrollSeparator />}
+                    />
+                  </FlatListContainer>
+                  <HeaderText style={{ marginLeft: 12 }}>
+                    Trending Now
+                  </HeaderText>
+                  <FlatListContainer
+                    style={{
+                      marginBottom: 12,
+                    }}
+                  >
+                    <FlatList
+                      data={safeBusinesses}
+                      renderItem={renderItem}
+                      keyExtractor={(item) => item.id?.toString() || ""}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      snapToAlignment="center"
+                      decelerationRate="fast"
+                      snapToInterval={viewportWidth - 30}
+                      contentContainerStyle={Platform.select({
+                        android: { paddingHorizontal: 12 },
+                      })}
+                      contentInset={Platform.select({
+                        ios: { left: 12, right: 12 },
+                      })}
+                      contentOffset={Platform.select({
+                        ios: { x: -12, y: 0 },
+                      })}
+                      ItemSeparatorComponent={() => <ScrollSeparator />}
+                    />
+                  </FlatListContainer>
+                  <HeaderText style={{ marginLeft: 12 }}>
+                    New Studios
+                  </HeaderText>
+                  <FlatListContainer
+                    style={{
+                      marginBottom: 12,
+                    }}
+                  >
+                    <FlatList
+                      data={safeBusinesses}
+                      renderItem={renderItem}
+                      keyExtractor={(item) => item.id?.toString() || ""}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      snapToAlignment="center"
+                      decelerationRate="fast"
+                      snapToInterval={viewportWidth - 30}
+                      contentContainerStyle={Platform.select({
+                        android: { paddingHorizontal: 12 },
+                      })}
+                      contentInset={Platform.select({
+                        ios: { left: 12, right: 12 },
+                      })}
+                      contentOffset={Platform.select({
+                        ios: { x: -12, y: 0 },
+                      })}
+                      ItemSeparatorComponent={() => <ScrollSeparator />}
+                    />
+                  </FlatListContainer>
+                </>
+              )}
             </FullWidthContainer>
           </BeWellBackground>
           {!isMapView && (

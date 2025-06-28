@@ -33,18 +33,7 @@
       "bundler": "metro",
       "output": "static"
     },
-    "plugins": [
-      "expo-router",
-      "expo-secure-store",
-      "expo-font",
-      [
-        "expo-google-places",
-        {
-          "androidApiKey": "AIzaSyBI9bwIvOS6AGxEPCHJywU0xKXUCfyrNRY",
-          "iosApiKey": "AIzaSyDaS1Cu-plIcFJeDlJ8i2aTrH3sBSsP9WY"
-        }
-      ]
-    ],
+    "plugins": ["expo-router", "expo-secure-store", "expo-font"],
     "experiments": {
       "typedRoutes": true
     },
