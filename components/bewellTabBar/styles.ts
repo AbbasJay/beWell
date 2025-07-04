@@ -7,35 +7,45 @@ export const Content = styled.View`
 
 export const TabBar = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  padding: ${Platform.OS === "ios" ? "0 0 20px 0" : "10px"};
-  margin-top: 8px;
+  border-top-width: 1px;
+  border-top-color: #f1f4f2;
+  background-color: white;
+  padding-horizontal: 16px;
+  padding-top: 10px;
+  padding-bottom: ${Platform.OS === "ios" ? "28px" : "20px"};
+  height: 72px;
 `;
 
 export const Tab = styled.TouchableOpacity`
   flex: 1;
   align-items: center;
-  padding: ${Platform.OS === "ios" ? "10px" : "6px"};
+  justify-content: center;
+  gap: 6px;
+  padding-vertical: 6px;
 `;
 
 export const TabText = styled.Text`
-  color: #000;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
+  color: #121714;
+  margin-top: 2px;
 `;
 
-export const ActiveTabText = styled(TabText)`
-  color: #007bff;
-  font-weight: 700;
+export const TabTextInactive = styled.Text`
+  font-size: 12px;
+  font-weight: 500;
+  color: #688273;
+  margin-top: 2px;
 `;
 
 export const BadgeContainer = styled.View`
   position: absolute;
-  top: -12px;
-  right: 2px;
-  border-radius: 100px;
-  padding: 4px 6px;
-  display: flex;
+  top: 2px;
+  right: -8px;
+  background-color: #ff4444;
+  border-radius: 10px;
+  padding: 2px 6px;
+  min-width: 16px;
   align-items: center;
   justify-content: center;
 `;
@@ -43,11 +53,12 @@ export const BadgeContainer = styled.View`
 export const NotificationBadge = styled.Text`
   font-size: 10px;
   font-weight: 700;
+  color: white;
 `;
 
 export const IconContainer = styled.View`
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 30px;
+  height: 32px;
 `;

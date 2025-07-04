@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import * as CSS from "./styles";
 import { useNavigation } from "expo-router";
+import { Image, TouchableOpacity } from "react-native";
 
 interface NavigationItem {
   label?: string;
@@ -13,6 +14,9 @@ interface NavigationBarProps {
   subtitle?: string;
   left?: NavigationItem;
   right?: NavigationItem;
+  profileImageUri?: string;
+  showSettings?: boolean;
+  onPressSettings?: () => void;
 }
 
 export const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -20,6 +24,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   subtitle,
   left,
   right,
+  profileImageUri,
+  showSettings,
+  onPressSettings,
 }) => {
   const navigation = useNavigation();
 
@@ -50,7 +57,16 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
   return (
     <CSS.Container>
-      <CSS.LeftContainer>{left && renderItem(left, false)}</CSS.LeftContainer>
+      <CSS.LeftContainer>
+        {profileImageUri ? (
+          <Image
+            source={{ uri: profileImageUri }}
+            style={{ width: 32, height: 32, borderRadius: 16 }}
+          />
+        ) : (
+          left && renderItem(left, false)
+        )}
+      </CSS.LeftContainer>
 
       <CSS.TitleContainer>
         {title && <CSS.Title numberOfLines={1}>{title}</CSS.Title>}
@@ -58,7 +74,13 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
       </CSS.TitleContainer>
 
       <CSS.RightContainer>
-        {right && renderItem(right, true)}
+        {showSettings ? (
+          <TouchableOpacity onPress={onPressSettings}>
+            {right?.icon}
+          </TouchableOpacity>
+        ) : (
+          right && renderItem(right, true)
+        )}
       </CSS.RightContainer>
     </CSS.Container>
   );

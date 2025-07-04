@@ -1,12 +1,12 @@
 import { Business } from "@/app/contexts/BusinessContext";
-import * as CSS from "./styles";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Skeleton } from "react-native-skeletons";
 
 type BusinessCardProps = {
   item: Business;
   onPress?: () => void;
   disabled?: boolean;
-  width?: string;
+  width?: number;
   height?: string;
   isLoading?: boolean;
   distance?: number;
@@ -15,44 +15,67 @@ type BusinessCardProps = {
 export const BusinessCard = ({
   item,
   onPress,
-  width,
+  width = 160,
   height,
   disabled,
   isLoading = false,
   distance,
 }: BusinessCardProps) => {
+  if (isLoading) {
+    return (
+      <View style={styles.card}>
+        <Skeleton height={160} width={160} style={styles.image} />
+        <View style={styles.info}>
+          <Skeleton height={16} width="60%" style={{ marginBottom: 4 }} />
+          <Skeleton height={14} width="80%" />
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <CSS.Wrapper>
-      <CSS.Container onPress={onPress} width={width} disabled={disabled}>
-        {isLoading ? (
-          <>
-            <Skeleton height={80} width="100%" />
-            <Skeleton height={20} width="60%" style={{ marginTop: 10 }} />
-            <Skeleton height={20} width="80%" style={{ marginTop: 5 }} />
-            <Skeleton height={20} width="40%" style={{ marginTop: 5 }} />
-          </>
-        ) : (
-          <>
-            <CSS.ImageWrapper></CSS.ImageWrapper>
-            <CSS.SampleImage
-              height={height}
-              source={
-                item.photo
-                  ? { uri: item.photo }
-                  : require("@/assets/images/home-gym.webp")
-              }
-              resizeMode="cover"
-            />
-            <CSS.ContentWrapper>
-              <CSS.CardTitle>{item.name}</CSS.CardTitle>
-              <CSS.CardType>{distance?.toFixed(1)} km</CSS.CardType>
-              <CSS.Info>{item.address}</CSS.Info>
-              <CSS.Info>{item.phoneNumber}</CSS.Info>
-              <CSS.Info>{item.type}</CSS.Info>
-            </CSS.ContentWrapper>
-          </>
-        )}
-      </CSS.Container>
-    </CSS.Wrapper>
+    <TouchableOpacity style={styles.card} onPress={onPress} disabled={disabled}>
+      <Image
+        source={
+          item.photo
+            ? { uri: item.photo }
+            : require("@/assets/images/home-gym.webp")
+        }
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <View style={styles.info}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.description}>
+          {distance
+            ? `${distance.toFixed(1)} km away`
+            : item.type || "Fitness Studio"}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    gap: 16,
+    width: 160,
+  },
+  image: {
+    width: 160,
+    height: 160,
+    borderRadius: 12,
+  },
+  info: {
+    gap: 4,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#121714",
+  },
+  description: {
+    fontSize: 14,
+    color: "#688273",
+  },
+});

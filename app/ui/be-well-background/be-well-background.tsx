@@ -1,13 +1,13 @@
 import * as CSS from "./styles";
-import { ScrollView, StyleSheet } from "react-native";
-import { useState } from "react";
+import { ScrollView, StyleSheet, RefreshControlProps } from "react-native";
+import { useState, ReactNode, ReactElement } from "react";
 import { ErrorMessage } from "@/app/ui/error-message";
 
 interface BeWellBackgroundProps {
   children: React.ReactNode;
   scrollable?: boolean;
   contentContainerStyle?: object;
-  refreshControl?: React.ReactElement;
+  refreshControl?: ReactElement<RefreshControlProps>;
 }
 
 const defaultContentContainerStyle = {
@@ -33,11 +33,11 @@ export const BeWellBackground = ({
     }
 
     return (
-      <CSS.StyledSafeAreaView>
+      <CSS.StyledSafeAreaView edges={["left", "right"]}>
         {scrollable ? (
           <ScrollView
             contentContainerStyle={combinedStyle}
-            refreshControl={refreshControl}
+            {...(refreshControl ? { refreshControl } : {})}
           >
             {children}
           </ScrollView>

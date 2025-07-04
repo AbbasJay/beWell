@@ -1,5 +1,3 @@
-"use client";
-
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { router, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -23,9 +21,51 @@ export const BeWellTabBar = () => {
 
   if (error) return <ErrorMessage error={error} />;
 
+  const isHomeActive = activeRoute === "/home";
+  const isExploreActive = activeRoute === "/explore";
+  const isNotificationsActive = activeRoute === "/notifications";
+  const isProfileActive = activeRoute === "/profile";
+
   return (
     <CSS.Content>
       <CSS.TabBar>
+        <CSS.Tab
+          onPress={() => {
+            router.push("/home");
+          }}
+        >
+          <CSS.IconContainer>
+            <MaterialIcons
+              name="home"
+              size={24}
+              color={isHomeActive ? "#121714" : "#688273"}
+            />
+            {isHomeActive ? (
+              <CSS.TabText>Home</CSS.TabText>
+            ) : (
+              <CSS.TabTextInactive>Home</CSS.TabTextInactive>
+            )}
+          </CSS.IconContainer>
+        </CSS.Tab>
+        <CSS.Tab
+          onPress={() => {
+            // TODO: Navigate to explore/search screen
+            console.log("Navigate to explore");
+          }}
+        >
+          <CSS.IconContainer>
+            <MaterialIcons
+              name="search"
+              size={24}
+              color={isExploreActive ? "#121714" : "#688273"}
+            />
+            {isExploreActive ? (
+              <CSS.TabText>Explore</CSS.TabText>
+            ) : (
+              <CSS.TabTextInactive>Explore</CSS.TabTextInactive>
+            )}
+          </CSS.IconContainer>
+        </CSS.Tab>
         <CSS.Tab
           onPress={() => {
             router.push("/notifications");
@@ -34,10 +74,14 @@ export const BeWellTabBar = () => {
           <CSS.IconContainer>
             <MaterialIcons
               name="notifications"
-              size={20}
-              color={unreadNotificationsCount > 0 ? "red" : "black"}
+              size={24}
+              color={isNotificationsActive ? "#121714" : "#688273"}
             />
-            <CSS.TabText>Notifications</CSS.TabText>
+            {isNotificationsActive ? (
+              <CSS.TabText>Notifications</CSS.TabText>
+            ) : (
+              <CSS.TabTextInactive>Notifications</CSS.TabTextInactive>
+            )}
             {unreadNotificationsCount > 0 && (
               <CSS.BadgeContainer>
                 <CSS.NotificationBadge>
@@ -49,22 +93,21 @@ export const BeWellTabBar = () => {
         </CSS.Tab>
         <CSS.Tab
           onPress={() => {
-            router.push("/home");
+            // TODO: Navigate to profile screen
+            console.log("Navigate to profile");
           }}
         >
           <CSS.IconContainer>
-            <MaterialIcons name="home" size={20} color={"black"} />
-            <CSS.TabText>Home</CSS.TabText>
-          </CSS.IconContainer>
-        </CSS.Tab>
-        <CSS.Tab
-          onPress={() => {
-            router.push("/settings");
-          }}
-        >
-          <CSS.IconContainer>
-            <MaterialIcons name="settings" size={20} color={"black"} />
-            <CSS.TabText>Settings</CSS.TabText>
+            <MaterialIcons
+              name="person"
+              size={24}
+              color={isProfileActive ? "#121714" : "#688273"}
+            />
+            {isProfileActive ? (
+              <CSS.TabText>Profile</CSS.TabText>
+            ) : (
+              <CSS.TabTextInactive>Profile</CSS.TabTextInactive>
+            )}
           </CSS.IconContainer>
         </CSS.Tab>
       </CSS.TabBar>

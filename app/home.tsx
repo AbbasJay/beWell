@@ -8,14 +8,14 @@ import {
   FlatList,
   Platform,
   TouchableOpacity,
-  View,
+  ScrollView,
+  ImageBackground,
 } from "react-native";
 
 import FilterMenu from "@/components/filterMenu";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-import { HeaderText } from "./homeStyles";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { ErrorMessage } from "./ui/error-message";
 import {
@@ -24,12 +24,7 @@ import {
   useFilterBusinessContext,
 } from "./contexts/BusinessContext";
 import { useAuth } from "./contexts/auth/AuthContext";
-import {
-  FlatListContainer,
-  FullWidthContainer,
-  ScrollSeparator,
-  SearchBarContainer,
-} from "./homeStyles";
+import * as CSS from "./homeStyles";
 
 import Constants from "expo-constants";
 import SearchBar from "@/components/searchBar";
@@ -79,6 +74,8 @@ export default function HomePage() {
   const [isMapView, setIsMapView] = useState(false);
   const [location, setLocation] = useState(INITIAL_REGION);
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   // Get current filter values from context
   const currentFilters = getCurrentFilters();
@@ -95,8 +92,42 @@ export default function HomePage() {
     [currentFilters.serviceTypes]
   );
 
+  // Filter businesses based on search query
+  const filteredBusinesses = useMemo(() => {
+    // Ensure businesses is an array to prevent filter errors
+    const safeBusinesses = businesses || [];
+
+    if (!searchQuery.trim()) {
+      return safeBusinesses;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return safeBusinesses.filter((business) => {
+      const name = business.name?.toLowerCase() || "";
+      const address = business.address?.toLowerCase() || "";
+      const type = business.type?.toLowerCase() || "";
+      const city = business.city?.toLowerCase() || "";
+      const state = business.state?.toLowerCase() || "";
+      const country = business.country?.toLowerCase() || "";
+      const zipCode = business.zipCode?.toLowerCase() || "";
+
+      return (
+        name.includes(query) ||
+        address.includes(query) ||
+        type.includes(query) ||
+        city.includes(query) ||
+        state.includes(query) ||
+        country.includes(query) ||
+        zipCode.includes(query)
+      );
+    });
+  }, [businesses, searchQuery]);
+
   // Get initialization state from context
   const isInitialized = getHomeInitialized();
+
+  // Ensure businesses is an array to prevent filter errors
+  const safeBusinesses = businesses || [];
 
   useEffect(() => {
     const initialiseHomeScreen = async () => {
@@ -243,6 +274,23 @@ export default function HomePage() {
     setIsFilterMenuVisible(false);
   };
 
+  const handleSearch = () => {
+    // Search is now handled by the filteredBusinesses useMemo
+    // This function can be used for additional search logic if needed
+    console.log("Searching for:", searchQuery);
+    setIsSearching(true);
+
+    // Clear search after a short delay to show results
+    setTimeout(() => {
+      setIsSearching(false);
+    }, 1000);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setIsSearching(false);
+  };
+
   const renderItem = ({ item }: { item: Business }) => {
     const businessId = item.id ?? 0;
 
@@ -281,95 +329,32 @@ export default function HomePage() {
   // Show login prompt if not authenticated
   if (!user && !isGuestMode) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <HeaderText>Welcome to Be Well</HeaderText>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#007AFF",
-            padding: 15,
-            borderRadius: 8,
-            marginTop: 20,
-          }}
-          onPress={() => router.push("/logIn")}
-        >
-          <HeaderText style={{ color: "white" }}>Sign In</HeaderText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "transparent",
-            padding: 15,
-            borderRadius: 8,
-            marginTop: 10,
-            borderWidth: 1,
-            borderColor: "#007AFF",
-          }}
-          onPress={() => router.push("/signUp")}
-        >
-          <HeaderText style={{ color: "#007AFF" }}>Sign Up</HeaderText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "transparent",
-            padding: 15,
-            borderRadius: 8,
-            marginTop: 10,
-            borderWidth: 1,
-            borderColor: "#28a745",
-          }}
-          onPress={continueAsGuest}
-        >
-          <HeaderText style={{ color: "#28a745" }}>
-            Continue as Guest
-          </HeaderText>
-        </TouchableOpacity>
-      </View>
+      <CSS.LoginContainer>
+        <CSS.LoginTitle>Welcome to Be Well</CSS.LoginTitle>
+        <CSS.LoginButton onPress={() => router.push("/logIn")}>
+          <CSS.LoginButtonText>Sign In</CSS.LoginButtonText>
+        </CSS.LoginButton>
+        <CSS.SignUpButton onPress={() => router.push("/signUp")}>
+          <CSS.SignUpButtonText>Sign Up</CSS.SignUpButtonText>
+        </CSS.SignUpButton>
+        <CSS.GuestButton onPress={continueAsGuest}>
+          <CSS.GuestButtonText>Continue as Guest</CSS.GuestButtonText>
+        </CSS.GuestButton>
+      </CSS.LoginContainer>
     );
   }
 
-  // Ensure businesses is an array to prevent filter errors
-  const safeBusinesses = businesses || [];
-
   // Show message when no businesses are available
   const renderNoBusinessesMessage = () => (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-      }}
-    >
-      <HeaderText style={{ textAlign: "center", marginBottom: 20 }}>
-        "No businesses found in your area"
-      </HeaderText>
-    </View>
+    <CSS.NoBusinessesContainer>
+      <CSS.NoBusinessesText>
+        No businesses found in your area
+      </CSS.NoBusinessesText>
+    </CSS.NoBusinessesContainer>
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      <SearchBarContainer>
-        <SearchBar
-          updateLocation={(lat: number, lng: number) =>
-            setLocation({ lat: lat, lng: lng })
-          }
-        />
-      </SearchBarContainer>
-
-      <FilterMenu
-        rating={rating}
-        isVisible={isFilterMenuVisible}
-        toggleFilterMenu={toggleFilterMenu}
-        distance={distance}
-        selectedCategories={selectedCategories}
-        applyFilters={applyFilters}
-      />
+    <CSS.Container>
       {isMapView ? (
         <Map
           businesses={safeBusinesses}
@@ -379,153 +364,197 @@ export default function HomePage() {
         />
       ) : (
         <>
-          <BeWellBackground scrollable>
-            <FullWidthContainer>
-              {safeBusinesses.length === 0 ? (
-                renderNoBusinessesMessage()
-              ) : (
-                <>
-                  <HeaderText style={{ marginLeft: 12 }}>
-                    Studios Near You
-                  </HeaderText>
-                  <FlatListContainer
-                    style={{
-                      marginBottom: 12,
-                    }}
-                  >
-                    <FlatList
-                      data={safeBusinesses}
-                      renderItem={renderItem}
-                      keyExtractor={(item) => item.id?.toString() || ""}
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      snapToAlignment="center"
-                      decelerationRate="fast"
-                      snapToInterval={viewportWidth - 30}
-                      contentContainerStyle={Platform.select({
-                        android: { paddingHorizontal: 12 },
-                      })}
-                      contentInset={Platform.select({
-                        ios: { left: 12, right: 12 },
-                      })}
-                      contentOffset={Platform.select({
-                        ios: { x: -12, y: 0 },
-                      })}
-                      ItemSeparatorComponent={() => <ScrollSeparator />}
-                    />
-                  </FlatListContainer>
-                  <HeaderText style={{ marginLeft: 12 }}>
-                    Trending Now
-                  </HeaderText>
-                  <FlatListContainer
-                    style={{
-                      marginBottom: 12,
-                    }}
-                  >
-                    <FlatList
-                      data={safeBusinesses}
-                      renderItem={renderItem}
-                      keyExtractor={(item) => item.id?.toString() || ""}
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      snapToAlignment="center"
-                      decelerationRate="fast"
-                      snapToInterval={viewportWidth - 30}
-                      contentContainerStyle={Platform.select({
-                        android: { paddingHorizontal: 12 },
-                      })}
-                      contentInset={Platform.select({
-                        ios: { left: 12, right: 12 },
-                      })}
-                      contentOffset={Platform.select({
-                        ios: { x: -12, y: 0 },
-                      })}
-                      ItemSeparatorComponent={() => <ScrollSeparator />}
-                    />
-                  </FlatListContainer>
-                  <HeaderText style={{ marginLeft: 12 }}>
-                    New Studios
-                  </HeaderText>
-                  <FlatListContainer
-                    style={{
-                      marginBottom: 12,
-                    }}
-                  >
-                    <FlatList
-                      data={safeBusinesses}
-                      renderItem={renderItem}
-                      keyExtractor={(item) => item.id?.toString() || ""}
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      snapToAlignment="center"
-                      decelerationRate="fast"
-                      snapToInterval={viewportWidth - 30}
-                      contentContainerStyle={Platform.select({
-                        android: { paddingHorizontal: 12 },
-                      })}
-                      contentInset={Platform.select({
-                        ios: { left: 12, right: 12 },
-                      })}
-                      contentOffset={Platform.select({
-                        ios: { x: -12, y: 0 },
-                      })}
-                      ItemSeparatorComponent={() => <ScrollSeparator />}
-                    />
-                  </FlatListContainer>
-                </>
-              )}
-            </FullWidthContainer>
-          </BeWellBackground>
-          {!isMapView && (
-            <View
-              style={{
-                position: "absolute",
-                bottom: 40,
-                right: 20,
-                gap: 10,
-                zIndex: 10,
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  backgroundColor: "lightgrey",
-                  borderRadius: 5,
-                  elevation: 6,
-                  shadowColor: "#000",
-                  shadowOpacity: 0.1,
-                  shadowRadius: 6,
-                  shadowOffset: {
-                    width: 1,
-                    height: 10,
-                  },
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Hero Section */}
+            <CSS.HeroSection>
+              <ImageBackground
+                source={{
+                  uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuDjGVpUnMoE8PUL1YsQDt7OTsyFkGfFMNcW4JxkyBKEYkDHIEVw6YqVMtPjpdrMWAC1avis3CCVTiIsqG7lsEYFIYMEBI9PQ8oRm3HOwYD6Hz0ZZodyh77KkDYyanvpvW7tx6ig0xQuz5jBvnDVhu3XuzmB9TDk42gpJdOy1Rkf0O_PnDJ0T7juNULasPl5jQfMmz72SefYZtzC0hiXoFPj7qiDsrrbkZpyWVRnUXQP_tEI7pKZlwspl0tpY6sswlYUMYAfOTjXVk0t",
                 }}
-                onPress={toggleFilterMenu}
+                style={{ flex: 1, borderRadius: 0 }}
               >
-                <MaterialIcons name="filter-alt" size={24} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  backgroundColor: "lightgrey",
-                  borderRadius: 5,
-                  elevation: 6,
-                  shadowColor: "#000",
-                  shadowOpacity: 0.1,
-                  shadowRadius: 6,
-                  shadowOffset: {
-                    width: 1,
-                    height: 10,
-                  },
-                }}
-                onPress={toggleListView}
-              >
-                <MaterialIcons name="map" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-          )}
+                <CSS.HeroOverlay>
+                  <CSS.HeroContent>
+                    <CSS.HeroTitle>Find Your Fit</CSS.HeroTitle>
+                    <CSS.HeroSubtitle>
+                      Explore a variety of classes and studios to meet your
+                      fitness goals.
+                    </CSS.HeroSubtitle>
+                  </CSS.HeroContent>
+
+                  {/* Search Bar */}
+                  <CSS.SearchContainer>
+                    <CSS.SearchInputContainer>
+                      <CSS.SearchIconContainer>
+                        <MaterialIcons
+                          name="search"
+                          size={20}
+                          color="#688273"
+                        />
+                      </CSS.SearchIconContainer>
+                      <CSS.SearchInput
+                        placeholder="Search studios, classes, or locations..."
+                        placeholderTextColor="#688273"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        onSubmitEditing={handleSearch}
+                        returnKeyType="search"
+                      />
+                      {searchQuery.length > 0 && (
+                        <CSS.ClearButton onPress={clearSearch}>
+                          <MaterialIcons
+                            name="close"
+                            size={20}
+                            color="#688273"
+                          />
+                        </CSS.ClearButton>
+                      )}
+                      <CSS.SearchButton onPress={handleSearch}>
+                        <CSS.SearchButtonText>
+                          {isSearching ? "..." : "Search"}
+                        </CSS.SearchButtonText>
+                      </CSS.SearchButton>
+                    </CSS.SearchInputContainer>
+                  </CSS.SearchContainer>
+                </CSS.HeroOverlay>
+              </ImageBackground>
+            </CSS.HeroSection>
+
+            {/* Search Results Header */}
+            {searchQuery.trim() && (
+              <CSS.SearchResultsHeader>
+                <CSS.SearchResultsText>
+                  {filteredBusinesses.length === 0
+                    ? `No results found for "${searchQuery}"`
+                    : `${filteredBusinesses.length} result${
+                        filteredBusinesses.length === 1 ? "" : "s"
+                      } for "${searchQuery}"`}
+                </CSS.SearchResultsText>
+                <TouchableOpacity onPress={clearSearch}>
+                  <CSS.ClearSearchText>Clear</CSS.ClearSearchText>
+                </TouchableOpacity>
+              </CSS.SearchResultsHeader>
+            )}
+
+            {/* Filter Menu */}
+            <FilterMenu
+              rating={rating}
+              isVisible={isFilterMenuVisible}
+              toggleFilterMenu={toggleFilterMenu}
+              distance={distance}
+              selectedCategories={selectedCategories}
+              applyFilters={applyFilters}
+            />
+
+            {/* Studios Near You */}
+            <CSS.SectionTitle>
+              {searchQuery.trim() ? "Search Results" : "Studios Near You"}
+            </CSS.SectionTitle>
+            {filteredBusinesses.length === 0 ? (
+              renderNoBusinessesMessage()
+            ) : (
+              <CSS.FlatListContainer>
+                <FlatList
+                  data={filteredBusinesses}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.id?.toString() || ""}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  snapToAlignment="center"
+                  decelerationRate="fast"
+                  snapToInterval={viewportWidth - 30}
+                  contentContainerStyle={Platform.select({
+                    android: { paddingHorizontal: 12 },
+                  })}
+                  contentInset={Platform.select({
+                    ios: { left: 12, right: 12 },
+                  })}
+                  contentOffset={Platform.select({
+                    ios: { x: -12, y: 0 },
+                  })}
+                  ItemSeparatorComponent={() => <CSS.ScrollSeparator />}
+                />
+              </CSS.FlatListContainer>
+            )}
+
+            {/* Only show Trending and New sections when not searching */}
+            {!searchQuery.trim() && (
+              <>
+                {/* Trending Now */}
+                <CSS.SectionTitle>Trending Now</CSS.SectionTitle>
+                {safeBusinesses.length === 0 ? (
+                  renderNoBusinessesMessage()
+                ) : (
+                  <CSS.FlatListContainer>
+                    <FlatList
+                      data={safeBusinesses}
+                      renderItem={renderItem}
+                      keyExtractor={(item) => item.id?.toString() || ""}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      snapToAlignment="center"
+                      decelerationRate="fast"
+                      snapToInterval={viewportWidth - 30}
+                      contentContainerStyle={Platform.select({
+                        android: { paddingHorizontal: 12 },
+                      })}
+                      contentInset={Platform.select({
+                        ios: { left: 12, right: 12 },
+                      })}
+                      contentOffset={Platform.select({
+                        ios: { x: -12, y: 0 },
+                      })}
+                      ItemSeparatorComponent={() => <CSS.ScrollSeparator />}
+                    />
+                  </CSS.FlatListContainer>
+                )}
+
+                {/* New Studios */}
+                <CSS.SectionTitle>New Studios</CSS.SectionTitle>
+                {safeBusinesses.length === 0 ? (
+                  renderNoBusinessesMessage()
+                ) : (
+                  <CSS.FlatListContainer>
+                    <FlatList
+                      data={safeBusinesses}
+                      renderItem={renderItem}
+                      keyExtractor={(item) => item.id?.toString() || ""}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      snapToAlignment="center"
+                      decelerationRate="fast"
+                      snapToInterval={viewportWidth - 30}
+                      contentContainerStyle={Platform.select({
+                        android: { paddingHorizontal: 12 },
+                      })}
+                      contentInset={Platform.select({
+                        ios: { left: 12, right: 12 },
+                      })}
+                      contentOffset={Platform.select({
+                        ios: { x: -12, y: 0 },
+                      })}
+                      ItemSeparatorComponent={() => <CSS.ScrollSeparator />}
+                    />
+                  </CSS.FlatListContainer>
+                )}
+              </>
+            )}
+
+            {/* Bottom Spacing */}
+            <CSS.BottomSpacing />
+          </ScrollView>
+
+          {/* Floating Action Buttons */}
+          <CSS.FloatingButtons>
+            <CSS.FloatingButton onPress={toggleFilterMenu}>
+              <MaterialIcons name="filter-alt" size={24} color="black" />
+            </CSS.FloatingButton>
+            <CSS.FloatingButton onPress={toggleListView}>
+              <MaterialIcons name="map" size={24} color="black" />
+            </CSS.FloatingButton>
+          </CSS.FloatingButtons>
         </>
       )}
-    </View>
+    </CSS.Container>
   );
 }
