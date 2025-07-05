@@ -29,6 +29,7 @@ import {
 import { Skeleton } from "react-native-skeletons";
 import { BeWellText, BeWellTextVariant } from "./ui/be-well-text/be-well-text";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
+import { ClassesCard } from "./ui/classes-card";
 
 export default function AllComponents() {
   return (
@@ -55,6 +56,32 @@ export default function AllComponents() {
               onPress={function (): void {
                 throw new Error("Function not implemented.");
               }}
+              imageIndex={0}
+            />
+          </SectionContent>
+        </Section>
+
+        <Section>
+          <SectionTitle>Classes Card</SectionTitle>
+          <SectionContent>
+            <ClassesCard
+              item={{
+                id: 1,
+                businessId: 1,
+                name: "Yoga Flow",
+                description: "A relaxing yoga session for all levels",
+                duration: 60,
+                price: 15,
+                instructor: "Sarah Johnson",
+                location: "Studio A",
+                startDate: new Date(Date.now() + 3600000).toISOString(),
+                time: "10:00 AM",
+                capacity: 20,
+                slotsLeft: 8,
+                createdAt: new Date(),
+              }}
+              onPress={() => {}}
+              imageIndex={0}
             />
           </SectionContent>
         </Section>

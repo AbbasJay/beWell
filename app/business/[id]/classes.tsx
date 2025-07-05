@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View, Text, Image, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
@@ -10,8 +10,6 @@ import {
   useClassesContext,
   Class,
 } from "@/app/contexts/ClassesContext";
-import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
-import { BusinessCard } from "@/app/ui/business-card/business-card";
 import { ClassesCard } from "@/app/ui/classes-card";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
@@ -20,8 +18,10 @@ import { useToast } from "@/app/contexts/ToastContext";
 import {
   formattedStartDate,
   formatDuration,
+  formatDateTime,
 } from "@/app/utils/helper-functions/format-time-and-dates";
 import * as CSS from "./styles";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function BusinessClassesScreen() {
   const { businesses } = useBusinessContext();
@@ -122,27 +122,31 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   };
 
   return (
-    <BeWellBackground scrollable>
-      <CSS.BusinessCardContainer>
-        <BusinessCard item={business} width="100%" height="200px" disabled />
-      </CSS.BusinessCardContainer>
-
-      {classes.length > 0 && <CSS.HeaderText>Available Classes</CSS.HeaderText>}
-
-      {classes
-        .sort((a, b) => (b.slotsLeft > 0 ? 1 : -1))
-        .map((classItem) => (
-          <TouchableOpacity
-            key={classItem.id}
-            onPress={() =>
-              classItem.slotsLeft > 0 ? handleClassPress(classItem) : null
-            }
-            disabled={classItem.slotsLeft === 0}
-          >
-            <ClassesCard item={classItem} isFull={classItem.slotsLeft === 0} />
-          </TouchableOpacity>
-        ))}
-
+    <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* Today Section */}
+      <Text
+        style={{
+          color: "#121714",
+          fontSize: 18,
+          fontWeight: "bold",
+          letterSpacing: -0.3,
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 8,
+        }}
+      >
+        Today
+      </Text>
+      {/* Classes List */}
+      {classes.map((classItem, idx) => (
+        <ClassesCard
+          key={classItem.id}
+          item={classItem}
+          onPress={() => handleClassPress(classItem)}
+          disabled={isBooking}
+          imageIndex={idx}
+        />
+      ))}
       <BeWellClassCardConfirmationModal
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -156,6 +160,6 @@ function BusinessClasses({ business }: BusinessClassesProps) {
         slotsLeft={selectedClass?.slotsLeft ?? 0}
         showLoginPrompt={!user}
       />
-    </BeWellBackground>
+    </ScrollView>
   );
 }

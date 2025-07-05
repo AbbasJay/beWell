@@ -229,7 +229,7 @@ const NotificationsDisplay: React.FC = () => {
 
   if (!user) {
     return (
-      <BeWellBackground contentContainerStyle={styles.container}>
+      <BeWellBackground paddingHorizontal={0}>
         <View style={styles.loginPrompt}>
           <Text style={styles.loginTitle}>Sign in to View Notifications</Text>
           <Text style={styles.loginDescription}>
@@ -290,7 +290,7 @@ const NotificationsDisplay: React.FC = () => {
   };
 
   return (
-    <BeWellBackground contentContainerStyle={styles.container}>
+    <BeWellBackground paddingHorizontal={0}>
       {(notifications.length > 0 || unreadIds.length > 0) && (
         <View style={styles.actionRow}>
           {unreadIds.length > 0 && (
@@ -343,7 +343,6 @@ const NotificationsDisplay: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 0,
     paddingTop: 0,
     paddingBottom: 0,
   },

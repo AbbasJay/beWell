@@ -1,5 +1,6 @@
 export const mockBusinessCard = [
   {
+    id: 1,
     userId: 1,
     name: "Example Business",
     address: "123 Main St",

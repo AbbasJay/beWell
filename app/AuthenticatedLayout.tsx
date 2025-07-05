@@ -94,6 +94,14 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
             onPress: () => router.back(),
           }}
         />
+      ) : currentRoute.match(/^\/business\/\d+\/classes$/) ? (
+        <NavigationBar
+          title="Classes"
+          left={{
+            icon: <MaterialIcons name="arrow-back" size={24} color="#121714" />,
+            onPress: () => router.back(),
+          }}
+        />
       ) : (
         !shouldHideNavigationBar() && (
           <NavigationBar

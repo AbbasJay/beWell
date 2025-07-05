@@ -15,7 +15,6 @@ import {
 import FilterMenu from "@/components/filterMenu";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
-import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { ErrorMessage } from "./ui/error-message";
 import {

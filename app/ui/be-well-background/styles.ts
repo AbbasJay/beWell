@@ -1,9 +1,18 @@
 import styled from "styled-components/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, ScrollView } from "react-native";
+import { View } from "react-native";
 import { Colors } from "@/constants/Colors";
 
-export const StyledSafeAreaView = styled(SafeAreaView)`
+interface StyledSafeAreaViewProps {
+  backgroundColor?: string;
+}
+
+export const StyledSafeAreaView = styled(SafeAreaView)<StyledSafeAreaViewProps>`
   flex: 1;
-  background-color: ${Colors.light.secondary};
+  background-color: ${({ backgroundColor }) =>
+    backgroundColor || Colors.light.secondary};
+`;
+
+export const ContentContainer = styled.View`
+  flex: 1;
 `;
