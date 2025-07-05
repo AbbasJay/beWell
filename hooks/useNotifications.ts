@@ -111,10 +111,90 @@ export const useNotifications = () => {
     }
   };
 
+  const markNotificationsAsRead = useCallback(
+    async (ids: number[]) => {
+      if (!user?.id) {
+        console.log("No user ID available - markNotificationsAsRead");
+        return;
+      }
+      try {
+        let token;
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("accessToken");
+        } else {
+          token = await SecureStore.getItemAsync("accessToken");
+        }
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+        const response = await fetch(`${API_URL}/api/mobile/notifications`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notificationIds: ids }),
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `HTTP error! status: ${response.status}, message: ${errorText}`
+          );
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Error marking notifications as read:", error);
+        throw error;
+      }
+    },
+    [user?.id]
+  );
+
+  const deleteNotifications = useCallback(
+    async (ids: number[]) => {
+      if (!user?.id) {
+        console.log("No user ID available - deleteNotifications");
+        return;
+      }
+      try {
+        let token;
+        if (Platform.OS === "web") {
+          token = localStorage.getItem("accessToken");
+        } else {
+          token = await SecureStore.getItemAsync("accessToken");
+        }
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+        const response = await fetch(`${API_URL}/api/mobile/notifications`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notificationIds: ids }),
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `HTTP error! status: ${response.status}, message: ${errorText}`
+          );
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Error deleting notifications:", error);
+        throw error;
+      }
+    },
+    [user?.id]
+  );
+
   return {
     notifications,
     fetchNotifications,
     sendNotification,
     resetNotifications,
+    markNotificationsAsRead,
+    deleteNotifications,
   };
 };
