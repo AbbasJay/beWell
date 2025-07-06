@@ -17,6 +17,8 @@ export interface Notification {
   userId: number;
   read: boolean;
   createdAt: string;
+  title: string;
+  type: string;
 }
 
 export interface NotificationsContextType {

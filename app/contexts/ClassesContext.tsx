@@ -24,6 +24,7 @@ export type Class = {
   capacity: number;
   slotsLeft: number;
   createdAt: Date;
+  isBooked?: boolean; // Added booking status
 };
 
 // State interface
@@ -37,6 +38,7 @@ interface ClassesState {
 interface ClassesContextType extends ClassesState {
   refreshClasses: () => Promise<void>;
   updateSlotsLeft: (classId: number, slotsLeft: number) => void;
+  updateClassBookingStatus: (classId: number, isBooked: boolean) => void;
 }
 
 // Action types
@@ -49,6 +51,10 @@ type ClassesAction =
   | {
       type: "UPDATE_SLOTS_LEFT";
       payload: { classId: number; slotsLeft: number };
+    }
+  | {
+      type: "UPDATE_CLASS_BOOKING_STATUS";
+      payload: { classId: number; isBooked: boolean };
     };
 
 // Initial state
@@ -110,6 +116,16 @@ function classesReducer(
         ),
       };
 
+    case "UPDATE_CLASS_BOOKING_STATUS":
+      return {
+        ...state,
+        classes: state.classes.map((classItem) =>
+          classItem.id === action.payload.classId
+            ? { ...classItem, isBooked: action.payload.isBooked }
+            : classItem
+        ),
+      };
+
     default:
       return state;
   }
@@ -145,6 +161,9 @@ export const ClassesProvider = ({
 
       const headers: any = {
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
       };
 
       // Add authorization header only if user is authenticated
@@ -153,7 +172,7 @@ export const ClassesProvider = ({
       }
 
       const response = await fetch(
-        `${API_URL}/api/mobile/classes?businessId=${businessId}`,
+        `${API_URL}/api/mobile/classes?businessId=${businessId}&_t=${Date.now()}`,
         {
           method: "GET",
           headers,
@@ -168,6 +187,23 @@ export const ClassesProvider = ({
       }
 
       const json = await response.json();
+
+      // Debug: Log the API response to see what fields are actually returned
+      console.log("=== CLASSES API RESPONSE DEBUG ===");
+      console.log(
+        "API URL:",
+        `${API_URL}/api/mobile/classes?businessId=${businessId}`
+      );
+      console.log("Response status:", response.status);
+      console.log(
+        "Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+      console.log("Response data:", JSON.stringify(json, null, 2));
+      console.log("First class (if exists):", json[0]);
+      console.log("=== END CLASSES API RESPONSE DEBUG ===");
+
+      // The backend now includes isBooked field for each class
       dispatch({ type: "FETCH_CLASSES_SUCCESS", payload: json });
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -185,6 +221,13 @@ export const ClassesProvider = ({
     });
   };
 
+  const updateClassBookingStatus = (classId: number, isBooked: boolean) => {
+    dispatch({
+      type: "UPDATE_CLASS_BOOKING_STATUS",
+      payload: { classId, isBooked },
+    });
+  };
+
   useEffect(() => {
     // Fetch classes for both guest and authenticated users
     fetchClasses();
@@ -196,6 +239,7 @@ export const ClassesProvider = ({
         ...state,
         refreshClasses: fetchClasses,
         updateSlotsLeft,
+        updateClassBookingStatus,
       }}
     >
       {children}

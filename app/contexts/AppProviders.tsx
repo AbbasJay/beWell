@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/hooks/themeContext";
 import { AuthProvider } from "./auth/AuthContext";
 import { BusinessProvider } from "./BusinessContext";
 import { NotificationsProvider } from "./NotificationsContext";
+import { BookingsProvider } from "./BookingsContext";
 import { ToastProvider } from "./ToastContext";
 import { MapViewProvider } from "./MapViewContext";
 
@@ -14,9 +15,11 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
       <ThemeProvider>
         <BusinessProvider>
           <NotificationsProvider>
-            <ToastProvider>
-              <MapViewProvider>{children}</MapViewProvider>
-            </ToastProvider>
+            <BookingsProvider>
+              <ToastProvider>
+                <MapViewProvider>{children}</MapViewProvider>
+              </ToastProvider>
+            </BookingsProvider>
           </NotificationsProvider>
         </BusinessProvider>
       </ThemeProvider>

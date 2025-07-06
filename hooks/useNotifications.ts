@@ -40,6 +40,9 @@ export const useNotifications = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
       if (!response.ok) {
@@ -58,9 +61,9 @@ export const useNotifications = () => {
     }
   }, [user?.id, resetNotifications]);
 
-  const sendNotification = async (classData: Class) => {
+  const bookClass = async (classData: Class) => {
     if (!user?.id) {
-      console.log("No user ID available - sendNotification");
+      console.log("No user ID available - bookClass");
       return;
     }
 
@@ -76,15 +79,10 @@ export const useNotifications = () => {
         throw new Error("No authentication token found");
       }
 
-      const notification = {
-        classId: classData.id,
-        businessId: classData.businessId,
-        message: classData.description,
-        userId: user.id,
-        title: classData.name,
-        read: false,
-      };
+      // Simple log to show what ID is being sent
+      console.log("Sending class ID to booking API:", classData.id);
 
+      // Use the booking API which will automatically create the notification with the correct classId
       const response = await fetch(
         `${API_URL}/api/mobile/classes/${classData.id}/book`,
         {
@@ -92,21 +90,106 @@ export const useNotifications = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
-          body: JSON.stringify(notification),
+          // No body needed - the booking API gets the classId from the URL params
         }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("Booking API error:", errorText);
         throw new Error(
           `HTTP error! status: ${response.status}, message: ${errorText}`
         );
       }
 
       const responseData = await response.json();
+      console.log("Booking successful");
     } catch (error) {
-      console.error("Error sending notification:", error);
+      console.error("Error booking class:", error);
+      throw error;
+    }
+  };
+
+  // Cancel a booked class
+  const cancelClass = async (classId: number) => {
+    if (!user?.id) {
+      console.log("No user ID available - cancelClass");
+      return;
+    }
+
+    try {
+      let token;
+      if (Platform.OS === "web") {
+        token = localStorage.getItem("accessToken");
+      } else {
+        token = await SecureStore.getItemAsync("accessToken");
+      }
+
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      console.log("Getting booking ID for class:", classId);
+
+      // First, get the booking ID for this class
+      const getBookingResponse = await fetch(
+        `${API_URL}/api/mobile/classes/${classId}/book`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
+
+      if (!getBookingResponse.ok) {
+        const errorText = await getBookingResponse.text();
+        console.error("Get booking API error:", errorText);
+        throw new Error(
+          `HTTP error! status: ${getBookingResponse.status}, message: ${errorText}`
+        );
+      }
+
+      const bookingData = await getBookingResponse.json();
+      const bookingId = bookingData.bookingId;
+
+      console.log("Cancelling booking ID:", bookingId);
+
+      // Now cancel the booking using the booking ID
+      const cancelResponse = await fetch(
+        `${API_URL}/api/mobile/classes/bookings/${bookingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
+
+      if (!cancelResponse.ok) {
+        const errorText = await cancelResponse.text();
+        console.error("Cancel API error:", errorText);
+        throw new Error(
+          `HTTP error! status: ${cancelResponse.status}, message: ${errorText}`
+        );
+      }
+
+      const responseData = await cancelResponse.json();
+      console.log("Class cancelled successfully");
+    } catch (error) {
+      console.error("Error cancelling class:", error);
       throw error;
     }
   };
@@ -192,7 +275,8 @@ export const useNotifications = () => {
   return {
     notifications,
     fetchNotifications,
-    sendNotification,
+    bookClass,
+    cancelClass,
     resetNotifications,
     markNotificationsAsRead,
     deleteNotifications,

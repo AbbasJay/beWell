@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import { useBookingsContext } from "@/app/contexts/BookingsContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
 import {
@@ -141,8 +142,14 @@ function ClassDetailsContent() {
   const [error, setError] = useState<Error | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [isBooking, setIsBooking] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [currentAction, setCurrentAction] = useState<
+    "booking" | "cancelling" | null
+  >(null);
   const { refreshNotifications } = useNotificationsContext();
-  const { sendNotification } = useNotifications();
+  const { refreshBookings } = useBookingsContext();
+  const { bookClass, cancelClass } = useNotifications();
+  const { updateClassBookingStatus, refreshClasses } = useClassesContext();
   const { user, setRedirectPath } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -193,6 +200,18 @@ function ClassDetailsContent() {
     return <ErrorMessage error={new Error("Class not found")} />;
   }
 
+  // Check if user has already booked this class
+  const hasBooked = classItem.isBooked || false;
+
+  // Debug logging
+  console.log("=== CLASS DETAILS DEBUG ===");
+  console.log("Class ID:", classItem.id);
+  console.log("User ID:", user?.id);
+  console.log("Class isBooked field:", classItem.isBooked);
+  console.log("Has booked this class:", hasBooked);
+  console.log("Full class item:", JSON.stringify(classItem, null, 2));
+  console.log("=== END CLASS DETAILS DEBUG ===");
+
   const handleBookClass = async () => {
     if (!user) {
       setRedirectPath(pathname);
@@ -201,17 +220,91 @@ function ClassDetailsContent() {
     }
 
     setIsBooking(true);
+    setCurrentAction("booking");
     try {
-      await sendNotification(classItem);
+      await bookClass(classItem);
+      updateClassBookingStatus(classItem.id, true);
       await refreshNotifications();
+      await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
+      // Refresh classes to get updated data from backend
+      await refreshClasses();
       router.back();
     } catch (err) {
       console.error("Error booking class:", err);
-      setError(err instanceof Error ? err : new Error("Failed to book class"));
-      showToast("Failed to book class", "error");
+
+      // If the error is "You have already booked this class", refresh the classes data
+      // to get the correct booking status
+      if (
+        err instanceof Error &&
+        err.message.includes("You have already booked this class")
+      ) {
+        console.log("User has already booked this class, refreshing data...");
+        try {
+          await refreshClasses();
+          showToast("You have already booked this class", "info");
+        } catch (refreshError) {
+          console.error("Error refreshing classes:", refreshError);
+          showToast("Failed to refresh class data", "error");
+        }
+      } else {
+        setError(
+          err instanceof Error ? err : new Error("Failed to book class")
+        );
+        showToast("Failed to book class", "error");
+      }
     } finally {
       setIsBooking(false);
+      setCurrentAction(null);
+    }
+  };
+
+  const handleCancelClass = async () => {
+    if (!user) {
+      setRedirectPath(pathname);
+      router.push("/logIn");
+      return;
+    }
+
+    setIsCancelling(true);
+    setCurrentAction("cancelling");
+    try {
+      await cancelClass(classItem.id);
+      updateClassBookingStatus(classItem.id, false);
+      await refreshNotifications();
+      await refreshBookings();
+      showToast(`Successfully cancelled ${classItem.name}!`, "success");
+      // Refresh classes to get updated data from backend
+      await refreshClasses();
+      router.back();
+    } catch (err) {
+      console.error("Error cancelling class:", err);
+
+      // If there's an error cancelling, refresh the classes data to get the correct status
+      try {
+        await refreshClasses();
+      } catch (refreshError) {
+        console.error("Error refreshing classes:", refreshError);
+      }
+
+      setError(
+        err instanceof Error ? err : new Error("Failed to cancel class")
+      );
+      showToast("Failed to cancel class", "error");
+    } finally {
+      setIsCancelling(false);
+      setCurrentAction(null);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    console.log("Manual refresh triggered");
+    try {
+      await refreshClasses();
+      showToast("Classes data refreshed", "success");
+    } catch (error) {
+      console.error("Error during manual refresh:", error);
+      showToast("Failed to refresh data", "error");
     }
   };
 
@@ -225,6 +318,8 @@ function ClassDetailsContent() {
       />
     ));
   };
+
+  console.log("Class Item:", classItem);
 
   return (
     <Container>
@@ -383,11 +478,42 @@ function ClassDetailsContent() {
         <View style={{ height: 100 }} />
       </StyledScrollView>
 
+      {/* Debug Button (temporary) */}
+      <View
+        style={{
+          position: "absolute",
+          top: 60,
+          right: 20,
+          zIndex: 1000,
+        }}
+      >
+        <TouchableOpacity
+          onPress={handleManualRefresh}
+          style={{
+            backgroundColor: "#007AFF",
+            padding: 8,
+            borderRadius: 6,
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 12 }}>Refresh</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Book Button */}
       <BookButtonContainer>
-        <BookButton onPress={handleBookClass} disabled={isBooking}>
+        <BookButton
+          onPress={hasBooked ? handleCancelClass : handleBookClass}
+          disabled={isBooking || isCancelling}
+          style={hasBooked ? { backgroundColor: "#d9534f" } : undefined}
+        >
           <BookButtonText>
-            {isBooking ? "Booking..." : "Book Class"}
+            {currentAction === "booking"
+              ? "Booking..."
+              : currentAction === "cancelling"
+              ? "Cancelling..."
+              : hasBooked
+              ? "Cancel"
+              : "Book Class"}
           </BookButtonText>
         </BookButton>
       </BookButtonContainer>
