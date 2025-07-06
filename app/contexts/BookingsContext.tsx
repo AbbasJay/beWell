@@ -15,7 +15,7 @@ export interface Booking {
   id: number;
   userId: number;
   classId: number;
-  status: "active" | "cancelled";
+  status: "active" | "cancelled" | "completed" | "no-show";
   createdAt: string;
   cancelledAt?: string;
   cancellationReason?: string;

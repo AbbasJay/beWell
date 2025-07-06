@@ -25,7 +25,7 @@ export type Class = {
   slotsLeft: number;
   createdAt: Date;
   isBooked?: boolean; // Added booking status
-  bookingStatus?: "active" | "cancelled"; // Added booking status
+  bookingStatus?: "active" | "cancelled" | "completed" | "no-show"; // Enhanced booking status
   bookingId?: number; // Added booking ID
 };
 

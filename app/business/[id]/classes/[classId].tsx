@@ -200,7 +200,7 @@ function ClassDetailsContent() {
     return <ErrorMessage error={new Error("Class not found")} />;
   }
 
-  // Check if user has an active booking for this class
+  // Check if user has an active booking for this class (only active bookings can be cancelled)
   const hasBooked =
     classItem.isBooked === true && classItem.bookingStatus === "active";
 
@@ -503,9 +503,29 @@ function ClassDetailsContent() {
       {/* Book Button */}
       <BookButtonContainer>
         <BookButton
-          onPress={hasBooked ? handleCancelClass : handleBookClass}
-          disabled={isBooking || isCancelling}
-          style={hasBooked ? { backgroundColor: "#d9534f" } : undefined}
+          onPress={
+            hasBooked
+              ? handleCancelClass
+              : classItem.bookingStatus === "completed" ||
+                classItem.bookingStatus === "no-show"
+              ? undefined // No action for completed/no-show
+              : handleBookClass
+          }
+          disabled={
+            isBooking ||
+            isCancelling ||
+            classItem.bookingStatus === "completed" ||
+            classItem.bookingStatus === "no-show"
+          }
+          style={
+            hasBooked
+              ? { backgroundColor: "#d9534f" }
+              : classItem.bookingStatus === "completed"
+              ? { backgroundColor: "#28a745" }
+              : classItem.bookingStatus === "no-show"
+              ? { backgroundColor: "#ffc107" }
+              : undefined
+          }
         >
           <BookButtonText>
             {currentAction === "booking"
@@ -514,6 +534,10 @@ function ClassDetailsContent() {
               ? "Cancelling..."
               : hasBooked
               ? "Cancel"
+              : classItem.bookingStatus === "completed"
+              ? "Completed"
+              : classItem.bookingStatus === "no-show"
+              ? "No Show"
               : "Book Class"}
           </BookButtonText>
         </BookButton>
