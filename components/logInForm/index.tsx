@@ -15,7 +15,8 @@ interface LoginFormData {
 const LoginForm = () => {
   const router = useRouter();
   const [loginError, setLoginError] = useState<string | null>(null);
-  const { signIn, continueAsGuest } = useAuth();
+  const { signIn, continueAsGuest, redirectPath, clearRedirectPath } =
+    useAuth();
   const {
     control,
     handleSubmit,
@@ -37,7 +38,20 @@ const LoginForm = () => {
     try {
       setLoginError(null);
       await signIn(data.email, data.password);
-      router.push("/home");
+
+      // Check if there's a redirect path set
+      if (redirectPath) {
+        try {
+          router.push(redirectPath as any);
+          clearRedirectPath();
+        } catch (error) {
+          // If redirect fails, go to home
+          router.push("/home");
+          clearRedirectPath();
+        }
+      } else {
+        router.push("/home");
+      }
     } catch (err) {
       if (err instanceof Error) {
         const errorMessage = err.message.toLowerCase();

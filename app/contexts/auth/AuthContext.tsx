@@ -29,6 +29,7 @@ interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isGuestMode: boolean;
+  redirectPath: string | null;
 }
 
 // Action types
@@ -38,7 +39,9 @@ type AuthAction =
   | { type: "AUTH_ERROR"; payload: Error }
   | { type: "REFRESH_TOKEN_SUCCESS"; payload: AuthTokens }
   | { type: "SET_GUEST_MODE" }
-  | { type: "SIGN_OUT" };
+  | { type: "SIGN_OUT" }
+  | { type: "SET_REDIRECT_PATH"; payload: string | null }
+  | { type: "CLEAR_REDIRECT_PATH" };
 
 // Context type
 interface AuthContextType extends AuthState {
@@ -47,6 +50,8 @@ interface AuthContextType extends AuthState {
   refreshSession: () => Promise<void>;
   continueAsGuest: () => void;
   hasPermission: (requiredRole: UserRole) => boolean;
+  setRedirectPath: (path: string | null) => void;
+  clearRedirectPath: () => void;
 }
 
 const initialState: AuthState = {
@@ -55,6 +60,7 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   isGuestMode: false,
+  redirectPath: null,
 };
 
 // Reducer
@@ -103,6 +109,18 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       return {
         ...initialState,
         isLoading: false,
+      };
+
+    case "SET_REDIRECT_PATH":
+      return {
+        ...state,
+        redirectPath: action.payload,
+      };
+
+    case "CLEAR_REDIRECT_PATH":
+      return {
+        ...state,
+        redirectPath: null,
       };
 
     default:
@@ -310,6 +328,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return roleHierarchy[state.user.role] >= roleHierarchy[requiredRole];
   };
 
+  // Redirect path management
+  const setRedirectPath = (path: string | null) => {
+    dispatch({ type: "SET_REDIRECT_PATH", payload: path });
+  };
+
+  const clearRedirectPath = () => {
+    dispatch({ type: "CLEAR_REDIRECT_PATH" });
+  };
+
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
@@ -343,6 +370,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         refreshSession,
         continueAsGuest,
         hasPermission,
+        setRedirectPath,
+        clearRedirectPath,
       }}
     >
       {children}

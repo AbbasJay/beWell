@@ -21,6 +21,7 @@ export default function RootLayout() {
             <Stack.Screen name="notifications" />
             <Stack.Screen name="settings" />
             <Stack.Screen name="business/[id]/classes" />
+            <Stack.Screen name="business/[id]/classes/[classId]" />
           </Stack>
         </AuthenticatedLayout>
       </PaperProvider>

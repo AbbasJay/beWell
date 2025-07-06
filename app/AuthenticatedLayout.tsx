@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { router, usePathname } from "expo-router";
 import { useAuth } from "./contexts/auth/AuthContext";
+import { useMapView } from "./contexts/MapViewContext";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -17,15 +18,7 @@ interface AuthenticatedLayoutProps {
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { tokens, isLoading, isGuestMode } = useAuth();
   const currentRoute = usePathname();
-
-  // Routes where we show the tab bar
-  const showTabBarRoutes = [
-    "/home",
-    "/notifications",
-    "/settings",
-    "/explore",
-    "/profile",
-  ];
+  const { isMapView } = useMapView();
 
   // Routes that don't require authentication
   const publicRoutes = ["/", "/logIn", "/signUp"];
@@ -42,11 +35,34 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   };
 
   const shouldShowTabBar = () => {
-    return showTabBarRoutes.some((route) => {
-      const routePattern = route.replace("[id]", "[^/]+");
-      const regex = new RegExp(`^${routePattern}$`);
-      return regex.test(currentRoute);
+    // Show on main sections
+    const mainSections = [
+      "/home",
+      "/notifications",
+      "/settings",
+      "/explore",
+      "/profile",
+    ];
+
+    // Show on business listing pages (but not detail pages)
+    const isBusinessListing = currentRoute.match(/^\/business\/\d+\/classes$/);
+    const isBusinessDetail = currentRoute.match(
+      /^\/business\/\d+\/classes\/\d+$/
+    );
+
+    const shouldShow = !!(
+      (mainSections.some((route) => route === currentRoute) ||
+        (isBusinessListing && !isBusinessDetail)) &&
+      !isMapView
+    );
+
+    console.log("TabBar Debug:", {
+      currentRoute,
+      isMapView,
+      shouldShow,
     });
+
+    return shouldShow;
   };
 
   useEffect(() => {
@@ -98,7 +114,15 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
         <NavigationBar
           title="Classes"
           left={{
-            icon: <MaterialIcons name="arrow-back" size={24} color="#121714" />,
+            icon: <MaterialIcons name="arrow-back" size={24} color="#111714" />,
+            onPress: () => router.back(),
+          }}
+        />
+      ) : currentRoute.match(/^\/business\/\d+\/classes\/\d+$/) ? (
+        <NavigationBar
+          title="Class Details"
+          left={{
+            icon: <MaterialIcons name="arrow-back" size={24} color="#111714" />,
             onPress: () => router.back(),
           }}
         />
@@ -115,7 +139,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
       {children}
 
-      {shouldShowTabBar() && <BeWellTabBar />}
+      <BeWellTabBar visible={shouldShowTabBar()} />
     </View>
   );
 }

@@ -13,7 +13,6 @@ import {
 import { ClassesCard } from "@/app/ui/classes-card";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
-import { BeWellClassCardConfirmationModal } from "@/app/ui/be-well-class-card-confirmation-modal/be-well-class-card-confirmation-modal";
 import { useToast } from "@/app/contexts/ToastContext";
 import {
   formattedStartDate,
@@ -66,9 +65,6 @@ interface BusinessClassesProps {
 
 function BusinessClasses({ business }: BusinessClassesProps) {
   const { classes, isLoading, error: classesError } = useClassesContext();
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isBooking, setIsBooking] = useState(false);
   const { refreshNotifications } = useNotificationsContext();
   const { sendNotification } = useNotifications();
   const { user } = useAuth();
@@ -90,35 +86,7 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   if (error) return <ErrorMessage error={error} />;
 
   const handleClassPress = (classItem: Class) => {
-    setSelectedClass(classItem);
-    setModalVisible(true);
-  };
-
-  const handleBookClass = async () => {
-    if (!selectedClass) return;
-
-    if (!user) {
-      setModalVisible(false);
-      router.push("/logIn");
-      return;
-    }
-
-    setIsBooking(true);
-    try {
-      await sendNotification(selectedClass);
-      await refreshNotifications();
-      setModalVisible(false);
-      showToast(`Successfully booked ${selectedClass.name}!`, "success");
-    } catch (err) {
-      console.error(
-        "Error booking class:",
-        err instanceof Error ? err.message : "Unknown error"
-      );
-      setError(err instanceof Error ? err : new Error("Failed to book class"));
-      showToast("Failed to book class", "error");
-    } finally {
-      setIsBooking(false);
-    }
+    router.push(`/business/${business.id}/classes/${classItem.id}`);
   };
 
   return (
@@ -143,23 +111,9 @@ function BusinessClasses({ business }: BusinessClassesProps) {
           key={classItem.id}
           item={classItem}
           onPress={() => handleClassPress(classItem)}
-          disabled={isBooking}
           imageIndex={idx}
         />
       ))}
-      <BeWellClassCardConfirmationModal
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-        onConfirm={handleBookClass}
-        title={selectedClass?.name ?? ""}
-        description={selectedClass?.description ?? ""}
-        instructor={selectedClass?.instructor ?? ""}
-        address={`${business.address}, ${selectedClass?.location ?? ""}`}
-        date={selectedClass ? formattedStartDate(selectedClass.startDate) : ""}
-        duration={selectedClass ? formatDuration(selectedClass.duration) : ""}
-        slotsLeft={selectedClass?.slotsLeft ?? 0}
-        showLoginPrompt={!user}
-      />
     </ScrollView>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import {
@@ -23,6 +23,7 @@ import {
   useFilterBusinessContext,
 } from "./contexts/BusinessContext";
 import { useAuth } from "./contexts/auth/AuthContext";
+import { useMapView } from "./contexts/MapViewContext";
 import * as CSS from "./homeStyles";
 
 import Constants from "expo-constants";
@@ -47,6 +48,10 @@ const GOOGLE_MAPS_API_KEY =
 const FILTER_STORAGE_KEY = "@be_well_filters";
 
 export default function HomePage() {
+  const params = useLocalSearchParams<{
+    mapView?: string;
+    focusBusinessId?: string;
+  }>();
   const {
     businesses,
     error: businessError,
@@ -70,7 +75,7 @@ export default function HomePage() {
   const [locationSetupError, setLocationSetupError] = useState<Error | null>(
     null
   );
-  const [isMapView, setIsMapView] = useState(false);
+  const { isMapView, setIsMapView } = useMapView();
   const [location, setLocation] = useState(INITIAL_REGION);
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -127,6 +132,16 @@ export default function HomePage() {
 
   // Ensure businesses is an array to prevent filter errors
   const safeBusinesses = businesses || [];
+
+  // Handle URL parameters for map view and business focus
+  useEffect(() => {
+    console.log("Home Debug - params.mapView:", params.mapView);
+    if (params.mapView === "true") {
+      setIsMapView(true);
+    } else {
+      setIsMapView(false);
+    }
+  }, [params.mapView, setIsMapView]);
 
   useEffect(() => {
     const initialiseHomeScreen = async () => {
@@ -226,7 +241,13 @@ export default function HomePage() {
   };
 
   const toggleListView = () => {
-    setIsMapView(!isMapView);
+    if (isMapView) {
+      // Switch to list view
+      router.replace("/home");
+    } else {
+      // Switch to map view
+      router.replace("/home?mapView=true");
+    }
   };
 
   const toggleFilterMenu = () => {
@@ -360,6 +381,7 @@ export default function HomePage() {
           toggleListView={toggleListView}
           toggleFilterMenu={toggleFilterMenu}
           location={location}
+          focusBusinessId={params.focusBusinessId}
         />
       ) : (
         <>

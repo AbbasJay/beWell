@@ -28,8 +28,7 @@ export const ClassesCard = ({
   const [error, setError] = useState<Error | null>(null);
 
   if (!item) {
-    setError(new Error("Class data is missing"));
-    return <ErrorMessage error={error} />;
+    return null; // Don't render anything if item is missing
   }
 
   // Placeholder images array
@@ -60,6 +59,7 @@ export const ClassesCard = ({
               uri: placeholderImages[imageIndex % placeholderImages.length],
             }}
             resizeMode="cover"
+            fadeDuration={0}
           />
         </CSS.CardImageContainer>
         <CSS.CardInfo>

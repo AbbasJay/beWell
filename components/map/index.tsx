@@ -44,6 +44,7 @@ interface MapComponentProps {
   toggleFilterMenu: () => void;
   businesses: Business[];
   location: { lat: number; lng: number };
+  focusBusinessId?: string;
 }
 
 const Map: React.FC<MapComponentProps> = ({
@@ -51,12 +52,14 @@ const Map: React.FC<MapComponentProps> = ({
   toggleFilterMenu,
   businesses,
   location,
+  focusBusinessId,
 }) => {
   if (Platform.OS === "web") {
     return <Text>Map View is not supported on web</Text>;
   }
 
   const mapRef = useRef<MapView>(null);
+  const carouselRef = useRef<any>(null);
   const [center, setCenter] = useState<Region>();
   const [firstBusinessLocation, setFirstBusinessLocation] = useState<Region>();
 
@@ -88,6 +91,30 @@ const Map: React.FC<MapComponentProps> = ({
       mapRef.current?.animateToRegion(firstBusinessLocation!, 1000);
     }
   }, [firstBusinessLocation]);
+
+  // Focus on specific business if focusBusinessId is provided
+  useEffect(() => {
+    if (focusBusinessId && businesses.length > 0) {
+      const focusBusiness = businesses.find(
+        (b) => b.id?.toString() === focusBusinessId
+      );
+      if (focusBusiness && focusBusiness.latitude && focusBusiness.longitude) {
+        const region = {
+          latitude:
+            typeof focusBusiness.latitude === "string"
+              ? parseFloat(focusBusiness.latitude)
+              : focusBusiness.latitude,
+          longitude:
+            typeof focusBusiness.longitude === "string"
+              ? parseFloat(focusBusiness.longitude)
+              : focusBusiness.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        };
+        mapRef.current?.animateToRegion(region, 1000);
+      }
+    }
+  }, [focusBusinessId, businesses]);
 
   const zoomIn = () => {
     mapRef.current?.animateToRegion(
@@ -139,23 +166,28 @@ const Map: React.FC<MapComponentProps> = ({
   };
 
   const onSnapToItem = (index: number) => {
-    let { latitude, longitude } = businesses[index];
+    const business = businesses[index];
+    if (!business || !business.latitude || !business.longitude) return;
 
-    if (latitude && longitude) {
-      if (typeof latitude === "string" && typeof longitude === "string") {
-        latitude = parseFloat(latitude);
-        longitude = parseFloat(longitude);
-      }
-      mapRef.current?.animateToRegion(
-        {
-          latitude,
-          longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        1000
-      );
+    let latitude = business.latitude;
+    let longitude = business.longitude;
+
+    if (typeof latitude === "string") {
+      latitude = parseFloat(latitude);
     }
+    if (typeof longitude === "string") {
+      longitude = parseFloat(longitude);
+    }
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      1000
+    );
   };
 
   const handleMarkerPress = (marker: {
@@ -210,7 +242,7 @@ const Map: React.FC<MapComponentProps> = ({
         onPress={() => Keyboard.dismiss()}
       >
         {businesses.map(
-          (marker) =>
+          (marker, index) =>
             marker.latitude &&
             marker.longitude && (
               <Marker
@@ -225,18 +257,23 @@ const Map: React.FC<MapComponentProps> = ({
                       ? parseFloat(marker.longitude)
                       : marker.longitude,
                 }}
-                onPress={() =>
+                onPress={() => {
+                  // When marker is pressed, also snap carousel to this item
+                  if (carouselRef.current) {
+                    carouselRef.current.snapToItem(index);
+                  }
                   handleMarkerPress({
                     latitude: marker.latitude!,
                     longitude: marker.longitude!,
-                  })
-                }
-              ></Marker>
+                  });
+                }}
+              />
             )
         )}
       </StyledMapView>
       <CarouselContainer>
         <StyledCarousel
+          ref={carouselRef}
           data={businesses}
           renderItem={renderCarouselItem}
           width={viewportWidth * 0.8}

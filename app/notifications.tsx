@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -16,7 +16,6 @@ import { useBusinessContext } from "./contexts/BusinessContext";
 import { ErrorMessage } from "@/app/ui/error-message";
 import { useAuth } from "./contexts/auth/AuthContext";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-import Button from "./ui/button/button";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -99,7 +98,7 @@ const NotificationsDisplay: React.FC = () => {
   const { notifications, refreshNotifications, markAsRead } =
     useNotificationsContext();
   const { businesses } = useBusinessContext();
-  const { user } = useAuth();
+  const { user, setRedirectPath } = useAuth();
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -217,28 +216,23 @@ const NotificationsDisplay: React.FC = () => {
     [deleteNotifications, refreshNotifications]
   );
 
-  const handleLoginPress = () => {
-    router.push("/logIn");
-  };
-
   const handleDismiss = (id: number) => {
     // TODO: Implement dismiss logic (e.g., remove notification)
     // For now, just log
     console.log("Dismiss notification", id);
   };
 
+  // Handle redirect for unauthenticated users
+  useEffect(() => {
+    if (!user) {
+      setRedirectPath("/notifications");
+      router.replace("/logIn");
+    }
+  }, [user, setRedirectPath]);
+
+  // If user is not authenticated, don't render anything
   if (!user) {
-    return (
-      <BeWellBackground paddingHorizontal={0}>
-        <View style={styles.loginPrompt}>
-          <Text style={styles.loginTitle}>Sign in to View Notifications</Text>
-          <Text style={styles.loginDescription}>
-            Please sign in to view and manage your notifications
-          </Text>
-          <Button onPress={handleLoginPress} title="Sign In" />
-        </View>
-      </BeWellBackground>
-    );
+    return null;
   }
 
   const renderSectionHeader = ({ section: { title } }: any) => (
@@ -330,7 +324,9 @@ const NotificationsDisplay: React.FC = () => {
           renderItem={({ item }) => (
             <View key={item.title}>
               {renderSectionHeader({ section: { title: item.title } })}
-              {item.data.map((notif) => renderItem({ item: notif }))}
+              {item.data.map((notif) => (
+                <View key={notif.id}>{renderItem({ item: notif })}</View>
+              ))}
             </View>
           )}
           refreshing={isRefreshing}
@@ -407,24 +403,6 @@ const styles = StyleSheet.create({
   deleteButton: {
     marginLeft: 12,
     padding: 4,
-  },
-  loginPrompt: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  loginTitle: {
-    marginBottom: 12,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  loginDescription: {
-    marginBottom: 24,
-    textAlign: "center",
-    opacity: 0.8,
-    fontSize: 16,
   },
   markAllButton: {
     paddingVertical: 6,

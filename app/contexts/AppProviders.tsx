@@ -4,6 +4,7 @@ import { AuthProvider } from "./auth/AuthContext";
 import { BusinessProvider } from "./BusinessContext";
 import { NotificationsProvider } from "./NotificationsContext";
 import { ToastProvider } from "./ToastContext";
+import { MapViewProvider } from "./MapViewContext";
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -13,7 +14,9 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
       <ThemeProvider>
         <BusinessProvider>
           <NotificationsProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <MapViewProvider>{children}</MapViewProvider>
+            </ToastProvider>
           </NotificationsProvider>
         </BusinessProvider>
       </ThemeProvider>
