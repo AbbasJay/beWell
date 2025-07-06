@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
@@ -25,6 +18,53 @@ import {
   formattedStartDate,
   formatDuration,
 } from "@/app/utils/helper-functions/format-time-and-dates";
+import {
+  Container,
+  ScrollView as StyledScrollView,
+  ImageContainer,
+  HeroImage,
+  Content,
+  ClassTitle,
+  ClassDescription,
+  SectionTitle,
+  ClassDetails,
+  DetailItem,
+  DetailIcon,
+  DetailInfo,
+  DetailLabel,
+  DetailValue,
+  ReviewsContainer,
+  RatingSummary,
+  RatingNumber,
+  StarsContainer,
+  ReviewCount,
+  RatingDistribution,
+  RatingRow,
+  RatingLabel,
+  ProgressBar,
+  ProgressFill,
+  Percentage,
+  ReviewsList,
+  ReviewItem,
+  ReviewHeader,
+  AuthorImage,
+  AuthorInfo,
+  AuthorName,
+  ReviewDate,
+  ReviewStars,
+  ReviewText,
+  ReviewActions,
+  ActionButton,
+  ActionText,
+  ScheduleItem,
+  ScheduleIcon,
+  ScheduleInfo,
+  ScheduleDay,
+  ScheduleTime,
+  BookButtonContainer,
+  BookButton,
+  BookButtonText,
+} from "./styles";
 
 // Mock data for reviews
 const mockReviews = [
@@ -187,41 +227,37 @@ function ClassDetailsContent() {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+    <Container>
+      <StyledScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Image */}
-        <View style={styles.imageContainer}>
-          <Image
+        <ImageContainer>
+          <HeroImage
             source={{
               uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuZpxL2qDLHyzg3_bnb8lbGigeRVyjUkI9RfW9nRMB6xHTgGSh_YL3dh4eR8kO4hKO8I4qVWH4rrvqW9-ZcHOZO8cDEBBz8u2dkXBcTSDlW5DujQ0QKvTlXewoJc-pb67doFv5vd2U-O9bQGTOzIo6PJfZIGyEBZwlV08ews8w7K_Nd-OwqAJbZxsfirXguCd1U3c_DdyDId-dkqnl7uRgREezubfA2pq48nHHfwOlT3I3rrIIIRGxgRAerbEiNHbvj9vfzmaKe0mr",
             }}
-            style={styles.heroImage}
             resizeMode="cover"
             fadeDuration={0}
           />
-        </View>
+        </ImageContainer>
 
         {/* Class Info */}
-        <View style={styles.content}>
-          <Text style={styles.classTitle}>{classItem.name}</Text>
-          <Text style={styles.classDescription}>{classItem.description}</Text>
+        <Content>
+          <ClassTitle>{classItem.name}</ClassTitle>
+          <ClassDescription>{classItem.description}</ClassDescription>
 
           {/* Class Details */}
-          <View style={styles.classDetails}>
-            <View style={styles.detailItem}>
-              <View style={styles.detailIcon}>
+          <ClassDetails>
+            <DetailItem>
+              <DetailIcon>
                 <MaterialIcons name="person" size={20} color="#111714" />
-              </View>
-              <View style={styles.detailInfo}>
-                <Text style={styles.detailLabel}>Instructor</Text>
-                <Text style={styles.detailValue}>{classItem.instructor}</Text>
-              </View>
-            </View>
+              </DetailIcon>
+              <DetailInfo>
+                <DetailLabel>Instructor</DetailLabel>
+                <DetailValue>{classItem.instructor}</DetailValue>
+              </DetailInfo>
+            </DetailItem>
             <TouchableOpacity
-              style={styles.detailItem}
+              style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
               onPress={() => {
                 // Navigate to home page with map view focused on this business
                 if (business.id) {
@@ -236,15 +272,15 @@ function ClassDetailsContent() {
               }}
               activeOpacity={0.7}
             >
-              <View style={styles.detailIcon}>
+              <DetailIcon>
                 <MaterialIcons name="location-on" size={20} color="#111714" />
-              </View>
-              <View style={styles.detailInfo}>
-                <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>
+              </DetailIcon>
+              <DetailInfo>
+                <DetailLabel>Location</DetailLabel>
+                <DetailValue>
                   {business.address}, {classItem.location}
-                </Text>
-              </View>
+                </DetailValue>
+              </DetailInfo>
               <MaterialIcons
                 name="open-in-new"
                 size={16}
@@ -252,369 +288,109 @@ function ClassDetailsContent() {
                 style={{ marginLeft: 8 }}
               />
             </TouchableOpacity>
-            <View style={styles.detailItem}>
-              <View style={styles.detailIcon}>
+            <DetailItem>
+              <DetailIcon>
                 <MaterialIcons name="schedule" size={20} color="#111714" />
-              </View>
-              <View style={styles.detailInfo}>
-                <Text style={styles.detailLabel}>Duration</Text>
-                <Text style={styles.detailValue}>
-                  {formatDuration(classItem.duration)}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.detailItem}>
-              <View style={styles.detailIcon}>
+              </DetailIcon>
+              <DetailInfo>
+                <DetailLabel>Duration</DetailLabel>
+                <DetailValue>{formatDuration(classItem.duration)}</DetailValue>
+              </DetailInfo>
+            </DetailItem>
+            <DetailItem>
+              <DetailIcon>
                 <MaterialIcons name="event" size={20} color="#111714" />
-              </View>
-              <View style={styles.detailInfo}>
-                <Text style={styles.detailLabel}>Next Class</Text>
-                <Text style={styles.detailValue}>
+              </DetailIcon>
+              <DetailInfo>
+                <DetailLabel>Next Class</DetailLabel>
+                <DetailValue>
                   {formattedStartDate(classItem.startDate)}
-                </Text>
-              </View>
-            </View>
-          </View>
+                </DetailValue>
+              </DetailInfo>
+            </DetailItem>
+          </ClassDetails>
 
           {/* Reviews Section */}
-          <Text style={styles.sectionTitle}>Reviews</Text>
-          <View style={styles.reviewsContainer}>
-            <View style={styles.ratingSummary}>
-              <Text style={styles.ratingNumber}>{mockRatingData.average}</Text>
-              <View style={styles.starsContainer}>
+          <SectionTitle>Reviews</SectionTitle>
+          <ReviewsContainer>
+            <RatingSummary>
+              <RatingNumber>{mockRatingData.average}</RatingNumber>
+              <StarsContainer>
                 {renderStars(Math.floor(mockRatingData.average))}
-              </View>
-              <Text style={styles.reviewCount}>
-                {mockRatingData.totalReviews} reviews
-              </Text>
-            </View>
+              </StarsContainer>
+              <ReviewCount>{mockRatingData.totalReviews} reviews</ReviewCount>
+            </RatingSummary>
 
-            <View style={styles.ratingDistribution}>
+            <RatingDistribution>
               {mockRatingData.distribution.map((item) => (
-                <View key={item.rating} style={styles.ratingRow}>
-                  <Text style={styles.ratingLabel}>{item.rating}</Text>
-                  <View style={styles.progressBar}>
-                    <View
-                      style={[
-                        styles.progressFill,
-                        { width: `${item.percentage}%` },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.percentage}>{item.percentage}%</Text>
-                </View>
+                <RatingRow key={item.rating}>
+                  <RatingLabel>{item.rating}</RatingLabel>
+                  <ProgressBar>
+                    <ProgressFill percentage={item.percentage} />
+                  </ProgressBar>
+                  <Percentage>{item.percentage}%</Percentage>
+                </RatingRow>
               ))}
-            </View>
-          </View>
+            </RatingDistribution>
+          </ReviewsContainer>
 
           {/* Individual Reviews */}
-          <View style={styles.reviewsList}>
+          <ReviewsList>
             {mockReviews.map((review) => (
-              <View key={review.id} style={styles.reviewItem}>
-                <View style={styles.reviewHeader}>
-                  <Image
-                    source={{ uri: review.authorImage }}
-                    style={styles.authorImage}
-                  />
-                  <View style={styles.authorInfo}>
-                    <Text style={styles.authorName}>{review.author}</Text>
-                    <Text style={styles.reviewDate}>{review.date}</Text>
-                  </View>
-                </View>
-                <View style={styles.reviewStars}>
-                  {renderStars(review.rating, 20)}
-                </View>
-                <Text style={styles.reviewText}>{review.text}</Text>
-                <View style={styles.reviewActions}>
-                  <TouchableOpacity style={styles.actionButton}>
+              <ReviewItem key={review.id}>
+                <ReviewHeader>
+                  <AuthorImage source={{ uri: review.authorImage }} />
+                  <AuthorInfo>
+                    <AuthorName>{review.author}</AuthorName>
+                    <ReviewDate>{review.date}</ReviewDate>
+                  </AuthorInfo>
+                </ReviewHeader>
+                <ReviewStars>{renderStars(review.rating, 20)}</ReviewStars>
+                <ReviewText>{review.text}</ReviewText>
+                <ReviewActions>
+                  <ActionButton>
                     <MaterialIcons name="thumb-up" size={20} color="#648772" />
-                    <Text style={styles.actionText}>{review.likes}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
+                    <ActionText>{review.likes}</ActionText>
+                  </ActionButton>
+                  <ActionButton>
                     <MaterialIcons
                       name="thumb-down"
                       size={20}
                       color="#648772"
                     />
-                    <Text style={styles.actionText}>{review.dislikes}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+                    <ActionText>{review.dislikes}</ActionText>
+                  </ActionButton>
+                </ReviewActions>
+              </ReviewItem>
             ))}
-          </View>
+          </ReviewsList>
 
           {/* Schedule Section */}
-          <Text style={styles.sectionTitle}>Schedule</Text>
+          <SectionTitle>Schedule</SectionTitle>
           {mockSchedule.map((schedule, index) => (
-            <View key={index} style={styles.scheduleItem}>
-              <View style={styles.scheduleIcon}>
+            <ScheduleItem key={index}>
+              <ScheduleIcon>
                 <MaterialIcons name="event" size={24} color="#111714" />
-              </View>
-              <View style={styles.scheduleInfo}>
-                <Text style={styles.scheduleDay}>{schedule.day}</Text>
-                <Text style={styles.scheduleTime}>{schedule.time}</Text>
-              </View>
-            </View>
+              </ScheduleIcon>
+              <ScheduleInfo>
+                <ScheduleDay>{schedule.day}</ScheduleDay>
+                <ScheduleTime>{schedule.time}</ScheduleTime>
+              </ScheduleInfo>
+            </ScheduleItem>
           ))}
-        </View>
+        </Content>
         {/* Bottom spacing for book button */}
         <View style={{ height: 100 }} />
-      </ScrollView>
+      </StyledScrollView>
 
       {/* Book Button */}
-      <View style={styles.bookButtonContainer}>
-        <TouchableOpacity
-          style={[styles.bookButton, isBooking && styles.bookButtonDisabled]}
-          onPress={handleBookClass}
-          disabled={isBooking}
-        >
-          <Text style={styles.bookButtonText}>
+      <BookButtonContainer>
+        <BookButton onPress={handleBookClass} disabled={isBooking}>
+          <BookButtonText>
             {isBooking ? "Booking..." : "Book Class"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          </BookButtonText>
+        </BookButton>
+      </BookButtonContainer>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  imageContainer: {
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-  },
-  heroImage: {
-    width: "100%",
-    height: 218,
-    borderRadius: 0,
-  },
-  content: {
-    paddingHorizontal: 16,
-  },
-  classTitle: {
-    color: "#111714",
-    fontSize: 22,
-    fontWeight: "bold",
-    letterSpacing: -0.3,
-    paddingBottom: 12,
-    paddingTop: 20,
-  },
-  classDescription: {
-    color: "#111714",
-    fontSize: 16,
-    lineHeight: 24,
-    paddingBottom: 12,
-    paddingTop: 4,
-  },
-  sectionTitle: {
-    color: "#111714",
-    fontSize: 18,
-    fontWeight: "bold",
-    letterSpacing: -0.3,
-    paddingBottom: 8,
-    paddingTop: 16,
-  },
-  reviewsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 32,
-    paddingVertical: 16,
-  },
-  ratingSummary: {
-    alignItems: "center",
-  },
-  ratingNumber: {
-    color: "#111714",
-    fontSize: 36,
-    fontWeight: "900",
-    letterSpacing: -0.3,
-  },
-  starsContainer: {
-    flexDirection: "row",
-    gap: 2,
-    marginVertical: 8,
-  },
-  reviewCount: {
-    color: "#111714",
-    fontSize: 16,
-  },
-  ratingDistribution: {
-    flex: 1,
-    minWidth: 200,
-    maxWidth: 400,
-  },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
-  },
-  ratingLabel: {
-    color: "#111714",
-    fontSize: 14,
-    width: 20,
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#dce5df",
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#111714",
-    borderRadius: 4,
-  },
-  percentage: {
-    color: "#648772",
-    fontSize: 14,
-    width: 40,
-    textAlign: "right",
-  },
-  reviewsList: {
-    gap: 32,
-    paddingVertical: 16,
-  },
-  reviewItem: {
-    gap: 12,
-  },
-  reviewHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  authorImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  authorInfo: {
-    flex: 1,
-  },
-  authorName: {
-    color: "#111714",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  reviewDate: {
-    color: "#648772",
-    fontSize: 14,
-  },
-  reviewStars: {
-    flexDirection: "row",
-    gap: 2,
-  },
-  reviewText: {
-    color: "#111714",
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  reviewActions: {
-    flexDirection: "row",
-    gap: 36,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  actionText: {
-    color: "#648772",
-    fontSize: 16,
-  },
-  scheduleItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    minHeight: 72,
-    paddingVertical: 8,
-  },
-  scheduleIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#f0f4f2",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-  },
-  scheduleInfo: {
-    flex: 1,
-  },
-  scheduleDay: {
-    color: "#111714",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  scheduleTime: {
-    color: "#648772",
-    fontSize: 14,
-  },
-  bookButtonContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#f0f4f2",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  bookButton: {
-    backgroundColor: "#38e07b",
-    borderRadius: 12,
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    minWidth: 84,
-    maxWidth: 480,
-    flex: 1,
-  },
-  bookButtonDisabled: {
-    opacity: 0.6,
-  },
-  bookButtonText: {
-    color: "#111714",
-    fontSize: 16,
-    fontWeight: "bold",
-    letterSpacing: 0.3,
-  },
-  classDetails: {
-    gap: 16,
-    paddingVertical: 16,
-  },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  detailIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#f0f4f2",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-  },
-  detailInfo: {
-    flex: 1,
-  },
-  detailLabel: {
-    color: "#111714",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  detailValue: {
-    color: "#648772",
-    fontSize: 14,
-  },
-});

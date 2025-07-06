@@ -2,6 +2,54 @@ import { Image } from "react-native";
 import { styled } from "styled-components/native";
 import { Colors } from "@/constants/Colors";
 
+export const Card = styled.TouchableOpacity<{ width?: number }>`
+  gap: 12px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  width: ${({ width }) => (width ? `${width}px` : "160px")};
+`;
+
+export const CardImage = styled(Image)<{ width?: number; height?: number }>`
+  border-radius: 12px;
+  width: ${({ width }) => (width ? `${width}px` : "160px")};
+  height: ${({ height }) => (height ? `${height}px` : "160px")};
+`;
+
+export const Info = styled.View`
+  gap: 4px;
+  padding-horizontal: 12px;
+  padding-bottom: 12px;
+`;
+
+export const Name = styled.Text`
+  font-size: 16px;
+  font-weight: 600;
+  color: #121714;
+  letter-spacing: -0.3px;
+`;
+
+export const Description = styled.Text`
+  font-size: 14px;
+  color: #688273;
+  font-weight: 400;
+`;
+
+// Skeleton wrapper for loading state
+export const SkeletonCard = styled.View<{ width?: number }>`
+  gap: 12px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  width: ${({ width }) => (width ? `${width}px` : "160px")};
+`;
+
+export const SkeletonImage = styled.View<{ width?: number; height?: number }>`
+  border-radius: 12px;
+  width: ${({ width }) => (width ? `${width}px` : "160px")};
+  height: ${({ height }) => (height ? `${height}px` : "160px")};
+`;
+
 export const Wrapper = styled.View``;
 
 export const Container = styled.TouchableOpacity<{ width?: string }>`
@@ -33,7 +81,7 @@ export const CardTitle = styled.Text`
   font-weight: 400;
 `;
 
-export const Info = styled.Text`
+export const InfoText = styled.Text`
   font-size: 12px;
   margin-bottom: 2px;
   color: ${Colors.dark.secondary};

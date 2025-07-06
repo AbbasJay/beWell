@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
-  StyleSheet,
   View,
   FlatList,
   Text,
@@ -20,6 +19,23 @@ import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useToast } from "@/app/contexts/ToastContext";
+import {
+  SectionHeader,
+  NotificationRow,
+  UnreadIndicator,
+  ReadIndicatorSpacer,
+  ActivityImage,
+  NotificationTextContainer,
+  ActivityName,
+  ActivityNameUnread,
+  Time,
+  DeleteButton,
+  MarkAllButton,
+  MarkAllText,
+  DeleteAllButton,
+  DeleteAllText,
+  ActionRow,
+} from "./styles/notifications";
 
 // Helper functions for date operations
 const isToday = (date: Date): boolean => {
@@ -236,7 +252,7 @@ const NotificationsDisplay: React.FC = () => {
   }
 
   const renderSectionHeader = ({ section: { title } }: any) => (
-    <Text style={styles.sectionHeader}>{title}</Text>
+    <SectionHeader>{title}</SectionHeader>
   );
 
   const renderItem = ({ item }: { item: Notification }) => {
@@ -247,73 +263,59 @@ const NotificationsDisplay: React.FC = () => {
       : require("@/assets/images/home-gym.webp");
     const time = formatTime(new Date(item.createdAt));
     return (
-      <TouchableOpacity
+      <NotificationRow
         onPress={() => handleNotificationPress(item)}
-        style={[
-          styles.notificationRow,
-          !item.read && styles.notificationRowUnread,
-        ]}
         activeOpacity={0.7}
       >
-        {!item.read ? (
-          <View style={styles.unreadIndicator} />
-        ) : (
-          <View style={styles.readIndicatorSpacer} />
-        )}
-        <Image source={activityImage} style={styles.activityImage} />
-        <View style={styles.notificationTextContainer}>
-          <Text
-            style={[
-              styles.activityName,
-              !item.read && styles.activityNameUnread,
-            ]}
-          >
-            {activityName}
-          </Text>
-          <Text style={styles.time}>{time}</Text>
-        </View>
-        <TouchableOpacity
+        {!item.read ? <UnreadIndicator /> : <ReadIndicatorSpacer />}
+        <ActivityImage source={activityImage} />
+        <NotificationTextContainer>
+          {!item.read ? (
+            <ActivityNameUnread>{activityName}</ActivityNameUnread>
+          ) : (
+            <ActivityName>{activityName}</ActivityName>
+          )}
+          <Time>{time}</Time>
+        </NotificationTextContainer>
+        <DeleteButton
           onPress={() => handleDeleteNotification(item.id)}
-          style={styles.deleteButton}
           disabled={deleting}
         >
           <MaterialIcons name="close" size={28} color="#d9534f" />
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </DeleteButton>
+      </NotificationRow>
     );
   };
 
   return (
     <BeWellBackground paddingHorizontal={0}>
       {(notifications.length > 0 || unreadIds.length > 0) && (
-        <View style={styles.actionRow}>
+        <ActionRow>
           {unreadIds.length > 0 && (
-            <TouchableOpacity
-              style={styles.markAllButton}
+            <MarkAllButton
               onPress={() => handleMarkAllAsRead(unreadIds)}
               disabled={loading || deleting}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#688273" />
               ) : (
-                <Text style={styles.markAllText}>Mark all as read</Text>
+                <MarkAllText>Mark all as read</MarkAllText>
               )}
-            </TouchableOpacity>
+            </MarkAllButton>
           )}
           {notifications.length > 0 && (
-            <TouchableOpacity
-              style={styles.deleteAllButton}
+            <DeleteAllButton
               onPress={() => handleDeleteAll(notifications.map((n) => n.id))}
               disabled={deleting}
             >
               {deleting ? (
                 <ActivityIndicator size="small" color="#d9534f" />
               ) : (
-                <Text style={styles.deleteAllText}>Delete all</Text>
+                <DeleteAllText>Delete all</DeleteAllText>
               )}
-            </TouchableOpacity>
+            </DeleteAllButton>
           )}
-        </View>
+        </ActionRow>
       )}
       {error ? (
         <ErrorMessage error={error} />
@@ -336,107 +338,5 @@ const NotificationsDisplay: React.FC = () => {
     </BeWellBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-  sectionHeader: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#222",
-    marginTop: 24,
-    marginBottom: 12,
-    marginLeft: 16,
-  },
-  notificationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginBottom: 16,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    position: "relative",
-  },
-  notificationRowUnread: {
-    // No background, just indicator
-  },
-  unreadIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#4caf50",
-    marginRight: 12,
-    alignSelf: "center",
-  },
-  readIndicatorSpacer: {
-    width: 8,
-    marginRight: 12,
-  },
-  activityImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    marginRight: 16,
-    backgroundColor: "#f3f6f4",
-  },
-  notificationTextContainer: {
-    flex: 1,
-  },
-  activityName: {
-    fontSize: 18,
-    fontWeight: "400",
-    color: "#222",
-    marginBottom: 2,
-  },
-  activityNameUnread: {
-    fontWeight: "bold",
-    color: "#121714",
-  },
-  time: {
-    fontSize: 15,
-    color: "#7a9683",
-    fontWeight: "400",
-  },
-  deleteButton: {
-    marginLeft: 12,
-    padding: 4,
-  },
-  markAllButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 18,
-    backgroundColor: "#eaf3ee",
-    borderRadius: 20,
-    marginRight: 0,
-  },
-  markAllText: {
-    color: "#688273",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  deleteAllButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 18,
-    backgroundColor: "#fbe9e7",
-    borderRadius: 20,
-    marginLeft: 0,
-  },
-  deleteAllText: {
-    color: "#d9534f",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  actionRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: 12,
-    marginTop: 16,
-    marginBottom: 8,
-    marginRight: 8,
-  },
-});
 
 export default NotificationsDisplay;

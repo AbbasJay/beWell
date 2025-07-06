@@ -1,6 +1,15 @@
 import { Business } from "@/app/contexts/BusinessContext";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { Skeleton } from "react-native-skeletons";
+import {
+  Card,
+  CardImage,
+  Info,
+  Name,
+  Description,
+  SkeletonCard,
+  SkeletonImage,
+} from "./styles";
 
 type BusinessCardProps = {
   item: Business;
@@ -34,13 +43,13 @@ export const BusinessCard = ({
 
   if (isLoading) {
     return (
-      <View style={[styles.card, { width }]}>
-        <Skeleton height={height} width={width} style={styles.image} />
-        <View style={styles.info}>
+      <SkeletonCard width={width}>
+        <Skeleton height={height} width={width} style={{ borderRadius: 12 }} />
+        <Info>
           <Skeleton height={16} width="60%" style={{ marginBottom: 4 }} />
           <Skeleton height={14} width="80%" />
-        </View>
-      </View>
+        </Info>
+      </SkeletonCard>
     );
   }
 
@@ -49,56 +58,27 @@ export const BusinessCard = ({
     : { uri: placeholderImages[imageIndex % placeholderImages.length] };
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { width }]}
+    <Card
+      width={width}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Image
+      <CardImage
         source={imageSource}
-        style={[styles.image, { width, height }]}
+        width={width}
+        height={height}
         resizeMode="cover"
         defaultSource={require("@/assets/images/home-gym.webp")}
       />
-      <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text style={styles.description} numberOfLines={1}>
+      <Info>
+        <Name numberOfLines={1}>{item.name}</Name>
+        <Description numberOfLines={1}>
           {distance
             ? `${distance.toFixed(1)} km away`
             : item.type || "Fitness Studio"}
-        </Text>
-      </View>
-    </TouchableOpacity>
+        </Description>
+      </Info>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    gap: 12,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  image: {
-    borderRadius: 12,
-  },
-  info: {
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingBottom: 12,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#121714",
-    letterSpacing: -0.3,
-  },
-  description: {
-    fontSize: 14,
-    color: "#688273",
-    fontWeight: "400",
-  },
-});

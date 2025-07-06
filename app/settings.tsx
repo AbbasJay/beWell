@@ -1,11 +1,11 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
 import { useAuth } from "./contexts/auth/AuthContext";
 import { router } from "expo-router";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import Button from "./ui/button/button";
 import { BeWellText, BeWellTextVariant } from "./ui/be-well-text/be-well-text";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Container, Section } from "./styles/settings";
 
 export default function Settings() {
   const { signOut } = useAuth();
@@ -25,14 +25,14 @@ export default function Settings() {
 
   return (
     <BeWellBackground>
-      <View style={styles.container}>
-        <View style={styles.section}>
+      <Container>
+        <Section>
           <BeWellText variant={BeWellTextVariant.Headline3}>
             Settings
           </BeWellText>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
+        <Section>
           <Button
             title="Logout"
             onPress={handleLogout}
@@ -40,9 +40,9 @@ export default function Settings() {
             fullWidth
             iconLeft={<MaterialIcons name="logout" size={24} color="black" />}
           />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
+        <Section>
           <Button
             title="View Components"
             onPress={handleViewComponents}
@@ -50,18 +50,8 @@ export default function Settings() {
             fullWidth
             iconLeft={<MaterialIcons name="palette" size={24} color="black" />}
           />
-        </View>
-      </View>
+        </Section>
+      </Container>
     </BeWellBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  section: {
-    marginBottom: 20,
-  },
-});

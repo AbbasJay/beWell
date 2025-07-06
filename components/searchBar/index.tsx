@@ -1,12 +1,11 @@
 import React, { useState } from "react";
+import { Keyboard, TextInput, TouchableOpacity } from "react-native";
 import {
-  Keyboard,
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+  FallbackContainer,
+  FallbackInput,
+  FallbackButton,
+  FallbackButtonText,
+} from "./styles";
 
 interface SearchBarProps {
   updateLocation?: (lat: number, lng: number) => void;
@@ -38,52 +37,19 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
   };
 
   return (
-    <View style={styles.fallbackContainer}>
-      <TextInput
-        style={styles.fallbackInput}
+    <FallbackContainer>
+      <FallbackInput
         placeholder="Search (using default location)"
         value={search}
         onChangeText={setSearch}
         onFocus={handleFocus}
         onBlur={() => setIsFocused(false)}
       />
-      <TouchableOpacity
-        style={styles.fallbackButton}
-        onPress={handleFallbackSearch}
-      >
-        <Text style={styles.fallbackButtonText}>Search</Text>
-      </TouchableOpacity>
-    </View>
+      <FallbackButton onPress={handleFallbackSearch}>
+        <FallbackButtonText>Search</FallbackButtonText>
+      </FallbackButton>
+    </FallbackContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  fallbackContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-  },
-  fallbackInput: {
-    flex: 1,
-    height: 38,
-    color: "#5d5d5d",
-    fontSize: 16,
-    backgroundColor: "lightgrey",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginRight: 10,
-  },
-  fallbackButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  fallbackButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
 
 export default AddressSearchBar;
