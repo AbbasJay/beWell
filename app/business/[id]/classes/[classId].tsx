@@ -200,8 +200,9 @@ function ClassDetailsContent() {
     return <ErrorMessage error={new Error("Class not found")} />;
   }
 
-  // Check if user has already booked this class
-  const hasBooked = classItem.isBooked || false;
+  // Check if user has an active booking for this class
+  const hasBooked =
+    classItem.isBooked === true && classItem.bookingStatus === "active";
 
   // Debug logging
   console.log("=== CLASS DETAILS DEBUG ===");
