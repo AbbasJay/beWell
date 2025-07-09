@@ -66,52 +66,8 @@ import {
   BookButton,
   BookButtonText,
 } from "./styles";
-
-// Mock data for reviews
-const mockReviews = [
-  {
-    id: 1,
-    author: "Sophia Clark",
-    authorImage:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCKh-5ins07UK0OIshGMe_Stl3XImoAWiPBbbzxTco03NJmG18qBU9nxBqkrk9Sh2ut73VkgFlY4py0VIP_zj407WEl1iLFv7PI9HMk_3SY2mHajNpKBKNrh2jg1gM-3up8gZMGmPpk6mLApiBT9GLgGDdl7wr0t6gU4gAFIuozFfhW6SpHfOfZ2-t_02VFPqrN5lwOx5DgnqLg2DC8dA5nHZlY26f7IWJYtpJHRiH8K8WSlEflf-eVqcjp3UCaEJA_vvF5iLP6ZS2t",
-    rating: 5,
-    date: "2 weeks ago",
-    text: "This class was amazing! The instructor was very knowledgeable and made the class accessible for all levels. I left feeling refreshed and energized.",
-    likes: 15,
-    dislikes: 2,
-  },
-  {
-    id: 2,
-    author: "Ethan Bennett",
-    authorImage:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCEElp7WF4K4mFEQ4nGJLIOb3oBlGWAfQ8cXsgx1tagE-UK0JyXaW1wVYQ29g4hA3dcIkDXiHtgH1TEkb5K2uUnT2m7pIXPJd27HMEeL9BNqGgT41IL6J9Iy4QvY-TQgBuRe0cT49cnlGxvPEik3lvNaBZ3NQFWkwcdkd9sYRAFZMH34BH8FAuWqLoiE2hfiP5O8LCqgJ6Mk9rVDPK2ERLkLaXNBLI0-n6YwNr7zQrNixl0KFHGIGlQ5OF4GcjxTMHQsPYAcyjHjGzR",
-    rating: 4,
-    date: "1 month ago",
-    text: "Great class, but the studio was a bit crowded. The instructor was excellent and the flow was challenging but rewarding.",
-    likes: 8,
-    dislikes: 1,
-  },
-];
-
-// Mock schedule data
-const mockSchedule = [
-  { day: "Monday", time: "10:00 AM - 11:00 AM" },
-  { day: "Wednesday", time: "6:00 PM - 7:00 PM" },
-  { day: "Saturday", time: "9:00 AM - 10:00 AM" },
-];
-
-// Mock rating data
-const mockRatingData = {
-  average: 4.8,
-  totalReviews: 125,
-  distribution: [
-    { rating: 5, percentage: 70 },
-    { rating: 4, percentage: 20 },
-    { rating: 3, percentage: 5 },
-    { rating: 2, percentage: 3 },
-    { rating: 1, percentage: 2 },
-  ],
-};
+import { useClassReviews } from "@/app/utils/hooks/useClassReviews";
+import { Review } from "@/app/utils/components-data/class-reviews-data";
 
 export default function ClassDetailsScreen() {
   const { id: businessId, classId } = useLocalSearchParams<{
@@ -164,6 +120,14 @@ function ClassDetailsContent() {
   const classItem = useMemo(() => {
     return classes.find((c) => c.id === Number(classId));
   }, [classes, classId]);
+
+  const {
+    reviews,
+    averageRating,
+    totalReviews,
+    ratingDistribution,
+    loading: reviewsLoading,
+  } = useClassReviews(Number(classId));
 
   useEffect(() => {
     if (!businessId || !classId) {
@@ -410,43 +374,45 @@ function ClassDetailsContent() {
           <SectionTitle>Reviews</SectionTitle>
           <ReviewsContainer>
             <RatingSummary>
-              <RatingNumber>{mockRatingData.average}</RatingNumber>
+              <RatingNumber>{averageRating}</RatingNumber>
               <StarsContainer>
-                {renderStars(Math.floor(mockRatingData.average))}
+                {renderStars(Math.floor(averageRating))}
               </StarsContainer>
-              <ReviewCount>{mockRatingData.totalReviews} reviews</ReviewCount>
+              <ReviewCount>{totalReviews} reviews</ReviewCount>
             </RatingSummary>
 
             <RatingDistribution>
-              {mockRatingData.distribution.map((item) => (
-                <RatingRow key={item.rating}>
-                  <RatingLabel>{item.rating}</RatingLabel>
-                  <ProgressBar>
-                    <ProgressFill percentage={item.percentage} />
-                  </ProgressBar>
-                  <Percentage>{item.percentage}%</Percentage>
-                </RatingRow>
-              ))}
+              {ratingDistribution.map(
+                (item: { rating: number; percentage: number }) => (
+                  <RatingRow key={item.rating}>
+                    <RatingLabel>{item.rating}</RatingLabel>
+                    <ProgressBar>
+                      <ProgressFill percentage={item.percentage} />
+                    </ProgressBar>
+                    <Percentage>{item.percentage}%</Percentage>
+                  </RatingRow>
+                )
+              )}
             </RatingDistribution>
           </ReviewsContainer>
 
           {/* Individual Reviews */}
           <ReviewsList>
-            {mockReviews.map((review) => (
+            {reviews.map((review: Review) => (
               <ReviewItem key={review.id}>
                 <ReviewHeader>
-                  <AuthorImage source={{ uri: review.authorImage }} />
+                  <AuthorImage source={{ uri: review.userAvatar }} />
                   <AuthorInfo>
-                    <AuthorName>{review.author}</AuthorName>
-                    <ReviewDate>{review.date}</ReviewDate>
+                    <AuthorName>{review.userName}</AuthorName>
+                    <ReviewDate>{review.createdAt}</ReviewDate>
                   </AuthorInfo>
                 </ReviewHeader>
                 <ReviewStars>{renderStars(review.rating, 20)}</ReviewStars>
-                <ReviewText>{review.text}</ReviewText>
+                <ReviewText>{review.comment}</ReviewText>
                 <ReviewActions>
                   <ActionButton>
                     <MaterialIcons name="thumb-up" size={20} color="#648772" />
-                    <ActionText>{review.likes}</ActionText>
+                    <ActionText>{review.likedCount}</ActionText>
                   </ActionButton>
                   <ActionButton>
                     <MaterialIcons
@@ -454,7 +420,7 @@ function ClassDetailsContent() {
                       size={20}
                       color="#648772"
                     />
-                    <ActionText>{review.dislikes}</ActionText>
+                    <ActionText>{review.dislikedCount}</ActionText>
                   </ActionButton>
                 </ReviewActions>
               </ReviewItem>
@@ -463,17 +429,23 @@ function ClassDetailsContent() {
 
           {/* Schedule Section */}
           <SectionTitle>Schedule</SectionTitle>
-          {mockSchedule.map((schedule, index) => (
-            <ScheduleItem key={index}>
-              <ScheduleIcon>
-                <MaterialIcons name="event" size={24} color="#111714" />
-              </ScheduleIcon>
-              <ScheduleInfo>
-                <ScheduleDay>{schedule.day}</ScheduleDay>
-                <ScheduleTime>{schedule.time}</ScheduleTime>
-              </ScheduleInfo>
-            </ScheduleItem>
-          ))}
+          {
+            Array.isArray((classItem as any).schedule)
+              ? (classItem as any).schedule.map(
+                  (schedule: { day: string; time: string }, index: number) => (
+                    <ScheduleItem key={index}>
+                      <ScheduleIcon>
+                        <MaterialIcons name="event" size={24} color="#111714" />
+                      </ScheduleIcon>
+                      <ScheduleInfo>
+                        <ScheduleDay>{schedule.day}</ScheduleDay>
+                        <ScheduleTime>{schedule.time}</ScheduleTime>
+                      </ScheduleInfo>
+                    </ScheduleItem>
+                  )
+                )
+              : null /* Remove or replace this when schedule is added to Class type */
+          }
         </Content>
         {/* Bottom spacing for book button */}
         <View style={{ height: 100 }} />
