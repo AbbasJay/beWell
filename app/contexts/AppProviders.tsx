@@ -6,6 +6,7 @@ import { NotificationsProvider } from "./NotificationsContext";
 import { BookingsProvider } from "./BookingsContext";
 import { ToastProvider } from "./ToastContext";
 import { MapViewProvider } from "./MapViewContext";
+import { ReviewsProvider } from "./ReviewsContext";
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -17,7 +18,9 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
           <NotificationsProvider>
             <BookingsProvider>
               <ToastProvider>
-                <MapViewProvider>{children}</MapViewProvider>
+                <ReviewsProvider>
+                  <MapViewProvider>{children}</MapViewProvider>
+                </ReviewsProvider>
               </ToastProvider>
             </BookingsProvider>
           </NotificationsProvider>

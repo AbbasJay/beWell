@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
@@ -20,78 +27,13 @@ import {
   formatDuration,
 } from "@/app/utils/helper-functions/format-time-and-dates";
 import {
-  Container,
-  ScrollView as StyledScrollView,
-  ImageContainer,
-  HeroImage,
-  Content,
-  ClassTitle,
-  ClassDescription,
-  SectionTitle,
-  ClassDetails,
-  DetailItem,
-  DetailIcon,
-  DetailInfo,
-  DetailLabel,
-  DetailValue,
-  ReviewsContainer,
-  RatingSummary,
-  RatingNumber,
-  StarsContainer,
-  ReviewCount,
-  RatingDistribution,
-  RatingRow,
-  RatingLabel,
-  ProgressBar,
-  ProgressFill,
-  Percentage,
+  ReviewsSummary,
   ReviewsList,
-  ReviewItem,
-  ReviewHeader,
-  AuthorImage,
-  AuthorInfo,
-  AuthorName,
-  ReviewDate,
-  ReviewStars,
-  ReviewText,
-  ReviewActions,
-  ActionButton,
-  ActionText,
-  ScheduleItem,
-  ScheduleIcon,
-  ScheduleInfo,
-  ScheduleDay,
-  ScheduleTime,
-  BookButtonContainer,
-  BookButton,
-  BookButtonText,
-} from "./styles";
+  ReviewForm,
+} from "../../../ui/class-reviews";
+import { useReviewsContext } from "@/app/contexts/ReviewsContext";
 
-// Mock data for reviews
-const mockReviews = [
-  {
-    id: 1,
-    author: "Sophia Clark",
-    authorImage:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCKh-5ins07UK0OIshGMe_Stl3XImoAWiPBbbzxTco03NJmG18qBU9nxBqkrk9Sh2ut73VkgFlY4py0VIP_zj407WEl1iLFv7PI9HMk_3SY2mHajNpKBKNrh2jg1gM-3up8gZMGmPpk6mLApiBT9GLgGDdl7wr0t6gU4gAFIuozFfhW6SpHfOfZ2-t_02VFPqrN5lwOx5DgnqLg2DC8dA5nHZlY26f7IWJYtpJHRiH8K8WSlEflf-eVqcjp3UCaEJA_vvF5iLP6ZS2t",
-    rating: 5,
-    date: "2 weeks ago",
-    text: "This class was amazing! The instructor was very knowledgeable and made the class accessible for all levels. I left feeling refreshed and energized.",
-    likes: 15,
-    dislikes: 2,
-  },
-  {
-    id: 2,
-    author: "Ethan Bennett",
-    authorImage:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCEElp7WF4K4mFEQ4nGJLIOb3oBlGWAfQ8cXsgx1tagE-UK0JyXaW1wVYQ29g4hA3dcIkDXiHtgH1TEkb5K2uUnT2m7pIXPJd27HMEeL9BNqGgT41IL6J9Iy4QvY-TQgBuRe0cT49cnlGxvPEik3lvNaBZ3NQFWkwcdkd9sYRAFZMH34BH8FAuWqLoiE2hfiP5O8LCqgJ6Mk9rVDPK2ERLkLaXNBLI0-n6YwNr7zQrNixl0KFHGIGlQ5OF4GcjxTMHQsPYAcyjHjGzR",
-    rating: 4,
-    date: "1 month ago",
-    text: "Great class, but the studio was a bit crowded. The instructor was excellent and the flow was challenging but rewarding.",
-    likes: 8,
-    dislikes: 1,
-  },
-];
+import * as CSS from "./styles";
 
 // Mock schedule data
 const mockSchedule = [
@@ -99,19 +41,6 @@ const mockSchedule = [
   { day: "Wednesday", time: "6:00 PM - 7:00 PM" },
   { day: "Saturday", time: "9:00 AM - 10:00 AM" },
 ];
-
-// Mock rating data
-const mockRatingData = {
-  average: 4.8,
-  totalReviews: 125,
-  distribution: [
-    { rating: 5, percentage: 70 },
-    { rating: 4, percentage: 20 },
-    { rating: 3, percentage: 5 },
-    { rating: 2, percentage: 3 },
-    { rating: 1, percentage: 2 },
-  ],
-};
 
 export default function ClassDetailsScreen() {
   const { id: businessId, classId } = useLocalSearchParams<{
@@ -154,6 +83,13 @@ function ClassDetailsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
+  const { fetchReviews } = useReviewsContext();
+
+  useEffect(() => {
+    if (classId) {
+      fetchReviews(Number(classId));
+    }
+  }, [classId]);
 
   // Memoize the business lookup to prevent unnecessary re-renders
   const foundBusiness = useMemo(() => {
@@ -245,7 +181,6 @@ function ClassDetailsContent() {
           await refreshClasses();
           showToast("You have already booked this class", "info");
         } catch (refreshError) {
-          console.error("Error refreshing classes:", refreshError);
           showToast("Failed to refresh class data", "error");
         }
       } else {
@@ -323,35 +258,35 @@ function ClassDetailsContent() {
   console.log("Class Item:", classItem);
 
   return (
-    <Container>
-      <StyledScrollView showsVerticalScrollIndicator={false}>
+    <CSS.Container>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Image */}
-        <ImageContainer>
-          <HeroImage
+        <CSS.ImageContainer>
+          <CSS.HeroImage
             source={{
               uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuZpxL2qDLHyzg3_bnb8lbGigeRVyjUkI9RfW9nRMB6xHTgGSh_YL3dh4eR8kO4hKO8I4qVWH4rrvqW9-ZcHOZO8cDEBBz8u2dkXBcTSDlW5DujQ0QKvTlXewoJc-pb67doFv5vd2U-O9bQGTOzIo6PJfZIGyEBZwlV08ews8w7K_Nd-OwqAJbZxsfirXguCd1U3c_DdyDId-dkqnl7uRgREezubfA2pq48nHHfwOlT3I3rrIIIRGxgRAerbEiNHbvj9vfzmaKe0mr",
             }}
             resizeMode="cover"
             fadeDuration={0}
           />
-        </ImageContainer>
+        </CSS.ImageContainer>
 
         {/* Class Info */}
-        <Content>
-          <ClassTitle>{classItem.name}</ClassTitle>
-          <ClassDescription>{classItem.description}</ClassDescription>
+        <CSS.Content>
+          <CSS.ClassTitle>{classItem.name}</CSS.ClassTitle>
+          <CSS.ClassDescription>{classItem.description}</CSS.ClassDescription>
 
           {/* Class Details */}
-          <ClassDetails>
-            <DetailItem>
-              <DetailIcon>
+          <CSS.ClassDetails>
+            <CSS.DetailItem>
+              <CSS.DetailIcon>
                 <MaterialIcons name="person" size={20} color="#111714" />
-              </DetailIcon>
-              <DetailInfo>
-                <DetailLabel>Instructor</DetailLabel>
-                <DetailValue>{classItem.instructor}</DetailValue>
-              </DetailInfo>
-            </DetailItem>
+              </CSS.DetailIcon>
+              <CSS.DetailInfo>
+                <CSS.DetailLabel>Instructor</CSS.DetailLabel>
+                <CSS.DetailValue>{classItem.instructor}</CSS.DetailValue>
+              </CSS.DetailInfo>
+            </CSS.DetailItem>
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
               onPress={() => {
@@ -368,15 +303,15 @@ function ClassDetailsContent() {
               }}
               activeOpacity={0.7}
             >
-              <DetailIcon>
+              <CSS.DetailIcon>
                 <MaterialIcons name="location-on" size={20} color="#111714" />
-              </DetailIcon>
-              <DetailInfo>
-                <DetailLabel>Location</DetailLabel>
-                <DetailValue>
+              </CSS.DetailIcon>
+              <CSS.DetailInfo>
+                <CSS.DetailLabel>Location</CSS.DetailLabel>
+                <CSS.DetailValue>
                   {business.address}, {classItem.location}
-                </DetailValue>
-              </DetailInfo>
+                </CSS.DetailValue>
+              </CSS.DetailInfo>
               <MaterialIcons
                 name="open-in-new"
                 size={16}
@@ -384,100 +319,55 @@ function ClassDetailsContent() {
                 style={{ marginLeft: 8 }}
               />
             </TouchableOpacity>
-            <DetailItem>
-              <DetailIcon>
+            <CSS.DetailItem>
+              <CSS.DetailIcon>
                 <MaterialIcons name="schedule" size={20} color="#111714" />
-              </DetailIcon>
-              <DetailInfo>
-                <DetailLabel>Duration</DetailLabel>
-                <DetailValue>{formatDuration(classItem.duration)}</DetailValue>
-              </DetailInfo>
-            </DetailItem>
-            <DetailItem>
-              <DetailIcon>
+              </CSS.DetailIcon>
+              <CSS.DetailInfo>
+                <CSS.DetailLabel>Duration</CSS.DetailLabel>
+                <CSS.DetailValue>
+                  {formatDuration(classItem.duration)}
+                </CSS.DetailValue>
+              </CSS.DetailInfo>
+            </CSS.DetailItem>
+            <CSS.DetailItem>
+              <CSS.DetailIcon>
                 <MaterialIcons name="event" size={20} color="#111714" />
-              </DetailIcon>
-              <DetailInfo>
-                <DetailLabel>Next Class</DetailLabel>
-                <DetailValue>
+              </CSS.DetailIcon>
+              <CSS.DetailInfo>
+                <CSS.DetailLabel>Next Class</CSS.DetailLabel>
+                <CSS.DetailValue>
                   {formattedStartDate(classItem.startDate)}
-                </DetailValue>
-              </DetailInfo>
-            </DetailItem>
-          </ClassDetails>
+                </CSS.DetailValue>
+              </CSS.DetailInfo>
+            </CSS.DetailItem>
+          </CSS.ClassDetails>
 
           {/* Reviews Section */}
-          <SectionTitle>Reviews</SectionTitle>
-          <ReviewsContainer>
-            <RatingSummary>
-              <RatingNumber>{mockRatingData.average}</RatingNumber>
-              <StarsContainer>
-                {renderStars(Math.floor(mockRatingData.average))}
-              </StarsContainer>
-              <ReviewCount>{mockRatingData.totalReviews} reviews</ReviewCount>
-            </RatingSummary>
+          <CSS.SectionTitle>Reviews</CSS.SectionTitle>
+          <ReviewsSummary />
 
-            <RatingDistribution>
-              {mockRatingData.distribution.map((item) => (
-                <RatingRow key={item.rating}>
-                  <RatingLabel>{item.rating}</RatingLabel>
-                  <ProgressBar>
-                    <ProgressFill percentage={item.percentage} />
-                  </ProgressBar>
-                  <Percentage>{item.percentage}%</Percentage>
-                </RatingRow>
-              ))}
-            </RatingDistribution>
-          </ReviewsContainer>
+          <ReviewsList />
 
-          {/* Individual Reviews */}
-          <ReviewsList>
-            {mockReviews.map((review) => (
-              <ReviewItem key={review.id}>
-                <ReviewHeader>
-                  <AuthorImage source={{ uri: review.authorImage }} />
-                  <AuthorInfo>
-                    <AuthorName>{review.author}</AuthorName>
-                    <ReviewDate>{review.date}</ReviewDate>
-                  </AuthorInfo>
-                </ReviewHeader>
-                <ReviewStars>{renderStars(review.rating, 20)}</ReviewStars>
-                <ReviewText>{review.text}</ReviewText>
-                <ReviewActions>
-                  <ActionButton>
-                    <MaterialIcons name="thumb-up" size={20} color="#648772" />
-                    <ActionText>{review.likes}</ActionText>
-                  </ActionButton>
-                  <ActionButton>
-                    <MaterialIcons
-                      name="thumb-down"
-                      size={20}
-                      color="#648772"
-                    />
-                    <ActionText>{review.dislikes}</ActionText>
-                  </ActionButton>
-                </ReviewActions>
-              </ReviewItem>
-            ))}
-          </ReviewsList>
+          <ReviewForm />
 
           {/* Schedule Section */}
-          <SectionTitle>Schedule</SectionTitle>
+          <CSS.SectionTitle>Schedule</CSS.SectionTitle>
           {mockSchedule.map((schedule, index) => (
-            <ScheduleItem key={index}>
-              <ScheduleIcon>
+            <CSS.ScheduleItem key={index}>
+              <CSS.ScheduleIcon>
                 <MaterialIcons name="event" size={24} color="#111714" />
-              </ScheduleIcon>
-              <ScheduleInfo>
-                <ScheduleDay>{schedule.day}</ScheduleDay>
-                <ScheduleTime>{schedule.time}</ScheduleTime>
-              </ScheduleInfo>
-            </ScheduleItem>
+              </CSS.ScheduleIcon>
+              <CSS.ScheduleInfo>
+                <CSS.ScheduleDay>{schedule.day}</CSS.ScheduleDay>
+                <CSS.ScheduleTime>{schedule.time}</CSS.ScheduleTime>
+              </CSS.ScheduleInfo>
+            </CSS.ScheduleItem>
           ))}
-        </Content>
+        </CSS.Content>
         {/* Bottom spacing for book button */}
         <View style={{ height: 100 }} />
-      </StyledScrollView>
+      </ScrollView>
 
       {/* Debug Button (temporary) */}
       <View
@@ -501,8 +391,8 @@ function ClassDetailsContent() {
       </View>
 
       {/* Book Button */}
-      <BookButtonContainer>
-        <BookButton
+      <CSS.BookButtonContainer>
+        <CSS.BookButton
           onPress={
             hasBooked
               ? handleCancelClass
@@ -527,7 +417,7 @@ function ClassDetailsContent() {
               : undefined
           }
         >
-          <BookButtonText>
+          <CSS.BookButtonText>
             {currentAction === "booking"
               ? "Booking..."
               : currentAction === "cancelling"
@@ -539,9 +429,9 @@ function ClassDetailsContent() {
               : classItem.bookingStatus === "no-show"
               ? "No Show"
               : "Book Class"}
-          </BookButtonText>
-        </BookButton>
-      </BookButtonContainer>
-    </Container>
+          </CSS.BookButtonText>
+        </CSS.BookButton>
+      </CSS.BookButtonContainer>
+    </CSS.Container>
   );
 }
