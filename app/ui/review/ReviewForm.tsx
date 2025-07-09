@@ -85,7 +85,7 @@ const StyledInput = styled(TextInput)`
   border-color: #ccc;
   border-radius: 8px;
   padding: 8px;
-  min-height: 890px;
+  min-height: 80px;
   margin-bottom: 8px;
   font-size: 15px;
 `;
