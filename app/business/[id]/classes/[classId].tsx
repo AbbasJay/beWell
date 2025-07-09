@@ -8,7 +8,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
 import {
   useClassesContext,
-  Class,
   ClassesProvider,
 } from "@/app/contexts/ClassesContext";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
@@ -45,18 +44,6 @@ import {
   ProgressBar,
   ProgressFill,
   Percentage,
-  ReviewsList,
-  ReviewItem,
-  ReviewHeader,
-  AuthorImage,
-  AuthorInfo,
-  AuthorName,
-  ReviewDate,
-  ReviewStars,
-  ReviewText,
-  ReviewActions,
-  ActionButton,
-  ActionText,
   ScheduleItem,
   ScheduleIcon,
   ScheduleInfo,
@@ -67,7 +54,12 @@ import {
   BookButtonText,
 } from "./styles";
 import { useClassReviews } from "@/app/utils/hooks/useClassReviews";
-import { Review } from "@/app/utils/components-data/class-reviews-data";
+import { Review as ReviewComponent, ReviewType } from "@/app/ui/review/Review";
+import { ReviewForm } from "@/app/ui/review/ReviewForm";
+import { ReviewList } from "@/app/ui/review/ReviewList";
+import { useState as useLocalState } from "react";
+import { TextInput } from "react-native";
+import Button from "@/app/ui/button/button";
 
 export default function ClassDetailsScreen() {
   const { id: businessId, classId } = useLocalSearchParams<{
@@ -95,11 +87,11 @@ function ClassDetailsContent() {
     id: string;
     classId: string;
   }>();
-  const [error, setError] = useState<Error | null>(null);
-  const [business, setBusiness] = useState<Business | null>(null);
-  const [isBooking, setIsBooking] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [currentAction, setCurrentAction] = useState<
+  const [error, setError] = useLocalState<Error | null>(null);
+  const [business, setBusiness] = useLocalState<Business | null>(null);
+  const [isBooking, setIsBooking] = useLocalState(false);
+  const [isCancelling, setIsCancelling] = useLocalState(false);
+  const [currentAction, setCurrentAction] = useLocalState<
     "booking" | "cancelling" | null
   >(null);
   const { refreshNotifications } = useNotificationsContext();
@@ -110,6 +102,67 @@ function ClassDetailsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
+  const {
+    reviews,
+    averageRating,
+    totalReviews,
+    ratingDistribution,
+    loading: reviewsLoading,
+  } = useClassReviews(Number(classId));
+  const [reviewText, setReviewText] = useLocalState("");
+  const [reviewRating, setReviewRating] = useLocalState(5);
+  const [isEditing, setIsEditing] = useLocalState(false);
+  const [submitting, setSubmitting] = useLocalState(false);
+  const userId = user ? String(user.id) : undefined;
+  const userReview = user
+    ? reviews.find((r) => r.userId === userId)
+    : undefined;
+  const [allReviews, setAllReviews] = useLocalState<ReviewType[]>(reviews);
+  useEffect(() => {
+    setAllReviews(reviews);
+  }, [reviews]);
+  const handleReviewSubmit = ({
+    text,
+    rating,
+  }: {
+    text: string;
+    rating: number;
+  }) => {
+    if (!user) return;
+    setSubmitting(true);
+    const newReview: ReviewType = {
+      id: Math.random().toString(36).slice(2),
+      userId: userId!,
+      userName: (user as any).name || "Anonymous",
+      userAvatar:
+        (user as any).avatar || "https://ui-avatars.com/api/?name=Anonymous",
+      rating,
+      comment: text,
+      createdAt: "now",
+      updatedAt: "now",
+      likedCount: 0,
+      dislikedCount: 0,
+    };
+    setAllReviews((prev) => [
+      newReview,
+      ...prev.filter((r) => r.userId !== userId),
+    ]);
+    setIsEditing(false);
+    setSubmitting(false);
+  };
+  const handleReviewEdit = () => {
+    if (!userReview) return;
+    setReviewText(userReview.comment);
+    setReviewRating(userReview.rating);
+    setIsEditing(true);
+  };
+  const handleReviewDelete = () => {
+    if (!user) return;
+    setAllReviews((prev) => prev.filter((r) => r.userId !== userId));
+    setReviewText("");
+    setReviewRating(5);
+    setIsEditing(false);
+  };
 
   // Memoize the business lookup to prevent unnecessary re-renders
   const foundBusiness = useMemo(() => {
@@ -120,14 +173,6 @@ function ClassDetailsContent() {
   const classItem = useMemo(() => {
     return classes.find((c) => c.id === Number(classId));
   }, [classes, classId]);
-
-  const {
-    reviews,
-    averageRating,
-    totalReviews,
-    ratingDistribution,
-    loading: reviewsLoading,
-  } = useClassReviews(Number(classId));
 
   useEffect(() => {
     if (!businessId || !classId) {
@@ -286,6 +331,13 @@ function ClassDetailsContent() {
 
   console.log("Class Item:", classItem);
 
+  // Mock schedule data
+  const mockSchedule = [
+    { day: "Monday", time: "10:00 AM - 11:00 AM" },
+    { day: "Wednesday", time: "6:00 PM - 7:00 PM" },
+    { day: "Saturday", time: "9:00 AM - 10:00 AM" },
+  ];
+
   return (
     <Container>
       <StyledScrollView showsVerticalScrollIndicator={false}>
@@ -369,9 +421,27 @@ function ClassDetailsContent() {
               </DetailInfo>
             </DetailItem>
           </ClassDetails>
-
-          {/* Reviews Section */}
           <SectionTitle>Reviews</SectionTitle>
+          {user && (
+            <ReviewsContainer>
+              {userReview && !isEditing ? (
+                <ReviewComponent
+                  review={userReview}
+                  onEdit={handleReviewEdit}
+                  onDelete={handleReviewDelete}
+                  showActions
+                />
+              ) : (
+                <ReviewForm
+                  initialText={reviewText}
+                  initialRating={reviewRating}
+                  onSubmit={handleReviewSubmit}
+                  onCancel={userReview ? () => setIsEditing(false) : undefined}
+                  submitting={submitting}
+                />
+              )}
+            </ReviewsContainer>
+          )}
           <ReviewsContainer>
             <RatingSummary>
               <RatingNumber>{averageRating}</RatingNumber>
@@ -380,7 +450,6 @@ function ClassDetailsContent() {
               </StarsContainer>
               <ReviewCount>{totalReviews} reviews</ReviewCount>
             </RatingSummary>
-
             <RatingDistribution>
               {ratingDistribution.map(
                 (item: { rating: number; percentage: number }) => (
@@ -395,57 +464,21 @@ function ClassDetailsContent() {
               )}
             </RatingDistribution>
           </ReviewsContainer>
-
-          {/* Individual Reviews */}
-          <ReviewsList>
-            {reviews.map((review: Review) => (
-              <ReviewItem key={review.id}>
-                <ReviewHeader>
-                  <AuthorImage source={{ uri: review.userAvatar }} />
-                  <AuthorInfo>
-                    <AuthorName>{review.userName}</AuthorName>
-                    <ReviewDate>{review.createdAt}</ReviewDate>
-                  </AuthorInfo>
-                </ReviewHeader>
-                <ReviewStars>{renderStars(review.rating, 20)}</ReviewStars>
-                <ReviewText>{review.comment}</ReviewText>
-                <ReviewActions>
-                  <ActionButton>
-                    <MaterialIcons name="thumb-up" size={20} color="#648772" />
-                    <ActionText>{review.likedCount}</ActionText>
-                  </ActionButton>
-                  <ActionButton>
-                    <MaterialIcons
-                      name="thumb-down"
-                      size={20}
-                      color="#648772"
-                    />
-                    <ActionText>{review.dislikedCount}</ActionText>
-                  </ActionButton>
-                </ReviewActions>
-              </ReviewItem>
-            ))}
-          </ReviewsList>
+          <ReviewList reviews={allReviews} userId={userId} />
 
           {/* Schedule Section */}
           <SectionTitle>Schedule</SectionTitle>
-          {
-            Array.isArray((classItem as any).schedule)
-              ? (classItem as any).schedule.map(
-                  (schedule: { day: string; time: string }, index: number) => (
-                    <ScheduleItem key={index}>
-                      <ScheduleIcon>
-                        <MaterialIcons name="event" size={24} color="#111714" />
-                      </ScheduleIcon>
-                      <ScheduleInfo>
-                        <ScheduleDay>{schedule.day}</ScheduleDay>
-                        <ScheduleTime>{schedule.time}</ScheduleTime>
-                      </ScheduleInfo>
-                    </ScheduleItem>
-                  )
-                )
-              : null /* Remove or replace this when schedule is added to Class type */
-          }
+          {mockSchedule.map((schedule, index) => (
+            <ScheduleItem key={index}>
+              <ScheduleIcon>
+                <MaterialIcons name="event" size={24} color="#111714" />
+              </ScheduleIcon>
+              <ScheduleInfo>
+                <ScheduleDay>{schedule.day}</ScheduleDay>
+                <ScheduleTime>{schedule.time}</ScheduleTime>
+              </ScheduleInfo>
+            </ScheduleItem>
+          ))}
         </Content>
         {/* Bottom spacing for book button */}
         <View style={{ height: 100 }} />

@@ -20,7 +20,7 @@ export function useClassReviews(classId: number) {
           userName: "Sophia Clark",
           userAvatar:
             "https://lh3.googleusercontent.com/aida-public/AB6AXuCKh-5ins07UK0OIshGMe_Stl3XImoAWiPBbbzxTco03NJmG18qBU9nxBqkrk9Sh2ut73VkgFlY4py0VIP_zj407WEl1iLFv7PI9HMk_3SY2mHajNpKBKNrh2jg1gM-3up8gZMGmPpk6mLApiBT9GLgGDdl7wr0t6gU4gAFIuozFfhW6SpHfOfZ2-t_02VFPqrN5lwOx5DgnqLg2DC8dA5nHZlY26f7IWJYtpJHRiH8K8WSlEflf-eVqcjp3UCaEJA_vvF5iLP6ZS2t",
-          rating: 5,
+          rating: 3,
           comment: "sup dawg",
           createdAt: "4 weeks ago",
           updatedAt: "4 weeks ago",
@@ -44,7 +44,7 @@ export function useClassReviews(classId: number) {
       ];
       setReviews(mock);
       setTotalReviews(mock.length);
-      const avg = mock.reduce((sum, r) => sum + r.rating, 0) / mock.length;
+      const avg = mock.reduce((sum, r) => sum + r.rating, 2) / mock.length;
       setAverageRating(Number(avg.toFixed(1)));
       const dist = [5, 4, 3, 2, 1].map((star) => {
         const count = mock.filter((r) => r.rating === star).length;
