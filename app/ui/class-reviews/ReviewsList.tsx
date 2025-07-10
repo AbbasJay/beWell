@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useClassReviews } from "@/app/contexts/ReviewsContext";
@@ -33,6 +33,9 @@ export const ReviewsList = () => {
     cancelLikeDislike,
   } = useClassReviews(Number(classId));
 
+  const [showAll, setShowAll] = useState(false);
+  const MAX_REVIEWS = 4;
+
   const handleLike = (review: any) => {
     if (review.userLikeStatus === "like") {
       cancelLikeDislike(review.id);
@@ -47,6 +50,16 @@ export const ReviewsList = () => {
       dislikeReview(review.id);
     }
   };
+
+  const sortedReviews = reviews
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  const visibleReviews = showAll
+    ? sortedReviews
+    : sortedReviews.slice(0, MAX_REVIEWS);
 
   return (
     <CSS.ReviewsList>
@@ -89,13 +102,8 @@ export const ReviewsList = () => {
           </Text>
         </View>
       ) : (
-        reviews
-          .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )
-          .map((review) => (
+        <>
+          {visibleReviews.map((review) => (
             <CSS.ReviewItem key={review.id}>
               <CSS.ReviewHeader>
                 {review.userAvatarUrl ? (
@@ -148,7 +156,48 @@ export const ReviewsList = () => {
                 </CSS.ActionPill>
               </CSS.ReviewActions>
             </CSS.ReviewItem>
-          ))
+          ))}
+          {sortedReviews.length > MAX_REVIEWS && !showAll && (
+            <TouchableOpacity
+              style={{
+                alignSelf: "center",
+                marginTop: 12,
+                paddingVertical: 8,
+                paddingHorizontal: 24,
+                borderRadius: 20,
+                backgroundColor: "#f7f7f7",
+              }}
+              onPress={() => setShowAll(true)}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={{ color: "#648772", fontWeight: "bold", fontSize: 16 }}
+              >
+                View More
+              </Text>
+            </TouchableOpacity>
+          )}
+          {sortedReviews.length > MAX_REVIEWS && showAll && (
+            <TouchableOpacity
+              style={{
+                alignSelf: "center",
+                marginTop: 12,
+                paddingVertical: 8,
+                paddingHorizontal: 24,
+                borderRadius: 20,
+                backgroundColor: "#f7f7f7",
+              }}
+              onPress={() => setShowAll(false)}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={{ color: "#648772", fontWeight: "bold", fontSize: 16 }}
+              >
+                View Less
+              </Text>
+            </TouchableOpacity>
+          )}
+        </>
       )}
     </CSS.ReviewsList>
   );

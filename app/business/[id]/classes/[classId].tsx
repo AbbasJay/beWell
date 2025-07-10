@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   TouchableOpacity,
-  TextInput,
+  Dimensions,
+  Modal,
 } from "react-native";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
@@ -15,7 +15,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
 import {
   useClassesContext,
-  Class,
   ClassesProvider,
 } from "@/app/contexts/ClassesContext";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
@@ -32,14 +31,17 @@ import {
   ReviewForm,
 } from "../../../ui/class-reviews";
 import { useReviewsContext } from "@/app/contexts/ReviewsContext";
-
 import * as CSS from "./styles";
 
-// Mock schedule data
 const mockSchedule = [
   { day: "Monday", time: "10:00 AM - 11:00 AM" },
   { day: "Wednesday", time: "6:00 PM - 7:00 PM" },
   { day: "Saturday", time: "9:00 AM - 10:00 AM" },
+];
+
+const TABS = [
+  { key: "details", label: "Details" },
+  { key: "reviews", label: "Reviews" },
 ];
 
 export default function ClassDetailsScreen() {
@@ -47,13 +49,11 @@ export default function ClassDetailsScreen() {
     id: string;
     classId: string;
   }>();
-
   if (!businessId || !classId) {
     return (
       <ErrorMessage error={new Error("Missing business ID or class ID")} />
     );
   }
-
   return (
     <ClassesProvider businessId={Number(businessId)}>
       <ClassDetailsContent />
@@ -75,6 +75,8 @@ function ClassDetailsContent() {
   const [currentAction, setCurrentAction] = useState<
     "booking" | "cancelling" | null
   >(null);
+  const [activeTab, setActiveTab] = useState("details");
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
   const { refreshNotifications } = useNotificationsContext();
   const { refreshBookings } = useBookingsContext();
   const { bookClass, cancelClass } = useNotifications();
@@ -91,12 +93,10 @@ function ClassDetailsContent() {
     }
   }, [classId]);
 
-  // Memoize the business lookup to prevent unnecessary re-renders
   const foundBusiness = useMemo(() => {
     return businesses.find((b) => b.id === Number(businessId));
   }, [businesses, businessId]);
 
-  // Get the real class data from the classes context
   const classItem = useMemo(() => {
     return classes.find((c) => c.id === Number(classId));
   }, [classes, classId]);
@@ -106,12 +106,10 @@ function ClassDetailsContent() {
       setError(new Error("Missing business ID or class ID"));
       return;
     }
-
     if (!foundBusiness) {
       setError(new Error("Business not found"));
       return;
     }
-
     setBusiness(foundBusiness);
     setError(null);
   }, [businessId, classId, foundBusiness]);
@@ -131,23 +129,11 @@ function ClassDetailsContent() {
       </View>
     );
   }
-
   if (!classItem) {
     return <ErrorMessage error={new Error("Class not found")} />;
   }
-
-  // Check if user has an active booking for this class (only active bookings can be cancelled)
   const hasBooked =
     classItem.isBooked === true && classItem.bookingStatus === "active";
-
-  // Debug logging
-  console.log("=== CLASS DETAILS DEBUG ===");
-  console.log("Class ID:", classItem.id);
-  console.log("User ID:", user?.id);
-  console.log("Class isBooked field:", classItem.isBooked);
-  console.log("Has booked this class:", hasBooked);
-  console.log("Full class item:", JSON.stringify(classItem, null, 2));
-  console.log("=== END CLASS DETAILS DEBUG ===");
 
   const handleBookClass = async () => {
     if (!user) {
@@ -155,7 +141,6 @@ function ClassDetailsContent() {
       router.push("/logIn");
       return;
     }
-
     setIsBooking(true);
     setCurrentAction("booking");
     try {
@@ -164,19 +149,13 @@ function ClassDetailsContent() {
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
-      // Refresh classes to get updated data from backend
       await refreshClasses();
       router.back();
     } catch (err) {
-      console.error("Error booking class:", err);
-
-      // If the error is "You have already booked this class", refresh the classes data
-      // to get the correct booking status
       if (
         err instanceof Error &&
         err.message.includes("You have already booked this class")
       ) {
-        console.log("User has already booked this class, refreshing data...");
         try {
           await refreshClasses();
           showToast("You have already booked this class", "info");
@@ -201,7 +180,6 @@ function ClassDetailsContent() {
       router.push("/logIn");
       return;
     }
-
     setIsCancelling(true);
     setCurrentAction("cancelling");
     try {
@@ -210,19 +188,12 @@ function ClassDetailsContent() {
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully cancelled ${classItem.name}!`, "success");
-      // Refresh classes to get updated data from backend
       await refreshClasses();
       router.back();
     } catch (err) {
-      console.error("Error cancelling class:", err);
-
-      // If there's an error cancelling, refresh the classes data to get the correct status
       try {
         await refreshClasses();
-      } catch (refreshError) {
-        console.error("Error refreshing classes:", refreshError);
-      }
-
+      } catch (refreshError) {}
       setError(
         err instanceof Error ? err : new Error("Failed to cancel class")
       );
@@ -233,205 +204,348 @@ function ClassDetailsContent() {
     }
   };
 
-  const handleManualRefresh = async () => {
-    console.log("Manual refresh triggered");
-    try {
-      await refreshClasses();
-      showToast("Classes data refreshed", "success");
-    } catch (error) {
-      console.error("Error during manual refresh:", error);
-      showToast("Failed to refresh data", "error");
-    }
-  };
-
-  const renderStars = (rating: number, size: number = 18) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <MaterialIcons
-        key={i}
-        name={i < rating ? "star" : "star-border"}
-        size={size}
-        color={i < rating ? "#111714" : "#bccdc3"}
-      />
-    ));
-  };
-
-  console.log("Class Item:", classItem);
+  const renderTabBar = () => (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f7f7f7",
+        borderRadius: 16,
+        marginHorizontal: 24,
+        marginTop: 24,
+        marginBottom: 8,
+        overflow: "hidden",
+      }}
+    >
+      {TABS.map((tab) => (
+        <TouchableOpacity
+          key={tab.key}
+          onPress={() => setActiveTab(tab.key)}
+          style={{
+            flex: 1,
+            paddingVertical: 10,
+            backgroundColor: activeTab === tab.key ? "#111714" : "#f7f7f7",
+            borderRadius: 16,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          activeOpacity={0.8}
+        >
+          <Text
+            style={{
+              color: activeTab === tab.key ? "#fff" : "#111714",
+              fontWeight: "bold",
+              fontSize: 16,
+              letterSpacing: 0.5,
+            }}
+          >
+            {tab.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
   return (
     <CSS.Container>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero Image */}
-        <CSS.ImageContainer>
-          <CSS.HeroImage
-            source={{
-              uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuZpxL2qDLHyzg3_bnb8lbGigeRVyjUkI9RfW9nRMB6xHTgGSh_YL3dh4eR8kO4hKO8I4qVWH4rrvqW9-ZcHOZO8cDEBBz8u2dkXBcTSDlW5DujQ0QKvTlXewoJc-pb67doFv5vd2U-O9bQGTOzIo6PJfZIGyEBZwlV08ews8w7K_Nd-OwqAJbZxsfirXguCd1U3c_DdyDId-dkqnl7uRgREezubfA2pq48nHHfwOlT3I3rrIIIRGxgRAerbEiNHbvj9vfzmaKe0mr",
-            }}
-            resizeMode="cover"
-            fadeDuration={0}
-          />
-        </CSS.ImageContainer>
-
-        {/* Class Info */}
-        <CSS.Content>
-          <CSS.ClassTitle>{classItem.name}</CSS.ClassTitle>
-          <CSS.ClassDescription>{classItem.description}</CSS.ClassDescription>
-
-          {/* Class Details */}
-          <CSS.ClassDetails>
-            <CSS.DetailItem>
-              <CSS.DetailIcon>
-                <MaterialIcons name="person" size={20} color="#111714" />
-              </CSS.DetailIcon>
-              <CSS.DetailInfo>
-                <CSS.DetailLabel>Instructor</CSS.DetailLabel>
-                <CSS.DetailValue>{classItem.instructor}</CSS.DetailValue>
-              </CSS.DetailInfo>
-            </CSS.DetailItem>
-            <TouchableOpacity
-              style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
-              onPress={() => {
-                // Navigate to home page with map view focused on this business
-                if (business.id) {
-                  router.push({
-                    pathname: "/home",
-                    params: {
-                      mapView: "true",
-                      focusBusinessId: business.id.toString(),
-                    },
-                  });
-                }
+        <View style={{ position: "relative" }}>
+          <CSS.ImageContainer>
+            <CSS.HeroImage
+              source={{
+                uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuZpxL2qDLHyzg3_bnb8lbGigeRVyjUkI9RfW9nRMB6xHTgGSh_YL3dh4eR8kO4hKO8I4qVWH4rrvqW9-ZcHOZO8cDEBBz8u2dkXBcTSDlW5DujQ0QKvTlXewoJc-pb67doFv5vd2U-O9bQGTOzIo6PJfZIGyEBZwlV08ews8w7K_Nd-OwqAJbZxsfirXguCd1U3c_DdyDId-dkqnl7uRgREezubfA2pq48nHHfwOlT3I3rrIIIRGxgRAerbEiNHbvj9vfzmaKe0mr",
               }}
-              activeOpacity={0.7}
+              resizeMode="cover"
+              fadeDuration={0}
+              style={{ width: "100%", height: 260 }}
+            />
+            <View
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                paddingHorizontal: 28,
+                paddingBottom: 28,
+                paddingTop: 24,
+                backgroundColor: "rgba(17, 23, 20, 0.45)",
+                // No border radius for a modern, edge-to-edge look
+              }}
             >
-              <CSS.DetailIcon>
-                <MaterialIcons name="location-on" size={20} color="#111714" />
-              </CSS.DetailIcon>
-              <CSS.DetailInfo>
-                <CSS.DetailLabel>Location</CSS.DetailLabel>
-                <CSS.DetailValue>
-                  {business.address}, {classItem.location}
-                </CSS.DetailValue>
-              </CSS.DetailInfo>
-              <MaterialIcons
-                name="open-in-new"
-                size={16}
-                color="#648772"
-                style={{ marginLeft: 8 }}
-              />
-            </TouchableOpacity>
-            <CSS.DetailItem>
-              <CSS.DetailIcon>
-                <MaterialIcons name="schedule" size={20} color="#111714" />
-              </CSS.DetailIcon>
-              <CSS.DetailInfo>
-                <CSS.DetailLabel>Duration</CSS.DetailLabel>
-                <CSS.DetailValue>
-                  {formatDuration(classItem.duration)}
-                </CSS.DetailValue>
-              </CSS.DetailInfo>
-            </CSS.DetailItem>
-            <CSS.DetailItem>
-              <CSS.DetailIcon>
-                <MaterialIcons name="event" size={20} color="#111714" />
-              </CSS.DetailIcon>
-              <CSS.DetailInfo>
-                <CSS.DetailLabel>Next Class</CSS.DetailLabel>
-                <CSS.DetailValue>
-                  {formattedStartDate(classItem.startDate)}
-                </CSS.DetailValue>
-              </CSS.DetailInfo>
-            </CSS.DetailItem>
-          </CSS.ClassDetails>
-
-          {/* Reviews Section */}
-          <CSS.SectionTitle>Reviews</CSS.SectionTitle>
-          <ReviewsSummary />
-
-          <ReviewsList />
-
-          <ReviewForm />
-
-          {/* Schedule Section */}
-          <CSS.SectionTitle>Schedule</CSS.SectionTitle>
-          {mockSchedule.map((schedule, index) => (
-            <CSS.ScheduleItem key={index}>
-              <CSS.ScheduleIcon>
-                <MaterialIcons name="event" size={24} color="#111714" />
-              </CSS.ScheduleIcon>
-              <CSS.ScheduleInfo>
-                <CSS.ScheduleDay>{schedule.day}</CSS.ScheduleDay>
-                <CSS.ScheduleTime>{schedule.time}</CSS.ScheduleTime>
-              </CSS.ScheduleInfo>
-            </CSS.ScheduleItem>
-          ))}
-        </CSS.Content>
-        {/* Bottom spacing for book button */}
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  marginBottom: 8,
+                  letterSpacing: 0.5,
+                  textShadowColor: "rgba(0,0,0,0.25)",
+                  textShadowOffset: { width: 0, height: 2 },
+                  textShadowRadius: 6,
+                }}
+                numberOfLines={2}
+              >
+                {classItem.name}
+              </Text>
+              <Text
+                style={{
+                  color: "#e0e0e0",
+                  fontSize: 16,
+                  fontWeight: "400",
+                  marginBottom: 0,
+                  letterSpacing: 0.2,
+                  textShadowColor: "rgba(0,0,0,0.18)",
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 4,
+                }}
+                numberOfLines={3}
+              >
+                {classItem.description}
+              </Text>
+            </View>
+          </CSS.ImageContainer>
+        </View>
+        {renderTabBar()}
+        {activeTab === "details" && (
+          <CSS.Content style={{ paddingTop: 8 }}>
+            <CSS.ClassDetails>
+              <CSS.DetailItem>
+                <CSS.DetailIcon>
+                  <MaterialIcons name="person" size={20} color="#111714" />
+                </CSS.DetailIcon>
+                <CSS.DetailInfo>
+                  <CSS.DetailLabel>Instructor</CSS.DetailLabel>
+                  <CSS.DetailValue>{classItem.instructor}</CSS.DetailValue>
+                </CSS.DetailInfo>
+              </CSS.DetailItem>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
+                onPress={() => {
+                  if (business.id) {
+                    router.push({
+                      pathname: "/home",
+                      params: {
+                        mapView: "true",
+                        focusBusinessId: business.id.toString(),
+                      },
+                    });
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <CSS.DetailIcon>
+                  <MaterialIcons name="location-on" size={20} color="#111714" />
+                </CSS.DetailIcon>
+                <CSS.DetailInfo>
+                  <CSS.DetailLabel>Location</CSS.DetailLabel>
+                  <CSS.DetailValue>
+                    {business.address}, {classItem.location}
+                  </CSS.DetailValue>
+                </CSS.DetailInfo>
+                <MaterialIcons
+                  name="open-in-new"
+                  size={16}
+                  color="#648772"
+                  style={{ marginLeft: 8 }}
+                />
+              </TouchableOpacity>
+              <CSS.DetailItem>
+                <CSS.DetailIcon>
+                  <MaterialIcons name="schedule" size={20} color="#111714" />
+                </CSS.DetailIcon>
+                <CSS.DetailInfo>
+                  <CSS.DetailLabel>Duration</CSS.DetailLabel>
+                  <CSS.DetailValue>
+                    {formatDuration(classItem.duration)}
+                  </CSS.DetailValue>
+                </CSS.DetailInfo>
+              </CSS.DetailItem>
+              <CSS.DetailItem>
+                <CSS.DetailIcon>
+                  <MaterialIcons name="event" size={20} color="#111714" />
+                </CSS.DetailIcon>
+                <CSS.DetailInfo>
+                  <CSS.DetailLabel>Next Class</CSS.DetailLabel>
+                  <CSS.DetailValue>
+                    {formattedStartDate(classItem.startDate)}
+                  </CSS.DetailValue>
+                </CSS.DetailInfo>
+              </CSS.DetailItem>
+            </CSS.ClassDetails>
+            <CSS.SectionTitle style={{ marginTop: 24 }}>
+              Schedule
+            </CSS.SectionTitle>
+            {mockSchedule.map((schedule, index) => (
+              <CSS.ScheduleItem key={index}>
+                <CSS.ScheduleIcon>
+                  <MaterialIcons name="event" size={24} color="#111714" />
+                </CSS.ScheduleIcon>
+                <CSS.ScheduleInfo>
+                  <CSS.ScheduleDay>{schedule.day}</CSS.ScheduleDay>
+                  <CSS.ScheduleTime>{schedule.time}</CSS.ScheduleTime>
+                </CSS.ScheduleInfo>
+              </CSS.ScheduleItem>
+            ))}
+          </CSS.Content>
+        )}
+        {activeTab === "reviews" && (
+          <CSS.Content style={{ paddingTop: 8 }}>
+            <ReviewsSummary />
+            <View style={{ marginBottom: 16 }}>
+              <CSS.BookButton
+                onPress={
+                  hasBooked
+                    ? handleCancelClass
+                    : classItem.bookingStatus === "completed" ||
+                      classItem.bookingStatus === "no-show"
+                    ? undefined
+                    : handleBookClass
+                }
+                disabled={
+                  isBooking ||
+                  isCancelling ||
+                  classItem.bookingStatus === "completed" ||
+                  classItem.bookingStatus === "no-show"
+                }
+                style={
+                  hasBooked
+                    ? { backgroundColor: "#d9534f" }
+                    : classItem.bookingStatus === "completed"
+                    ? { backgroundColor: "#28a745" }
+                    : classItem.bookingStatus === "no-show"
+                    ? { backgroundColor: "#ffc107" }
+                    : undefined
+                }
+              >
+                <CSS.BookButtonText>
+                  {currentAction === "booking"
+                    ? "Booking..."
+                    : currentAction === "cancelling"
+                    ? "Cancelling..."
+                    : hasBooked
+                    ? "Cancel"
+                    : classItem.bookingStatus === "completed"
+                    ? "Completed"
+                    : classItem.bookingStatus === "no-show"
+                    ? "No Show"
+                    : "Book Class"}
+                </CSS.BookButtonText>
+              </CSS.BookButton>
+            </View>
+            <ReviewsList />
+          </CSS.Content>
+        )}
         <View style={{ height: 100 }} />
       </ScrollView>
-
-      {/* Debug Button (temporary) */}
-      <View
-        style={{
-          position: "absolute",
-          top: 60,
-          right: 20,
-          zIndex: 1000,
-        }}
-      >
-        <TouchableOpacity
-          onPress={handleManualRefresh}
+      {activeTab === "details" && (
+        <CSS.BookButtonContainer>
+          <CSS.BookButton
+            onPress={
+              hasBooked
+                ? handleCancelClass
+                : classItem.bookingStatus === "completed" ||
+                  classItem.bookingStatus === "no-show"
+                ? undefined
+                : handleBookClass
+            }
+            disabled={
+              isBooking ||
+              isCancelling ||
+              classItem.bookingStatus === "completed" ||
+              classItem.bookingStatus === "no-show"
+            }
+            style={
+              hasBooked
+                ? { backgroundColor: "#d9534f" }
+                : classItem.bookingStatus === "completed"
+                ? { backgroundColor: "#28a745" }
+                : classItem.bookingStatus === "no-show"
+                ? { backgroundColor: "#ffc107" }
+                : undefined
+            }
+          >
+            <CSS.BookButtonText>
+              {currentAction === "booking"
+                ? "Booking..."
+                : currentAction === "cancelling"
+                ? "Cancelling..."
+                : hasBooked
+                ? "Cancel"
+                : classItem.bookingStatus === "completed"
+                ? "Completed"
+                : classItem.bookingStatus === "no-show"
+                ? "No Show"
+                : "Book Class"}
+            </CSS.BookButtonText>
+          </CSS.BookButton>
+        </CSS.BookButtonContainer>
+      )}
+      {activeTab === "reviews" && (
+        <View
           style={{
-            backgroundColor: "#007AFF",
-            padding: 8,
-            borderRadius: 6,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            paddingBottom: 24,
+            zIndex: 10,
           }}
         >
-          <Text style={{ color: "white", fontSize: 12 }}>Refresh</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Book Button */}
-      <CSS.BookButtonContainer>
-        <CSS.BookButton
-          onPress={
-            hasBooked
-              ? handleCancelClass
-              : classItem.bookingStatus === "completed" ||
-                classItem.bookingStatus === "no-show"
-              ? undefined // No action for completed/no-show
-              : handleBookClass
-          }
-          disabled={
-            isBooking ||
-            isCancelling ||
-            classItem.bookingStatus === "completed" ||
-            classItem.bookingStatus === "no-show"
-          }
-          style={
-            hasBooked
-              ? { backgroundColor: "#d9534f" }
-              : classItem.bookingStatus === "completed"
-              ? { backgroundColor: "#28a745" }
-              : classItem.bookingStatus === "no-show"
-              ? { backgroundColor: "#ffc107" }
-              : undefined
-          }
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#111714",
+              borderRadius: 24,
+              paddingVertical: 16,
+              paddingHorizontal: 48,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+            onPress={() => setReviewModalVisible(true)}
+            activeOpacity={0.85}
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
+              Leave a Review
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <Modal
+        visible={reviewModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setReviewModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0,0,0,0.25)",
+          }}
         >
-          <CSS.BookButtonText>
-            {currentAction === "booking"
-              ? "Booking..."
-              : currentAction === "cancelling"
-              ? "Cancelling..."
-              : hasBooked
-              ? "Cancel"
-              : classItem.bookingStatus === "completed"
-              ? "Completed"
-              : classItem.bookingStatus === "no-show"
-              ? "No Show"
-              : "Book Class"}
-          </CSS.BookButtonText>
-        </CSS.BookButton>
-      </CSS.BookButtonContainer>
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+              minHeight: 320,
+            }}
+          >
+            <TouchableOpacity
+              style={{ position: "absolute", top: 16, right: 16, zIndex: 2 }}
+              onPress={() => setReviewModalVisible(false)}
+            >
+              <MaterialIcons name="close" size={28} color="#888" />
+            </TouchableOpacity>
+            <ReviewForm />
+          </View>
+        </View>
+      </Modal>
     </CSS.Container>
   );
 }
