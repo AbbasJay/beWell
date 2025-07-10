@@ -259,32 +259,10 @@ function ClassDetailsContent() {
         {renderTabBar()}
         {activeTab === "details" && (
           <CSS.Content style={{ paddingTop: 8 }}>
-            <Text
-              style={{
-                fontSize: 28,
-                fontWeight: "bold",
-                color: "#111714",
-                marginBottom: 8,
-                letterSpacing: 0.5,
-                textAlign: "left",
-              }}
-              numberOfLines={2}
-            >
-              {classItem.name}
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "400",
-                color: "#444",
-                marginBottom: 16,
-                letterSpacing: 0.2,
-                textAlign: "left",
-              }}
-              numberOfLines={3}
-            >
+            <CSS.ClassTitle numberOfLines={2}>{classItem.name}</CSS.ClassTitle>
+            <CSS.ClassDescription numberOfLines={3}>
               {classItem.description}
-            </Text>
+            </CSS.ClassDescription>
             <CSS.ClassDetails>
               <CSS.DetailItem>
                 <CSS.DetailIcon>

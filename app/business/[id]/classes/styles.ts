@@ -26,7 +26,7 @@ export const Content = styled.View`
 
 export const ClassTitle = styled.Text`
   color: #111714;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: bold;
   letter-spacing: -0.3px;
   padding-bottom: 12px;
@@ -34,7 +34,7 @@ export const ClassTitle = styled.Text`
 `;
 
 export const ClassDescription = styled.Text`
-  color: #111714;
+  color: #000;
   font-size: 16px;
   line-height: 24px;
   padding-bottom: 12px;
