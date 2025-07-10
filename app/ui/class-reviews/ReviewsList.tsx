@@ -60,57 +60,67 @@ export const ReviewsList = () => {
           No reviews yet.
         </Text>
       ) : (
-        reviews.map((review) => (
-          <CSS.ReviewItem key={review.id}>
-            <CSS.ReviewHeader>
-              {review.userAvatarUrl ? (
-                <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
-              ) : (
-                <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
-              )}
-              <CSS.AuthorInfo>
-                <CSS.AuthorName>
-                  {review.userName || `User ${review.userId}`}
-                </CSS.AuthorName>
-                <CSS.ReviewDate>
-                  {formatGetTimeAgo(review.createdAt)}
-                </CSS.ReviewDate>
-              </CSS.AuthorInfo>
-            </CSS.ReviewHeader>
-            <CSS.ReviewStars>{renderStars(review.rating, 20)}</CSS.ReviewStars>
-            <CSS.ReviewText>{review.text}</CSS.ReviewText>
-            <CSS.ReviewActions>
-              <TouchableOpacity
-                onPress={() => handleLike(review)}
-                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-                activeOpacity={0.7}
-              >
-                <MaterialIcons
-                  name="thumb-up"
-                  size={20}
-                  color={
-                    review.userLikeStatus === "like" ? "#38e07b" : "#648772"
-                  }
-                />
-                <CSS.ActionText>{review.likeCount}</CSS.ActionText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleDislike(review)}
-                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-                activeOpacity={0.7}
-              >
-                <MaterialIcons
-                  name="thumb-down"
-                  size={20}
-                  color={
-                    review.userLikeStatus === "dislike" ? "#d9534f" : "#648772"
-                  }
-                />
-                <CSS.ActionText>{review.dislikeCount}</CSS.ActionText>
-              </TouchableOpacity>
-            </CSS.ReviewActions>
-          </CSS.ReviewItem>
-        ))
+        reviews
+          .slice()
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .map((review) => (
+            <CSS.ReviewItem key={review.id}>
+              <CSS.ReviewHeader>
+                {review.userAvatarUrl ? (
+                  <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
+                ) : (
+                  <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
+                )}
+                <CSS.AuthorInfo>
+                  <CSS.AuthorName>
+                    {review.userName || `User ${review.userId}`}
+                  </CSS.AuthorName>
+                  <CSS.ReviewDate>
+                    {formatGetTimeAgo(review.createdAt)}
+                  </CSS.ReviewDate>
+                </CSS.AuthorInfo>
+              </CSS.ReviewHeader>
+              <CSS.ReviewStars>
+                {renderStars(review.rating, 20)}
+              </CSS.ReviewStars>
+              <CSS.ReviewText>{review.text}</CSS.ReviewText>
+              <CSS.ReviewActions>
+                <TouchableOpacity
+                  onPress={() => handleLike(review)}
+                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                  activeOpacity={0.7}
+                >
+                  <MaterialIcons
+                    name="thumb-up"
+                    size={20}
+                    color={
+                      review.userLikeStatus === "like" ? "#38e07b" : "#648772"
+                    }
+                  />
+                  <CSS.ActionText>{review.likeCount}</CSS.ActionText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleDislike(review)}
+                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                  activeOpacity={0.7}
+                >
+                  <MaterialIcons
+                    name="thumb-down"
+                    size={20}
+                    color={
+                      review.userLikeStatus === "dislike"
+                        ? "#d9534f"
+                        : "#648772"
+                    }
+                  />
+                  <CSS.ActionText>{review.dislikeCount}</CSS.ActionText>
+                </TouchableOpacity>
+              </CSS.ReviewActions>
+            </CSS.ReviewItem>
+          ))
       )}
     </CSS.ReviewsList>
   );
