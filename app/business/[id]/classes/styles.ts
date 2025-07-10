@@ -162,11 +162,11 @@ export const ReviewsList = styled.View`
 `;
 
 export const ReviewItem = styled.View`
-  gap: 10px;
-  background-color: #fff;
+  gap: 12px;
+  background-color: #fdfefe;
   border-radius: 14px;
-  padding: 16px;
-  border: 1px solid #e6ece9;
+  padding: 16px 14px;
+  border: 1px solid #f7f9f8;
   shadow-color: #000;
   shadow-offset: 0px 1px;
   shadow-opacity: 0.04;
@@ -226,6 +226,7 @@ export const ActionButton = styled.TouchableOpacity`
 export const ActionText = styled.Text`
   color: #648772;
   font-size: 16px;
+  font-weight: 600;
 `;
 
 export const ScheduleItem = styled.View`
@@ -290,4 +291,40 @@ export const BookButtonText = styled.Text`
   font-size: 16px;
   font-weight: bold;
   letter-spacing: 0.3px;
+`;
+
+export const AvatarWrapper = styled.View`
+  border-width: 2px;
+  border-color: #e6ece9;
+  border-radius: 24px;
+  padding: 2px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.08;
+  shadow-radius: 4px;
+  elevation: 2;
+`;
+
+export const AuthorInfoRow = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const HeaderDivider = styled.View`
+  height: 1px;
+  background-color: #f0f4f2;
+  margin-vertical: 8px;
+`;
+
+export const ActionPill = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border-radius: 20px;
+  padding-vertical: 6px;
+  padding-horizontal: 16px;
+  min-width: 48px;
 `;

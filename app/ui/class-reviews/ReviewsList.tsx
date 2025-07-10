@@ -7,6 +7,7 @@ import { ErrorMessage } from "@/app/ui/error-message";
 import * as CSS from "../../business/[id]/classes/styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { formatGetTimeAgo } from "@/app/utils/helper-functions/format-time-and-dates";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const PLACEHOLDER_AVATAR = require("@/assets/images/home-gym.webp");
 
@@ -50,15 +51,43 @@ export const ReviewsList = () => {
   return (
     <CSS.ReviewsList>
       {isLoading ? (
-        <LoadingSpinner />
-      ) : error ? (
-        <ErrorMessage error={error} />
-      ) : reviews.length === 0 ? (
-        <Text
-          style={{ color: "#888", textAlign: "center", marginVertical: 16 }}
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 32,
+          }}
         >
-          No reviews yet.
-        </Text>
+          <LoadingSpinner />
+        </View>
+      ) : error ? (
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 32,
+          }}
+        >
+          <ErrorMessage error={error} />
+        </View>
+      ) : reviews.length === 0 ? (
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 32,
+          }}
+        >
+          <MaterialCommunityIcons
+            name="emoticon-sad-outline"
+            size={48}
+            color="#bccdc3"
+            style={{ marginBottom: 12 }}
+          />
+          <Text style={{ color: "#888", textAlign: "center", fontSize: 18 }}>
+            No reviews yet.
+          </Text>
+        </View>
       ) : (
         reviews
           .slice()
@@ -69,28 +98,30 @@ export const ReviewsList = () => {
           .map((review) => (
             <CSS.ReviewItem key={review.id}>
               <CSS.ReviewHeader>
-                {review.userAvatarUrl ? (
-                  <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
-                ) : (
-                  <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
-                )}
-                <CSS.AuthorInfo>
+                <CSS.AvatarWrapper>
+                  {review.userAvatarUrl ? (
+                    <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
+                  ) : (
+                    <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
+                  )}
+                </CSS.AvatarWrapper>
+                <CSS.AuthorInfoRow>
                   <CSS.AuthorName>
                     {review.userName || `User ${review.userId}`}
                   </CSS.AuthorName>
                   <CSS.ReviewDate>
                     {formatGetTimeAgo(review.createdAt)}
                   </CSS.ReviewDate>
-                </CSS.AuthorInfo>
+                </CSS.AuthorInfoRow>
               </CSS.ReviewHeader>
+              <CSS.HeaderDivider />
               <CSS.ReviewStars>
-                {renderStars(review.rating, 20)}
+                {renderStars(review.rating, 24)}
               </CSS.ReviewStars>
               <CSS.ReviewText>{review.text}</CSS.ReviewText>
               <CSS.ReviewActions>
-                <TouchableOpacity
+                <CSS.ActionPill
                   onPress={() => handleLike(review)}
-                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
                   activeOpacity={0.7}
                 >
                   <MaterialIcons
@@ -101,10 +132,9 @@ export const ReviewsList = () => {
                     }
                   />
                   <CSS.ActionText>{review.likeCount}</CSS.ActionText>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </CSS.ActionPill>
+                <CSS.ActionPill
                   onPress={() => handleDislike(review)}
-                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
                   activeOpacity={0.7}
                 >
                   <MaterialIcons
@@ -117,7 +147,7 @@ export const ReviewsList = () => {
                     }
                   />
                   <CSS.ActionText>{review.dislikeCount}</CSS.ActionText>
-                </TouchableOpacity>
+                </CSS.ActionPill>
               </CSS.ReviewActions>
             </CSS.ReviewItem>
           ))
