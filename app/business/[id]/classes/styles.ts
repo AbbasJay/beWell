@@ -163,15 +163,7 @@ export const ReviewsList = styled.View`
 
 export const ReviewItem = styled.View`
   gap: 12px;
-  background-color: #fdfefe;
-  border-radius: 14px;
-  padding: 16px 14px;
-  border: 1px solid #f7f9f8;
-  shadow-color: #000;
-  shadow-offset: 0px 1px;
-  shadow-opacity: 0.04;
-  shadow-radius: 4px;
-  elevation: 1;
+  padding: 0px 0px 20px 0px;
 `;
 
 export const ReviewHeader = styled.View`

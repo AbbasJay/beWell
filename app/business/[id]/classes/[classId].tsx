@@ -254,55 +254,37 @@ function ClassDetailsContent() {
               fadeDuration={0}
               style={{ width: "100%", height: 260 }}
             />
-            <View
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                paddingHorizontal: 28,
-                paddingBottom: 28,
-                paddingTop: 24,
-                backgroundColor: "rgba(17, 23, 20, 0.45)",
-                // No border radius for a modern, edge-to-edge look
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 28,
-                  fontWeight: "bold",
-                  marginBottom: 8,
-                  letterSpacing: 0.5,
-                  textShadowColor: "rgba(0,0,0,0.25)",
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 6,
-                }}
-                numberOfLines={2}
-              >
-                {classItem.name}
-              </Text>
-              <Text
-                style={{
-                  color: "#e0e0e0",
-                  fontSize: 16,
-                  fontWeight: "400",
-                  marginBottom: 0,
-                  letterSpacing: 0.2,
-                  textShadowColor: "rgba(0,0,0,0.18)",
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 4,
-                }}
-                numberOfLines={3}
-              >
-                {classItem.description}
-              </Text>
-            </View>
           </CSS.ImageContainer>
         </View>
         {renderTabBar()}
         {activeTab === "details" && (
           <CSS.Content style={{ paddingTop: 8 }}>
+            <Text
+              style={{
+                fontSize: 28,
+                fontWeight: "bold",
+                color: "#111714",
+                marginBottom: 8,
+                letterSpacing: 0.5,
+                textAlign: "left",
+              }}
+              numberOfLines={2}
+            >
+              {classItem.name}
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "400",
+                color: "#444",
+                marginBottom: 16,
+                letterSpacing: 0.2,
+                textAlign: "left",
+              }}
+              numberOfLines={3}
+            >
+              {classItem.description}
+            </Text>
             <CSS.ClassDetails>
               <CSS.DetailItem>
                 <CSS.DetailIcon>
