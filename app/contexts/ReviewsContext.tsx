@@ -200,8 +200,6 @@ export const ReviewsProvider = ({ children }: { children: ReactNode }) => {
           `Failed to update like/dislike: ${response.status}, ${errorText}`
         );
       }
-      // Refetch reviews for this class to ensure consistency
-      await fetchReviews(classId);
     } catch (err: any) {
       setErrorByClass((prev) => ({
         ...prev,
@@ -210,7 +208,6 @@ export const ReviewsProvider = ({ children }: { children: ReactNode }) => {
             ? err
             : new Error("Failed to update like/dislike"),
       }));
-      // Optionally: revert optimistic update on error
       await fetchReviews(classId);
     }
   };
