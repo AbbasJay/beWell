@@ -130,7 +130,7 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
                 </CSS.AuthorInfoRow>
               </CSS.ReviewHeader>
               <CSS.ReviewStars>
-                {renderStars(review.rating, 24)}
+                {renderStars(review.rating, 20)}
               </CSS.ReviewStars>
               <CSS.ReviewText>{review.text}</CSS.ReviewText>
               <CSS.ReviewActions>
