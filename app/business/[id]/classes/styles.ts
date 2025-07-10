@@ -159,11 +159,15 @@ export const Percentage = styled.Text`
 export const ReviewsList = styled.View`
   gap: 24px;
   padding-vertical: 4px;
+  padding-left: 0px;
+  margin-left: 0px;
 `;
 
 export const ReviewItem = styled.View`
   gap: 8px;
   padding: 0px 0px 12px 0px;
+  padding-left: 0px;
+  margin-left: 0px;
 `;
 
 export const ReviewHeader = styled.View`
@@ -195,6 +199,7 @@ export const ReviewDate = styled.Text`
 
 export const ReviewStars = styled.View`
   flex-direction: row;
+  margin-top: 4px;
   gap: 0px;
 `;
 
@@ -202,8 +207,7 @@ export const ReviewText = styled.Text`
   color: #111714;
   font-size: 15px;
   line-height: 20px;
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin-vertical: 4px;
 `;
 
 export const ReviewActions = styled.View`
