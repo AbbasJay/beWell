@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  Modal,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
@@ -521,7 +514,6 @@ function ClassDetailsContent() {
         onRequestClose={() => setReviewModalVisible(false)}
       >
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          {/* Backdrop */}
           <View
             style={{
               position: "absolute",
