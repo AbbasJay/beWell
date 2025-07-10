@@ -85,9 +85,7 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
           <CSS.Tab
             onPress={() => {
               if (activeRoute !== "/explore") {
-                // TODO: Navigate to explore/search screen
-                console.log("Navigate to explore");
-                // router.push("/explore");
+                router.push("/explore");
               }
             }}
           >

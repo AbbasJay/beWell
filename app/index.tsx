@@ -56,6 +56,7 @@ export default function HomePage() {
     businesses,
     error: businessError,
     forceRefresh,
+    isLoading: businessesLoading,
   } = useBusinessContext();
   const {
     updateFilters,
@@ -71,7 +72,6 @@ export default function HomePage() {
     isLoading: authLoading,
     continueAsGuest,
   } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
   const [locationSetupError, setLocationSetupError] = useState<Error | null>(
     null
   );
@@ -145,17 +145,9 @@ export default function HomePage() {
 
   useEffect(() => {
     const initialiseHomeScreen = async () => {
-      // Skip initialization if already done
       if (isInitialized) {
-        setIsLoading(false);
         return;
       }
-
-      // Remove: Skip if not authenticated or in guest mode
-      // if (!user && !isGuestMode) {
-      //   setIsLoading(false);
-      //   return;
-      // }
 
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -215,7 +207,7 @@ export default function HomePage() {
             : new Error("Failed to initialise location and filters")
         );
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false); // Removed local isLoading state
       }
     };
 
@@ -340,11 +332,9 @@ export default function HomePage() {
     );
   };
 
-  if (authLoading || isLoading) return <LoadingSpinner />;
+  if (businessesLoading) return <LoadingSpinner />;
   if (locationSetupError) return <ErrorMessage error={locationSetupError} />;
   if (businessError) return <ErrorMessage error={businessError} />;
-
-  // Remove the login/signup/guest prompt. Always show the homepage content below.
 
   // Show message when no businesses are available
   const renderNoBusinessesMessage = () => (

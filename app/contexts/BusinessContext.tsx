@@ -49,7 +49,7 @@ type BusinessAction =
 // Initial state
 const initialState: BusinessState = {
   businesses: [],
-  isLoading: false,
+  isLoading: true,
   error: null,
 };
 

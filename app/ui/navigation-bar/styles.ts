@@ -14,7 +14,7 @@ export const Container = styled.View`
 
 export const TitleContainer = styled.View`
   display: flex;
-  flex: 2;
+  flex: 3;
   align-items: center;
 `;
 

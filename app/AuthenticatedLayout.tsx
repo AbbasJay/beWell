@@ -5,11 +5,9 @@ import { useMapView } from "./contexts/MapViewContext";
 import { BeWellTabBar } from "@/components/bewellTabBar";
 import { NavigationBar } from "./ui/navigation-bar/navigation-bar";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
+
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { View, StatusBar, Platform } from "react-native";
-import { ErrorMessage } from "@/app/ui/error-message";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { NotificationsMenuTrigger } from "./notifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -48,10 +46,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   // public route patterns
   const publicPatterns = [
-    /^\/$/, // root
-    /^\/home$/, // homepage
-    /^\/business\/\d+\/classes$/, // business classes
-    /^\/business\/\d+\/classes\/\d+$/, // class details
+    /^\/$/,
+    /^\/home$/,
+    /^\/business\/\d+\/classes$/,
+    /^\/business\/\d+\/classes\/\d+$/,
     /^\/logIn$/,
     /^\/signUp$/,
   ];
@@ -59,7 +57,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const isPublicRoute = (route: string) =>
     publicPatterns.some((pattern) => pattern.test(route));
 
-  // Routes where we don't show the navigation bar
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
 
   const shouldHideNavigationBar = () => {
@@ -71,7 +68,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   };
 
   const shouldShowTabBar = () => {
-    // Show on main sections
     const mainSections = [
       "/",
       "/notifications",
@@ -101,17 +97,15 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   };
 
   useEffect(() => {
-    // Don't do anything while loading or on public routes
     if (isLoading || isPublicRoute(currentRoute)) {
       return;
     }
-    // Only redirect to login if trying to access protected route without auth
+
     if (!tokens?.accessToken && !isGuestMode) {
       router.replace("/logIn");
     }
   }, [currentRoute, tokens?.accessToken, isGuestMode, isLoading]);
 
-  // Only show loading spinner for protected routes
   if (isLoading && !isPublicRoute(currentRoute)) {
     return <LoadingSpinner />;
   }
@@ -133,6 +127,14 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           right={{
             icon: <MaterialIcons name="menu" size={24} color="#121714" />,
             onPress: () => router.push("/settings"),
+          }}
+        />
+      ) : currentRoute === "/explore" ? (
+        <NavigationBar
+          title="Find a class or instructor"
+          left={{
+            icon: <MaterialIcons name="arrow-back" size={24} color="#121714" />,
+            onPress: () => router.back(),
           }}
         />
       ) : currentRoute === "/notifications" ? (
