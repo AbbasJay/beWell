@@ -157,12 +157,21 @@ export const Percentage = styled.Text`
 `;
 
 export const ReviewsList = styled.View`
-  gap: 32px;
-  padding-vertical: 16px;
+  gap: 16px;
+  padding-vertical: 12px;
 `;
 
 export const ReviewItem = styled.View`
-  gap: 12px;
+  gap: 10px;
+  background-color: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #e6ece9;
+  shadow-color: #000;
+  shadow-offset: 0px 1px;
+  shadow-opacity: 0.04;
+  shadow-radius: 4px;
+  elevation: 1;
 `;
 
 export const ReviewHeader = styled.View`
