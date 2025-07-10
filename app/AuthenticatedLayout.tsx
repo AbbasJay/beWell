@@ -20,8 +20,18 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const currentRoute = usePathname();
   const { isMapView } = useMapView();
 
-  // Routes that don't require authentication
-  const publicRoutes = ["/", "/logIn", "/signUp"];
+  // public route patterns
+  const publicPatterns = [
+    /^\/$/, // root
+    /^\/home$/, // homepage
+    /^\/business\/\d+\/classes$/, // business classes
+    /^\/business\/\d+\/classes\/\d+$/, // class details
+    /^\/logIn$/,
+    /^\/signUp$/,
+  ];
+
+  const isPublicRoute = (route: string) =>
+    publicPatterns.some((pattern) => pattern.test(route));
 
   // Routes where we don't show the navigation bar
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
@@ -37,14 +47,13 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const shouldShowTabBar = () => {
     // Show on main sections
     const mainSections = [
-      "/home",
+      "/",
       "/notifications",
       "/settings",
       "/explore",
       "/profile",
     ];
 
-    // Show on business listing pages (but not detail pages)
     const isBusinessListing = currentRoute.match(/^\/business\/\d+\/classes$/);
     const isBusinessDetail = currentRoute.match(
       /^\/business\/\d+\/classes\/\d+$/
@@ -67,10 +76,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   useEffect(() => {
     // Don't do anything while loading or on public routes
-    if (isLoading || publicRoutes.includes(currentRoute)) {
+    if (isLoading || isPublicRoute(currentRoute)) {
       return;
     }
-
     // Only redirect to login if trying to access protected route without auth
     if (!tokens?.accessToken && !isGuestMode) {
       router.replace("/logIn");
@@ -78,7 +86,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   }, [currentRoute, tokens?.accessToken, isGuestMode, isLoading]);
 
   // Only show loading spinner for protected routes
-  if (isLoading && !publicRoutes.includes(currentRoute)) {
+  if (isLoading && !isPublicRoute(currentRoute)) {
     return <LoadingSpinner />;
   }
 
@@ -92,7 +100,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       <StatusBar barStyle="light-content" backgroundColor="black" />
       <View style={{ height: STATUSBAR_HEIGHT, backgroundColor: "black" }} />
 
-      {/* Use new design for home screen */}
       {currentRoute === "/home" ? (
         <NavigationBar
           profileImageUri="https://lh3.googleusercontent.com/aida-public/AB6AXuCzyPAl8xpYctDPivROWxqGWa8z7pUbes25ziDhK6YarNZBddlBziHo0_8Sx-IXxfty6-gmkL_JRPR8oXcJ-QRbFchFXG2AQWVJnm0sqgLpHrO7tg5vFI9EiJhcnShcHCsQgNNHT9-v_rPfOYpStCfD21QfwZiKwe6eoVHHJcZ4TsSXvDsw6qEKd1Wtan4o_3ufxvnf_M7Mjifw_FmaG-Rd3Cg5Cd_EXHM23tA_mBg0QEsEHmay9MhFYD9EhST2QH-sQDoeZ8FQEaqz"

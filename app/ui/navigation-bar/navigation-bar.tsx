@@ -17,6 +17,7 @@ interface NavigationBarProps {
   profileImageUri?: string;
   showSettings?: boolean;
   onPressSettings?: () => void;
+  isAuthenticated?: boolean; // NEW PROP
 }
 
 export const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -27,6 +28,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   profileImageUri,
   showSettings,
   onPressSettings,
+  isAuthenticated = false, // default to false
 }) => {
   const navigation = useNavigation();
 

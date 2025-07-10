@@ -43,7 +43,7 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
 
   if (error) return <ErrorMessage error={error} />;
 
-  const isHomeActive = activeRoute === "/home";
+  const isHomeActive = activeRoute === "/";
   const isExploreActive = activeRoute === "/explore";
   const isNotificationsActive = activeRoute === "/notifications";
   const isProfileActive = activeRoute === "/profile";
@@ -64,7 +64,9 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
         <CSS.TabBar>
           <CSS.Tab
             onPress={() => {
-              router.push("/home");
+              if (activeRoute !== "/") {
+                router.push("/");
+              }
             }}
           >
             <CSS.IconContainer>
@@ -82,8 +84,11 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
           </CSS.Tab>
           <CSS.Tab
             onPress={() => {
-              // TODO: Navigate to explore/search screen
-              console.log("Navigate to explore");
+              if (activeRoute !== "/explore") {
+                // TODO: Navigate to explore/search screen
+                console.log("Navigate to explore");
+                // router.push("/explore");
+              }
             }}
           >
             <CSS.IconContainer>
@@ -101,7 +106,9 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
           </CSS.Tab>
           <CSS.Tab
             onPress={() => {
-              router.push("/notifications");
+              if (activeRoute !== "/notifications") {
+                router.push("/notifications");
+              }
             }}
           >
             <CSS.IconContainer>
@@ -126,8 +133,9 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
           </CSS.Tab>
           <CSS.Tab
             onPress={() => {
-              // TODO: Navigate to profile screen
-              console.log("Navigate to profile");
+              if (activeRoute !== "/settings") {
+                router.push("/settings" as any);
+              }
             }}
           >
             <CSS.IconContainer>

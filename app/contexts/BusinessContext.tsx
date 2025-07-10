@@ -302,7 +302,6 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
 
   // Smart fetch logic - only fetch if parameters actually changed
   useEffect(() => {
-    if (!user && !isGuestMode) return; // Don't fetch if not authenticated or guest
     if (isInitializing) return; // Don't fetch during initialization
 
     const currentParams = JSON.stringify({
