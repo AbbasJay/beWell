@@ -7,6 +7,7 @@ import {
   Dimensions,
   Modal,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
@@ -481,7 +482,7 @@ function ClassDetailsContent() {
           </CSS.BookButton>
         </CSS.BookButtonContainer>
       )}
-      {activeTab === "reviews" && (
+      {activeTab === "reviews" && !reviewModalVisible && (
         <View
           style={{
             position: "absolute",
@@ -516,25 +517,33 @@ function ClassDetailsContent() {
       )}
       <Modal
         visible={reviewModalVisible}
-        animationType="slide"
         transparent
         onRequestClose={() => setReviewModalVisible(false)}
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0,0,0,0.25)",
-          }}
-        >
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          {/* Backdrop */}
           <View
             style={{
-              backgroundColor: "#fff",
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
-              padding: 24,
-              minHeight: 320,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.7)",
             }}
+          />
+          <SafeAreaView
+            style={{
+              flex: 1,
+              backgroundColor: "#fff",
+              width: "100%",
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              borderRadius: 0,
+              padding: 0,
+              justifyContent: "flex-start",
+            }}
+            edges={["bottom"]}
           >
             <TouchableOpacity
               style={{ position: "absolute", top: 16, right: 16, zIndex: 2 }}
@@ -542,8 +551,10 @@ function ClassDetailsContent() {
             >
               <MaterialIcons name="close" size={28} color="#888" />
             </TouchableOpacity>
-            <ReviewForm />
-          </View>
+            <View style={{ marginTop: 56, paddingHorizontal: 24 }}>
+              <ReviewForm />
+            </View>
+          </SafeAreaView>
         </View>
       </Modal>
     </CSS.Container>
