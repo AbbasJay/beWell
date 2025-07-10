@@ -385,54 +385,14 @@ function ClassDetailsContent() {
         )}
         {activeTab === "reviews" && (
           <CSS.Content style={{ paddingTop: 8 }}>
+            <ReviewForm />
             <ReviewsSummary />
-            <View style={{ marginBottom: 16 }}>
-              <CSS.BookButton
-                onPress={
-                  hasBooked
-                    ? handleCancelClass
-                    : classItem.bookingStatus === "completed" ||
-                      classItem.bookingStatus === "no-show"
-                    ? undefined
-                    : handleBookClass
-                }
-                disabled={
-                  isBooking ||
-                  isCancelling ||
-                  classItem.bookingStatus === "completed" ||
-                  classItem.bookingStatus === "no-show"
-                }
-                style={
-                  hasBooked
-                    ? { backgroundColor: "#d9534f" }
-                    : classItem.bookingStatus === "completed"
-                    ? { backgroundColor: "#28a745" }
-                    : classItem.bookingStatus === "no-show"
-                    ? { backgroundColor: "#ffc107" }
-                    : undefined
-                }
-              >
-                <CSS.BookButtonText>
-                  {currentAction === "booking"
-                    ? "Booking..."
-                    : currentAction === "cancelling"
-                    ? "Cancelling..."
-                    : hasBooked
-                    ? "Cancel"
-                    : classItem.bookingStatus === "completed"
-                    ? "Completed"
-                    : classItem.bookingStatus === "no-show"
-                    ? "No Show"
-                    : "Book Class"}
-                </CSS.BookButtonText>
-              </CSS.BookButton>
-            </View>
             <ReviewsList />
           </CSS.Content>
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
-      {activeTab === "details" && (
+      {activeTab === "reviews" && (
         <CSS.BookButtonContainer>
           <CSS.BookButton
             onPress={
@@ -475,80 +435,6 @@ function ClassDetailsContent() {
           </CSS.BookButton>
         </CSS.BookButtonContainer>
       )}
-      {activeTab === "reviews" && !reviewModalVisible && (
-        <View
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            alignItems: "center",
-            paddingBottom: 24,
-            zIndex: 10,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#111714",
-              borderRadius: 24,
-              paddingVertical: 16,
-              paddingHorizontal: 48,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-            onPress={() => setReviewModalVisible(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
-              Leave a Review
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      <Modal
-        visible={reviewModalVisible}
-        transparent
-        onRequestClose={() => setReviewModalVisible(false)}
-      >
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.7)",
-            }}
-          />
-          <SafeAreaView
-            style={{
-              flex: 1,
-              backgroundColor: "#fff",
-              width: "100%",
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              borderRadius: 0,
-              padding: 0,
-              justifyContent: "flex-start",
-            }}
-            edges={["bottom"]}
-          >
-            <TouchableOpacity
-              style={{ position: "absolute", top: 16, right: 16, zIndex: 2 }}
-              onPress={() => setReviewModalVisible(false)}
-            >
-              <MaterialIcons name="close" size={28} color="#888" />
-            </TouchableOpacity>
-            <View style={{ marginTop: 56, paddingHorizontal: 24 }}>
-              <ReviewForm />
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
     </CSS.Container>
   );
 }
