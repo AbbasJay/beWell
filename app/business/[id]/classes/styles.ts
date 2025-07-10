@@ -293,24 +293,9 @@ export const BookButtonText = styled.Text`
   letter-spacing: 0.3px;
 `;
 
-export const AvatarWrapper = styled.View`
-  border-width: 2px;
-  border-color: #e6ece9;
-  border-radius: 24px;
-  padding: 2px;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.08;
-  shadow-radius: 4px;
-  elevation: 2;
-`;
+export const AvatarWrapper = styled.View``;
 
-export const AuthorInfoRow = styled.View`
-  flex: 1;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`;
+export const AuthorInfoRow = styled.View``;
 
 export const HeaderDivider = styled.View`
   height: 1px;

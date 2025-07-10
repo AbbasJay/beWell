@@ -98,13 +98,11 @@ export const ReviewsList = () => {
           .map((review) => (
             <CSS.ReviewItem key={review.id}>
               <CSS.ReviewHeader>
-                <CSS.AvatarWrapper>
-                  {review.userAvatarUrl ? (
-                    <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
-                  ) : (
-                    <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
-                  )}
-                </CSS.AvatarWrapper>
+                {review.userAvatarUrl ? (
+                  <CSS.AuthorImage source={{ uri: review.userAvatarUrl }} />
+                ) : (
+                  <CSS.AuthorImage source={PLACEHOLDER_AVATAR} />
+                )}
                 <CSS.AuthorInfoRow>
                   <CSS.AuthorName>
                     {review.userName || `User ${review.userId}`}
