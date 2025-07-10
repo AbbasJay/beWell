@@ -157,19 +157,19 @@ export const Percentage = styled.Text`
 `;
 
 export const ReviewsList = styled.View`
-  gap: 16px;
-  padding-vertical: 12px;
+  gap: 24px;
+  padding-vertical: 4px;
 `;
 
 export const ReviewItem = styled.View`
-  gap: 12px;
-  padding: 0px 0px 20px 0px;
+  gap: 8px;
+  padding: 0px 0px 12px 0px;
 `;
 
 export const ReviewHeader = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
 `;
 
 export const AuthorImage = styled.Image`
@@ -195,18 +195,21 @@ export const ReviewDate = styled.Text`
 
 export const ReviewStars = styled.View`
   flex-direction: row;
-  gap: 2px;
+  gap: 0px;
 `;
 
 export const ReviewText = styled.Text`
   color: #111714;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 20px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 `;
 
 export const ReviewActions = styled.View`
   flex-direction: row;
-  gap: 36px;
+  gap: 24px;
+  margin-top: 2px;
 `;
 
 export const ActionButton = styled.TouchableOpacity`
@@ -287,21 +290,15 @@ export const BookButtonText = styled.Text`
 
 export const AvatarWrapper = styled.View``;
 
-export const AuthorInfoRow = styled.View``;
-
-export const HeaderDivider = styled.View`
-  height: 1px;
-  background-color: #f0f4f2;
-  margin-vertical: 8px;
+export const AuthorInfoRow = styled.View`
+  gap: 0px;
 `;
 
 export const ActionPill = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   background-color: transparent;
   border-radius: 20px;
-  padding-vertical: 6px;
-  padding-horizontal: 16px;
-  min-width: 48px;
+  padding: 0px;
 `;

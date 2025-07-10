@@ -49,19 +49,6 @@ function AllReviewsContent() {
             </Text>
           </>
         )}
-        <View style={{ alignItems: "flex-end" }}>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: "#111714",
-              marginBottom: 10,
-              textAlign: "right",
-            }}
-          >
-            All Reviews
-          </Text>
-        </View>
       </View>
       <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
         <ReviewForm />

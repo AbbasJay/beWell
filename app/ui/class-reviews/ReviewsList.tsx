@@ -129,7 +129,6 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
                   </CSS.ReviewDate>
                 </CSS.AuthorInfoRow>
               </CSS.ReviewHeader>
-              <CSS.HeaderDivider />
               <CSS.ReviewStars>
                 {renderStars(review.rating, 24)}
               </CSS.ReviewStars>
@@ -169,8 +168,8 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
           {sortedReviews.length > MAX_REVIEWS && !showAll && !showAllState && (
             <TouchableOpacity
               style={{
-                alignSelf: "center",
                 marginTop: 12,
+                alignSelf: "center",
                 paddingVertical: 8,
                 paddingHorizontal: 24,
                 borderRadius: 20,
