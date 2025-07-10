@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, View, Image, TouchableOpacity } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useClassReviews } from "@/app/contexts/ReviewsContext";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
@@ -22,8 +22,15 @@ function renderStars(rating: number, size: number = 20) {
   ));
 }
 
-export const ReviewsList = () => {
-  const { classId } = useLocalSearchParams<{ classId: string }>();
+type ReviewsListProps = {
+  showAll?: boolean;
+};
+
+export const ReviewsList = ({ showAll }: ReviewsListProps) => {
+  const { classId, id: businessId } = useLocalSearchParams<{
+    classId: string;
+    id: string;
+  }>();
   const {
     reviews,
     isLoading,
@@ -33,7 +40,8 @@ export const ReviewsList = () => {
     cancelLikeDislike,
   } = useClassReviews(Number(classId));
 
-  const [showAll, setShowAll] = useState(false);
+  const [showAllState, setShowAllState] = useState(false);
+  const router = useRouter();
   const MAX_REVIEWS = 4;
 
   const handleLike = (review: any) => {
@@ -57,9 +65,10 @@ export const ReviewsList = () => {
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  const visibleReviews = showAll
-    ? sortedReviews
-    : sortedReviews.slice(0, MAX_REVIEWS);
+  const visibleReviews =
+    showAll ?? showAllState
+      ? sortedReviews
+      : sortedReviews.slice(0, MAX_REVIEWS);
 
   return (
     <CSS.ReviewsList>
@@ -157,7 +166,7 @@ export const ReviewsList = () => {
               </CSS.ReviewActions>
             </CSS.ReviewItem>
           ))}
-          {sortedReviews.length > MAX_REVIEWS && !showAll && (
+          {sortedReviews.length > MAX_REVIEWS && !showAll && !showAllState && (
             <TouchableOpacity
               style={{
                 alignSelf: "center",
@@ -167,7 +176,13 @@ export const ReviewsList = () => {
                 borderRadius: 20,
                 backgroundColor: "#f7f7f7",
               }}
-              onPress={() => setShowAll(true)}
+              onPress={() => {
+                if (businessId && classId) {
+                  router.push(
+                    `/business/${businessId}/classes/all-reviews?classId=${classId}`
+                  );
+                }
+              }}
               activeOpacity={0.8}
             >
               <Text
@@ -177,26 +192,7 @@ export const ReviewsList = () => {
               </Text>
             </TouchableOpacity>
           )}
-          {sortedReviews.length > MAX_REVIEWS && showAll && (
-            <TouchableOpacity
-              style={{
-                alignSelf: "center",
-                marginTop: 12,
-                paddingVertical: 8,
-                paddingHorizontal: 24,
-                borderRadius: 20,
-                backgroundColor: "#f7f7f7",
-              }}
-              onPress={() => setShowAll(false)}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={{ color: "#648772", fontWeight: "bold", fontSize: 16 }}
-              >
-                View Less
-              </Text>
-            </TouchableOpacity>
-          )}
+          {/* Hide View Less button if showAll is true (on all reviews screen) */}
         </>
       )}
     </CSS.ReviewsList>
