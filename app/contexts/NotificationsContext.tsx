@@ -19,6 +19,7 @@ export interface Notification {
   createdAt: string;
   title: string;
   type: string;
+  className?: string;
 }
 
 export interface NotificationsContextType {

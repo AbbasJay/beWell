@@ -241,10 +241,10 @@ export default function HomePage() {
   const toggleListView = () => {
     if (isMapView) {
       // Switch to list view
-      router.replace("/home" as any);
+      router.replace("/" as any);
     } else {
       // Switch to map view
-      router.replace("/home?mapView=true" as any);
+      router.replace("/?mapView=true" as any);
     }
   };
 

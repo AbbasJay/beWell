@@ -10,6 +10,9 @@ import { LoadingSpinner } from "./ui/loading-spinner";
 import { View, StatusBar, Platform } from "react-native";
 import { ErrorMessage } from "@/app/ui/error-message";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { NotificationsMenuTrigger } from "./notifications";
+import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
@@ -19,6 +22,29 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { tokens, isLoading, isGuestMode } = useAuth();
   const currentRoute = usePathname();
   const { isMapView } = useMapView();
+
+  // Add notifications context and handlers for menu
+  const notificationsCtx = useNotificationsContext();
+  const { markNotificationsAsRead, deleteNotifications } = useNotifications();
+
+  // Add menu handlers for notifications
+  const handleMarkAllAsRead = async (ids: number[]) => {
+    try {
+      await markNotificationsAsRead(ids);
+      ids.forEach(notificationsCtx.markAsRead); // optimistic UI
+      await notificationsCtx.refreshNotifications();
+    } catch (error) {
+      // Optionally show error to user
+    }
+  };
+  const handleDeleteAll = async (ids: number[]) => {
+    try {
+      await deleteNotifications(ids);
+      await notificationsCtx.refreshNotifications();
+    } catch (error) {
+      // Optionally show error to user
+    }
+  };
 
   // public route patterns
   const publicPatterns = [
@@ -115,6 +141,20 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           left={{
             icon: <MaterialIcons name="arrow-back" size={24} color="#121714" />,
             onPress: () => router.back(),
+          }}
+          right={{
+            icon: (
+              <NotificationsMenuTrigger
+                unreadIds={notificationsCtx.notifications
+                  .filter((n) => !n.read)
+                  .map((n) => n.id)}
+                notifications={notificationsCtx.notifications}
+                loading={false}
+                deleting={false}
+                handleMarkAllAsRead={handleMarkAllAsRead}
+                handleDeleteAll={handleDeleteAll}
+              />
+            ),
           }}
         />
       ) : currentRoute.match(/^\/business\/\d+\/classes$/) ? (

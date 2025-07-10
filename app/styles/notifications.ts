@@ -65,6 +65,12 @@ export const ActivityNameUnread = styled.Text`
   margin-bottom: 2px;
 `;
 
+export const NotificationTypeSubtitle = styled.Text`
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+`;
+
 export const Time = styled.Text`
   font-size: 15px;
   color: #7a9683;
