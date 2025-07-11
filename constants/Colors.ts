@@ -1,6 +1,6 @@
 export const Colors = {
   light: {
-    primary: "white", // Soft cream - main background
+    primary: "#38E07A", // Bright green - main button color
     secondary: "white", // Light peach - accents and highlights
     text: "#000000", // Dark gray - primary text color
     background: "white", // Soft cream - same as primary, for consistency
