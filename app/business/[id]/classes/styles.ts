@@ -26,7 +26,7 @@ export const Content = styled.View`
 
 export const ClassTitle = styled.Text`
   color: #111714;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: bold;
   letter-spacing: -0.3px;
   padding-bottom: 12px;
@@ -34,7 +34,7 @@ export const ClassTitle = styled.Text`
 `;
 
 export const ClassDescription = styled.Text`
-  color: #111714;
+  color: #000;
   font-size: 16px;
   line-height: 24px;
   padding-bottom: 12px;
@@ -157,18 +157,23 @@ export const Percentage = styled.Text`
 `;
 
 export const ReviewsList = styled.View`
-  gap: 32px;
-  padding-vertical: 16px;
+  gap: 24px;
+  padding-vertical: 4px;
+  padding-left: 0px;
+  margin-left: 0px;
 `;
 
 export const ReviewItem = styled.View`
-  gap: 12px;
+  gap: 8px;
+  padding: 0px 0px 12px 0px;
+  padding-left: 0px;
+  margin-left: 0px;
 `;
 
 export const ReviewHeader = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
 `;
 
 export const AuthorImage = styled.Image`
@@ -194,18 +199,21 @@ export const ReviewDate = styled.Text`
 
 export const ReviewStars = styled.View`
   flex-direction: row;
-  gap: 2px;
+  margin-top: 4px;
+  gap: 0px;
 `;
 
 export const ReviewText = styled.Text`
   color: #111714;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 20px;
+  margin-vertical: 4px;
 `;
 
 export const ReviewActions = styled.View`
   flex-direction: row;
-  gap: 36px;
+  gap: 24px;
+  margin-top: 2px;
 `;
 
 export const ActionButton = styled.TouchableOpacity`
@@ -217,6 +225,7 @@ export const ActionButton = styled.TouchableOpacity`
 export const ActionText = styled.Text`
   color: #648772;
   font-size: 16px;
+  font-weight: 600;
 `;
 
 export const ScheduleItem = styled.View`
@@ -281,4 +290,19 @@ export const BookButtonText = styled.Text`
   font-size: 16px;
   font-weight: bold;
   letter-spacing: 0.3px;
+`;
+
+export const AvatarWrapper = styled.View``;
+
+export const AuthorInfoRow = styled.View`
+  gap: 0px;
+`;
+
+export const ActionPill = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  background-color: transparent;
+  border-radius: 20px;
+  padding: 0px;
 `;
