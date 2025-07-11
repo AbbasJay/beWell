@@ -11,6 +11,7 @@ interface ButtonProps {
   iconRight?: React.ReactNode;
   fullWidth?: boolean;
   disabled?: boolean;
+  style?: any;
 }
 
 const handlePress = async (onPress: () => void, disabled: boolean) => {
@@ -33,6 +34,7 @@ export default function Button({
   size = "medium",
   fullWidth = false,
   disabled = false,
+  style,
 }: ButtonProps) {
   return (
     <CSS.Container
@@ -41,6 +43,7 @@ export default function Button({
       variant={variant}
       size={size}
       disabled={disabled}
+      style={style}
     >
       <CSS.StyledText variant={variant} disabled={disabled}>
         {title}
