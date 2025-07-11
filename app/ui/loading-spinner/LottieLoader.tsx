@@ -1,6 +1,7 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import LottieView from "lottie-react-native";
+import { styles } from "./styles";
 
 export default function LottieLoader({ style }: { style?: object }) {
   return (
@@ -14,15 +15,3 @@ export default function LottieLoader({ style }: { style?: object }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  lottie: {
-    width: 250,
-    height: 250,
-  },
-});
