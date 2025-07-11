@@ -35,9 +35,47 @@ const LoginForm = () => {
     setLoginError(null);
     try {
       await signIn(data.email, data.password);
-      router.push("/home");
-    } catch (err: any) {
-      setLoginError("Invalid email or password");
+      // Check if there's a redirect path set
+      if (redirectPath) {
+        try {
+          router.push(redirectPath as any);
+          clearRedirectPath();
+        } catch (error) {
+          // If redirect fails, go to home
+          router.push("/");
+          clearRedirectPath();
+        }
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        const errorMessage = err.message.toLowerCase();
+        if (errorMessage.includes("user not found")) {
+          setLoginError("No account found with this email");
+        } else if (errorMessage.includes("invalid password")) {
+          setLoginError("Incorrect password");
+        } else if (errorMessage.includes("authentication failed")) {
+          setLoginError("Invalid email or password");
+        } else if (errorMessage.includes("no authentication token")) {
+          setLoginError("Login failed. Please try again");
+        } else if (errorMessage.includes("invalid response format")) {
+          setLoginError("Server error. Please try again later");
+        } else {
+          setLoginError(err.message);
+        }
+      } else {
+        setLoginError("An unexpected error occurred");
+      }
+    }
+  };
+
+  const handleContinueAsGuest = () => {
+    try {
+      continueAsGuest();
+      router.push("/");
+    } catch (err) {
+      setLoginError("Failed to continue as guest. Please try again");
     }
   };
 

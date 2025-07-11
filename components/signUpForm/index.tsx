@@ -52,7 +52,7 @@ const SignUp = () => {
       if (!response.ok) {
         throw new Error(responseData.error || "Failed to register");
       }
-      router.push("/home");
+      router.push("/");
     } catch (error) {
       setSignUpError(
         error instanceof Error
@@ -198,7 +198,7 @@ const SignUp = () => {
         </CSS.ButtonContainer>
       </CSS.Body>
       <CSS.BottomLinkWrapper>
-        <TouchableOpacity onPress={() => router.push("/home")}>
+        <TouchableOpacity onPress={() => router.push("/")}>
           <CSS.BottomLinkText>
             Sign up later, continue to app
           </CSS.BottomLinkText>
