@@ -77,7 +77,7 @@ const SignUp = () => {
         throw new Error(responseData.error || "Failed to register");
       }
 
-      router.push("/home");
+      router.push("/");
     } catch (error) {
       console.error("Error signing up:", error);
       setSignUpError(
@@ -224,7 +224,7 @@ const SignUp = () => {
       </CSS.Body>
 
       <CSS.Footer>
-        <CSS.FooterText onPress={() => router.push("/home")}>
+        <CSS.FooterText onPress={() => router.push("/")}>
           Sign up later, continue to app
         </CSS.FooterText>
       </CSS.Footer>

@@ -46,11 +46,11 @@ const LoginForm = () => {
           clearRedirectPath();
         } catch (error) {
           // If redirect fails, go to home
-          router.push("/home");
+          router.push("/");
           clearRedirectPath();
         }
       } else {
-        router.push("/home");
+        router.push("/");
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -77,7 +77,7 @@ const LoginForm = () => {
   const handleContinueAsGuest = () => {
     try {
       continueAsGuest();
-      router.push("/home");
+      router.push("/");
     } catch (err) {
       setLoginError("Failed to continue as guest. Please try again");
     }
