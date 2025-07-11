@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { TextInput } from "react-native-paper";
 import { useForm, Controller, useWatch } from "react-hook-form";
-
 import Button from "@/app/ui/button/button";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useTheme } from "@/hooks/themeContext";
-
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
-import { Colors } from "@/constants/Colors";
-import { ErrorMessage } from "@/app/ui/error-message";
+import { TouchableOpacity } from "react-native";
+
+const BRIGHT_GREEN = "#38E07A";
+const PLACEHOLDER_COLOR = "#638773";
 
 const SignUp = () => {
   const {
@@ -27,39 +24,20 @@ const SignUp = () => {
   });
   const router = useRouter();
   const formValues = useWatch({ control });
-
   const { name, emailText, password, confirmPassword } = formValues;
-
-  const [status, setStatus] = useState("checked");
-
-  const { theme, setTheme } = useTheme();
-  const colors = useThemeColor();
-
   const isButtonDisabled = !Boolean(
     name && emailText && password && confirmPassword
   );
-
-  const onButtonToggle = () => {
-    setStatus(status === "checked" ? "unchecked" : "checked");
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
-
   const [signUpError, setSignUpError] = useState<Error | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: any) => {
     setSignUpError(null);
-
     if (data.password !== data.confirmPassword) {
       setSignUpError(new Error("Passwords do not match"));
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       const response = await fetch(`${API_URL}/api/mobile/auth/register`, {
         method: "POST",
@@ -70,16 +48,12 @@ const SignUp = () => {
           password: data.password,
         }),
       });
-
       const responseData = await response.json();
-
       if (!response.ok) {
         throw new Error(responseData.error || "Failed to register");
       }
-
       router.push("/home");
     } catch (error) {
-      console.error("Error signing up:", error);
       setSignUpError(
         error instanceof Error
           ? error
@@ -91,87 +65,81 @@ const SignUp = () => {
   };
 
   return (
-    <CSS.Container>
+    <CSS.Container style={{ justifyContent: "flex-start", paddingTop: 48 }}>
+      <CSS.TitleText>Sign Up</CSS.TitleText>
       <CSS.Body>
-        {signUpError && <ErrorMessage error={signUpError} />}
-
-        {/* <CSS.ThemeToggle onPress={toggleTheme}>
-          <CSS.ThemeToggleText colours={colors}>
-            Toggle Theme (Current: {theme})
-          </CSS.ThemeToggleText>
-        </CSS.ThemeToggle> */}
-
+        {signUpError && (
+          <CSS.ErrorContainer>
+            <CSS.ErrorText>{signUpError.message}</CSS.ErrorText>
+          </CSS.ErrorContainer>
+        )}
         <Controller
           control={control}
-          rules={{
-            required: true,
-          }}
+          rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{
-                borderRadius: 12,
-              }}
-              onBlur={onBlur}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Name"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              left={<TextInput.Icon color={Colors.light.text} icon="account" />}
-            />
+            <CSS.InputWrapper>
+              {!value && <CSS.PlaceholderText>Name</CSS.PlaceholderText>}
+              <CSS.PlainTextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder={""}
+                placeholderTextColor={PLACEHOLDER_COLOR}
+                autoCapitalize="words"
+              />
+            </CSS.InputWrapper>
           )}
           name="name"
         />
-
         <Controller
           control={control}
           rules={{
-            required: true,
+            required: "Email is required",
+            pattern: {
+              value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
+              message: "Enter a valid email address",
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{
-                borderRadius: 12,
-              }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Email"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              left={<TextInput.Icon color={Colors.light.text} icon="email" />}
-            />
+            <CSS.InputWrapper>
+              {!value && <CSS.PlaceholderText>Email</CSS.PlaceholderText>}
+              <CSS.PlainTextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder={""}
+                placeholderTextColor={PLACEHOLDER_COLOR}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+            </CSS.InputWrapper>
           )}
           name="emailText"
         />
-
+        {errors.emailText && (
+          <CSS.ErrorContainer>
+            <CSS.ErrorText>{errors.emailText.message}</CSS.ErrorText>
+          </CSS.ErrorContainer>
+        )}
         <Controller
           control={control}
-          rules={{
-            required: true,
-          }}
+          rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{
-                borderRadius: 12,
-              }}
-              textColor={Colors.light.text}
-              mode="outlined"
-              activeOutlineColor={Colors.light.text}
-              value={value}
-              placeholder="Password"
-              placeholderTextColor={Colors.light.text}
-              onChangeText={onChange}
-              secureTextEntry
-              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
-            />
+            <CSS.InputWrapper>
+              {!value && <CSS.PlaceholderText>Password</CSS.PlaceholderText>}
+              <CSS.PlainTextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder={""}
+                placeholderTextColor={PLACEHOLDER_COLOR}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+            </CSS.InputWrapper>
           )}
           name="password"
         />
-
         <Controller
           control={control}
           rules={{
@@ -180,54 +148,63 @@ const SignUp = () => {
               value === formValues.password || "Passwords do not match",
           }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CSS.StyledTextInput
-              outlineStyle={{
-                borderRadius: 12,
-              }}
-              textColor={colors.text}
-              mode="outlined"
-              value={value}
-              placeholder="Confirm Password"
-              placeholderTextColor={colors.text}
-              onChangeText={onChange}
-              left={<TextInput.Icon color={Colors.light.text} icon="lock" />}
-              secureTextEntry
-              error={Boolean(errors.confirmPassword)}
-            />
+            <CSS.InputWrapper style={{ marginBottom: 8 }}>
+              {!value && (
+                <CSS.PlaceholderText>Confirm Password</CSS.PlaceholderText>
+              )}
+              <CSS.PlainTextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder={""}
+                placeholderTextColor={PLACEHOLDER_COLOR}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+            </CSS.InputWrapper>
           )}
           name="confirmPassword"
         />
         {errors.confirmPassword && (
-          <ErrorMessage
-            error={
-              new Error(
-                errors.confirmPassword.message || "Confirm password is required"
-              )
-            }
-          />
+          <CSS.ErrorContainer>
+            <CSS.ErrorText>
+              {errors.confirmPassword.message || "Confirm password is required"}
+            </CSS.ErrorText>
+          </CSS.ErrorContainer>
         )}
-
         <CSS.ButtonContainer>
           <Button
-            variant="secondary"
+            variant="primary"
             title="Sign Up"
             disabled={isButtonDisabled || isSubmitting}
             onPress={handleSubmit(onSubmit)}
+            fullWidth
+            style={{
+              backgroundColor: BRIGHT_GREEN,
+              borderRadius: 32,
+              marginBottom: 16,
+            }}
+          />
+          <Button
+            variant="secondary"
+            title="Back to Login"
+            onPress={() => router.push("/logIn")}
+            fullWidth
+            style={{
+              backgroundColor: "#94E0B2",
+              borderRadius: 32,
+              marginBottom: 8,
+            }}
           />
         </CSS.ButtonContainer>
-
-        <Button
-          variant="secondary"
-          title="Back to Login"
-          onPress={() => router.push("/logIn")}
-        />
       </CSS.Body>
-
-      <CSS.Footer>
-        <CSS.FooterText onPress={() => router.push("/home")}>
-          Sign up later, continue to app
-        </CSS.FooterText>
-      </CSS.Footer>
+      <CSS.BottomLinkWrapper>
+        <TouchableOpacity onPress={() => router.push("/home")}>
+          <CSS.BottomLinkText>
+            Sign up later, continue to app
+          </CSS.BottomLinkText>
+        </TouchableOpacity>
+      </CSS.BottomLinkWrapper>
     </CSS.Container>
   );
 };
