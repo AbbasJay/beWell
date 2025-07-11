@@ -101,7 +101,6 @@ const LoginForm = () => {
           disabled={isButtonDisabled}
           fullWidth
           style={{
-            backgroundColor: BRIGHT_GREEN,
             borderRadius: 32,
             marginBottom: 16,
           }}

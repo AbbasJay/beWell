@@ -25,7 +25,7 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
   ${({ variant, disabled }) => {
     if (disabled) {
       return `
-        background-color: ${Colors.disabled.disabled};
+        background-color: #D3D3D3;
         opacity: 0.5;
       `;
     }
