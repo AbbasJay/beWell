@@ -3,8 +3,8 @@ import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import Button from "@/app/ui/button/button";
-import { Colors } from "@/constants/Colors";
 import * as CSS from "./styles";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 
 interface LoginFormData {
   email: string;
@@ -13,10 +13,10 @@ interface LoginFormData {
 
 const BRIGHT_GREEN = "#38E07A";
 const PLACEHOLDER_COLOR = "#6B7A6B";
-const INPUT_BG = "#F1F8F4";
 
 const LoginForm = () => {
   const router = useRouter();
+  const { signIn } = useAuth();
   const [loginError, setLoginError] = useState<string | null>(null);
   const {
     control,
@@ -32,11 +32,11 @@ const LoginForm = () => {
   const isButtonDisabled = !Boolean(email && password);
 
   const onSubmit = async (data: LoginFormData) => {
+    setLoginError(null);
     try {
-      setLoginError(null);
-      // signIn logic here
+      await signIn(data.email, data.password);
       router.push("/home");
-    } catch (err) {
+    } catch (err: any) {
       setLoginError("Invalid email or password");
     }
   };
