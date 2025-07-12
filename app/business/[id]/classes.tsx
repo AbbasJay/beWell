@@ -11,7 +11,7 @@ import {
   Class,
 } from "@/app/contexts/ClassesContext";
 import { ClassesCard } from "@/app/ui/classes-card";
-import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { LoadingSpinner, OverlaySpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import { useToast } from "@/app/contexts/ToastContext";
 import {
@@ -66,7 +66,6 @@ interface BusinessClassesProps {
 function BusinessClasses({ business }: BusinessClassesProps) {
   const { classes, isLoading, error: classesError } = useClassesContext();
   const { refreshNotifications } = useNotificationsContext();
-  const { sendNotification } = useNotifications();
   const { user } = useAuth();
   const [error, setError] = useState<Error | null>(null);
   const router = useRouter();
@@ -82,7 +81,6 @@ function BusinessClasses({ business }: BusinessClassesProps) {
     return () => setError(null);
   }, []);
 
-  if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
 
   const handleClassPress = (classItem: Class) => {
@@ -90,30 +88,35 @@ function BusinessClasses({ business }: BusinessClassesProps) {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Today Section */}
-      <Text
-        style={{
-          color: "#121714",
-          fontSize: 18,
-          fontWeight: "bold",
-          letterSpacing: -0.3,
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 8,
-        }}
-      >
-        Today
-      </Text>
-      {/* Classes List */}
-      {classes.map((classItem, idx) => (
-        <ClassesCard
-          key={classItem.id}
-          item={classItem}
-          onPress={() => handleClassPress(classItem)}
-          imageIndex={idx}
-        />
-      ))}
-    </ScrollView>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <ScrollView style={{ flex: 1 }}>
+        {/* Today Section */}
+        <Text
+          style={{
+            color: "#121714",
+            fontSize: 18,
+            fontWeight: "bold",
+            letterSpacing: -0.3,
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 8,
+          }}
+        >
+          Today
+        </Text>
+        {/* Classes List */}
+        {classes.map((classItem, idx) => (
+          <ClassesCard
+            key={classItem.id}
+            item={classItem}
+            onPress={() => handleClassPress(classItem)}
+            imageIndex={idx}
+          />
+        ))}
+      </ScrollView>
+
+      {/* Overlay spinner for classes loading */}
+      <OverlaySpinner visible={isLoading} />
+    </View>
   );
 }

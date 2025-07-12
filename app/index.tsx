@@ -15,7 +15,7 @@ import {
 import FilterMenu from "@/components/filterMenu";
 import Map from "../components/map";
 import { BusinessCard } from "./ui/business-card/business-card";
-import { LoadingSpinner } from "./ui/loading-spinner";
+import { LoadingSpinner, OverlaySpinner } from "./ui/loading-spinner";
 import { ErrorMessage } from "./ui/error-message";
 import {
   Business,
@@ -58,6 +58,8 @@ export default function HomePage() {
     forceRefresh,
     isLoading: businessesLoading,
   } = useBusinessContext();
+
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const {
     updateFilters,
     getCurrentFilters,
@@ -132,6 +134,17 @@ export default function HomePage() {
 
   // Ensure businesses is an array to prevent filter errors
   const safeBusinesses = businesses || [];
+
+  // Check if first load is complete
+  useEffect(() => {
+    if (
+      isInitialized &&
+      (safeBusinesses.length > 0 || businessError) &&
+      isFirstLoad
+    ) {
+      setIsFirstLoad(false);
+    }
+  }, [isInitialized, safeBusinesses.length, businessError, isFirstLoad]);
 
   // Handle URL parameters for map view and business focus
   useEffect(() => {
@@ -330,7 +343,11 @@ export default function HomePage() {
     );
   };
 
-  if (businessesLoading) return <LoadingSpinner />;
+  // Show Lottie loader only on first app load
+  if (isFirstLoad) {
+    return <LoadingSpinner />;
+  }
+
   if (locationSetupError) return <ErrorMessage error={locationSetupError} />;
   if (businessError) return <ErrorMessage error={businessError} />;
 
@@ -546,6 +563,8 @@ export default function HomePage() {
           </CSS.FloatingButtons>
         </>
       )}
+
+      <OverlaySpinner visible={businessesLoading && !isFirstLoad} />
     </CSS.Container>
   );
 }

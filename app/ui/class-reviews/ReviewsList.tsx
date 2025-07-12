@@ -3,7 +3,7 @@ import { Text, View, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useClassReviews } from "@/app/contexts/ReviewsContext";
 import { useAuth } from "@/app/contexts/auth/AuthContext";
-import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { LoadingSpinner, OverlaySpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import * as CSS from "../../business/[id]/classes/styles";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -74,17 +74,7 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
 
   return (
     <CSS.ReviewsList>
-      {isLoading ? (
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 32,
-          }}
-        >
-          <LoadingSpinner />
-        </View>
-      ) : error ? (
+      {error ? (
         <View
           style={{
             alignItems: "center",
@@ -198,6 +188,8 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
           {/* Hide View Less button if showAll is true (on all reviews screen) */}
         </>
       )}
+
+      <OverlaySpinner visible={isLoading} />
     </CSS.ReviewsList>
   );
 };

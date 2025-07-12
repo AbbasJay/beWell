@@ -11,7 +11,7 @@ import {
   useClassesContext,
   ClassesProvider,
 } from "@/app/contexts/ClassesContext";
-import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { LoadingSpinner, OverlaySpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import { useToast } from "@/app/contexts/ToastContext";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -109,22 +109,21 @@ function ClassDetailsContent() {
   }, [businessId, classId, foundBusiness]);
 
   if (error) return <ErrorMessage error={error} />;
-  if (!business || isLoading) {
+  if (!business) {
+    return <ErrorMessage error={new Error("Business not found")} />;
+  }
+
+  if (isLoading || !classItem) {
     return (
       <View
         style={{
           flex: 1,
           backgroundColor: "#fff",
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
-        <LoadingSpinner />
+        <OverlaySpinner visible={true} />
       </View>
     );
-  }
-  if (!classItem) {
-    return <ErrorMessage error={new Error("Class not found")} />;
   }
   const hasBooked =
     classItem.isBooked === true && classItem.bookingStatus === "active";
@@ -144,14 +143,13 @@ function ClassDetailsContent() {
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
-      await refreshClasses();
+      // Removed refreshClasses() to prevent loading flash
     } catch (err) {
       if (
         err instanceof Error &&
         err.message.includes("You have already booked this class")
       ) {
         try {
-          await refreshClasses();
           showToast("You have already booked this class", "info");
         } catch (refreshError) {
           showToast("Failed to refresh class data", "error");
@@ -183,11 +181,7 @@ function ClassDetailsContent() {
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully cancelled ${classItem.name}!`, "success");
-      await refreshClasses();
     } catch (err) {
-      try {
-        await refreshClasses();
-      } catch (refreshError) {}
       setError(
         err instanceof Error ? err : new Error("Failed to cancel class")
       );
@@ -393,6 +387,8 @@ function ClassDetailsContent() {
           </CSS.BookButtonText>
         </CSS.BookButton>
       </CSS.BookButtonContainer>
+
+      <OverlaySpinner visible={isBooking || isCancelling} />
     </CSS.Container>
   );
 }
