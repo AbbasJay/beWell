@@ -11,13 +11,14 @@ import { View, StatusBar, Platform } from "react-native";
 import { NotificationsMenuTrigger } from "./notifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
+import { publicRoutePatterns, isPublicRoute } from "@/utils/routeUtils";
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
 }
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const { tokens, isLoading, isGuestMode } = useAuth();
+  const { tokens, isLoading, isGuestMode, user } = useAuth();
   const currentRoute = usePathname();
   const { isMapView } = useMapView();
 
@@ -43,19 +44,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       // Optionally show error to user
     }
   };
-
-  // public route patterns
-  const publicPatterns = [
-    /^\/$/,
-    /^\/home$/,
-    /^\/business\/\d+\/classes$/,
-    /^\/business\/\d+\/classes\/\d+$/,
-    /^\/logIn$/,
-    /^\/signUp$/,
-  ];
-
-  const isPublicRoute = (route: string) =>
-    publicPatterns.some((pattern) => pattern.test(route));
 
   const hideNavigationBarRoutes = ["/", "/home", "/logIn", "/signUp"];
 
@@ -101,10 +89,14 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       return;
     }
 
-    if (!tokens?.accessToken && !isGuestMode) {
-      router.replace("/logIn");
+    const isAuthenticated = tokens?.accessToken && user && !isGuestMode;
+
+    if (!isAuthenticated) {
+      if (currentRoute !== "/logIn") {
+        router.replace("/logIn");
+      }
     }
-  }, [currentRoute, tokens?.accessToken, isGuestMode, isLoading]);
+  }, [currentRoute, tokens?.accessToken, user, isGuestMode, isLoading]);
 
   if (isLoading && !isPublicRoute(currentRoute)) {
     return <LoadingSpinner />;

@@ -4,10 +4,12 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 
 import Button from "@/app/ui/button/button";
 import { TouchableOpacity } from "react-native";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 
 import * as CSS from "./styles";
 import { API_URL } from "@/env";
 import { ErrorMessage } from "@/app/ui/error-message";
+import { isPublicRouteCombined } from "@/utils/routeUtils";
 
 const BRIGHT_GREEN = "#38E07A";
 const PLACEHOLDER_COLOR = "#638773";
@@ -26,6 +28,8 @@ const SignUp = () => {
     },
   });
   const router = useRouter();
+  const { redirectPath, clearRedirectPath, originalPath, clearOriginalPath } =
+    useAuth();
   const formValues = useWatch({ control });
 
   const { name, emailText, password, confirmPassword } = formValues;
@@ -64,7 +68,12 @@ const SignUp = () => {
         throw new Error(responseData.error || "Failed to register");
       }
 
-      router.push("/");
+      if (redirectPath) {
+        router.push(redirectPath as any);
+        clearRedirectPath();
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Error signing up:", error);
       setSignUpError(
@@ -212,7 +221,18 @@ const SignUp = () => {
         </CSS.ButtonContainer>
       </CSS.Body>
       <CSS.BottomLinkWrapper>
-        <TouchableOpacity onPress={() => router.push("/")}>
+        <TouchableOpacity
+          onPress={() => {
+            if (originalPath && isPublicRouteCombined(originalPath)) {
+              router.push(originalPath as any);
+              clearOriginalPath();
+            } else {
+              // If originalPath is not public (like /notifications), go to home page
+              router.push("/");
+              clearOriginalPath();
+            }
+          }}
+        >
           <CSS.BottomLinkText>
             Sign up later, continue to app
           </CSS.BottomLinkText>

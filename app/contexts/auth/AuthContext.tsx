@@ -4,6 +4,8 @@ import React, {
   useContext,
   useReducer,
   useEffect,
+  useCallback,
+  useRef,
 } from "react";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -30,6 +32,7 @@ interface AuthState {
   error: Error | null;
   isGuestMode: boolean;
   redirectPath: string | null;
+  originalPath: string | null;
 }
 
 // Action types
@@ -41,7 +44,9 @@ type AuthAction =
   | { type: "SET_GUEST_MODE" }
   | { type: "SIGN_OUT" }
   | { type: "SET_REDIRECT_PATH"; payload: string | null }
-  | { type: "CLEAR_REDIRECT_PATH" };
+  | { type: "CLEAR_REDIRECT_PATH" }
+  | { type: "SET_ORIGINAL_PATH"; payload: string | null }
+  | { type: "CLEAR_ORIGINAL_PATH" };
 
 // Context type
 interface AuthContextType extends AuthState {
@@ -52,6 +57,8 @@ interface AuthContextType extends AuthState {
   hasPermission: (requiredRole: UserRole) => boolean;
   setRedirectPath: (path: string | null) => void;
   clearRedirectPath: () => void;
+  setOriginalPath: (path: string | null) => void;
+  clearOriginalPath: () => void;
 }
 
 const initialState: AuthState = {
@@ -61,6 +68,7 @@ const initialState: AuthState = {
   error: null,
   isGuestMode: false,
   redirectPath: null,
+  originalPath: null,
 };
 
 // Reducer
@@ -123,6 +131,18 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         redirectPath: null,
       };
 
+    case "SET_ORIGINAL_PATH":
+      return {
+        ...state,
+        originalPath: action.payload,
+      };
+
+    case "CLEAR_ORIGINAL_PATH":
+      return {
+        ...state,
+        originalPath: null,
+      };
+
     default:
       return state;
   }
@@ -136,9 +156,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const isInitialized = useRef(false);
 
   // Token storage helpers
-  const storeTokens = async (tokens: AuthTokens) => {
+  const storeTokens = useCallback(async (tokens: AuthTokens) => {
     try {
       if (Platform.OS === "web") {
         localStorage.setItem("accessToken", tokens.accessToken);
@@ -152,25 +173,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error storing tokens:", error);
       throw error;
     }
-  };
+  }, []);
 
-  const removeTokens = async () => {
+  const removeTokens = useCallback(async () => {
     try {
       if (Platform.OS === "web") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
       } else {
-        await SecureStore.deleteItemAsync("accessToken");
-        await SecureStore.deleteItemAsync("refreshToken");
+        try {
+          await SecureStore.deleteItemAsync("accessToken");
+        } catch (error) {
+          console.log("Access token not found or already removed");
+        }
+        try {
+          await SecureStore.deleteItemAsync("refreshToken");
+        } catch (error) {
+          console.log("Refresh token not found or already removed");
+        }
       }
     } catch (error) {
       console.error("Error removing tokens:", error);
-      throw error;
     }
-  };
+  }, []);
 
   // Session refresh
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
     try {
       const refreshToken =
         Platform.OS === "web"
@@ -179,7 +207,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (!refreshToken) {
         console.log("No refresh token found, signing out");
-        await signOut();
+        dispatch({ type: "SIGN_OUT" });
         return;
       }
 
@@ -235,111 +263,135 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
     } catch (error) {
       console.error("Session refresh failed:", error);
-      await signOut(); // Sign out on refresh failure
+      dispatch({ type: "SIGN_OUT" });
     }
-  };
+  }, [dispatch, storeTokens]);
 
   // Auto refresh session
   useEffect(() => {
     const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes
-    if (state.tokens?.accessToken) {
+    if (state.tokens?.accessToken && !state.isLoading) {
       const intervalId = setInterval(refreshSession, REFRESH_INTERVAL);
       return () => clearInterval(intervalId);
     }
-  }, [state.tokens?.accessToken]);
+  }, [state.tokens?.accessToken, state.isLoading, refreshSession]);
 
   // Sign in
-  const signIn = async (email: string, password: string) => {
-    dispatch({ type: "AUTH_START" });
-    try {
-      const url = `${API_URL}/api/mobile/auth/login`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const responseText = await response.text();
-
-      if (!response.ok) {
-        throw new Error(responseText);
-      }
-
-      let data;
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      dispatch({ type: "AUTH_START" });
       try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error("Invalid response format from server");
+        const url = `${API_URL}/api/mobile/auth/login`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(responseText);
+        }
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          throw new Error("Invalid response format from server");
+        }
+
+        if (!data.token) {
+          throw new Error("Invalid response format: missing token");
+        }
+
+        const payload = JSON.parse(atob(data.token.split(".")[1]));
+        const user: AuthUser = {
+          id: payload.id,
+          email: email,
+          role: "user",
+        };
+        console.log("user", user);
+        const tokens: AuthTokens = {
+          accessToken: data.token,
+          refreshToken: data.token,
+        };
+
+        await storeTokens(tokens);
+        dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
+      } catch (error) {
+        throw error;
       }
-
-      if (!data.token) {
-        throw new Error("Invalid response format: missing token");
-      }
-
-      const payload = JSON.parse(atob(data.token.split(".")[1]));
-      const user: AuthUser = {
-        id: payload.id,
-        email: email,
-        role: "user",
-      };
-      console.log("user", user);
-      const tokens: AuthTokens = {
-        accessToken: data.token,
-        refreshToken: data.token,
-      };
-
-      await storeTokens(tokens);
-      dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
-    } catch (error) {
-      throw error;
-    }
-  };
+    },
+    [dispatch, storeTokens]
+  );
 
   // Sign out
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await removeTokens();
       dispatch({ type: "SIGN_OUT" });
     } catch (error) {
-      dispatch({ type: "AUTH_ERROR", payload: error as Error });
-      throw error;
+      console.error("Error during sign out:", error);
+      dispatch({ type: "SIGN_OUT" });
     }
-  };
+  }, [dispatch, removeTokens]);
 
   // Guest mode
-  const continueAsGuest = () => {
+  const continueAsGuest = useCallback(() => {
     dispatch({ type: "SET_GUEST_MODE" });
-  };
+  }, [dispatch]);
 
   // Role-based access control
-  const hasPermission = (requiredRole: UserRole): boolean => {
-    if (state.isGuestMode) return false;
-    if (!state.user) return false;
+  const hasPermission = useCallback(
+    (requiredRole: UserRole): boolean => {
+      if (state.isGuestMode) return false;
+      if (!state.user) return false;
 
-    const roleHierarchy: Record<UserRole, number> = {
-      user: 1,
-      business_owner: 2,
-      admin: 3,
-    };
+      const roleHierarchy: Record<UserRole, number> = {
+        user: 1,
+        business_owner: 2,
+        admin: 3,
+      };
 
-    return roleHierarchy[state.user.role] >= roleHierarchy[requiredRole];
-  };
+      return roleHierarchy[state.user.role] >= roleHierarchy[requiredRole];
+    },
+    [state.isGuestMode, state.user]
+  );
 
   // Redirect path management
-  const setRedirectPath = (path: string | null) => {
-    dispatch({ type: "SET_REDIRECT_PATH", payload: path });
-  };
+  const setRedirectPath = useCallback(
+    (path: string | null) => {
+      dispatch({ type: "SET_REDIRECT_PATH", payload: path });
+    },
+    [dispatch]
+  );
 
-  const clearRedirectPath = () => {
+  const clearRedirectPath = useCallback(() => {
     dispatch({ type: "CLEAR_REDIRECT_PATH" });
-  };
+  }, [dispatch]);
+
+  // Original path management
+  const setOriginalPath = useCallback(
+    (path: string | null) => {
+      dispatch({ type: "SET_ORIGINAL_PATH", payload: path });
+    },
+    [dispatch]
+  );
+
+  const clearOriginalPath = useCallback(() => {
+    dispatch({ type: "CLEAR_ORIGINAL_PATH" });
+  }, [dispatch]);
 
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
+      if (isInitialized.current) return;
+      isInitialized.current = true;
+
       dispatch({ type: "AUTH_START" });
       try {
         const accessToken =
@@ -348,7 +400,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             : await SecureStore.getItemAsync("accessToken");
 
         if (accessToken) {
-          await refreshSession();
+          try {
+            const refreshToken =
+              Platform.OS === "web"
+                ? localStorage.getItem("refreshToken")
+                : await SecureStore.getItemAsync("refreshToken");
+
+            if (!refreshToken) {
+              console.log("No refresh token found, signing out");
+              dispatch({ type: "SIGN_OUT" });
+              return;
+            }
+
+            try {
+              const payload = JSON.parse(atob(refreshToken.split(".")[1]));
+              const user: AuthUser = {
+                id: payload.id,
+                email: payload.email,
+                role: payload.role || "user",
+              };
+              console.log("user", user);
+              const tokens: AuthTokens = {
+                accessToken: refreshToken,
+                refreshToken: refreshToken,
+              };
+
+              await storeTokens(tokens);
+              dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
+              return;
+            } catch (e) {
+              dispatch({ type: "SIGN_OUT" });
+            }
+          } catch (error) {
+            console.error("Session refresh failed:", error);
+            dispatch({ type: "SIGN_OUT" });
+          }
         } else {
           dispatch({ type: "SIGN_OUT" });
         }
@@ -359,7 +445,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     initializeAuth();
-  }, []);
+  }, [storeTokens]);
 
   return (
     <AuthContext.Provider
@@ -372,6 +458,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         hasPermission,
         setRedirectPath,
         clearRedirectPath,
+        setOriginalPath,
+        clearOriginalPath,
       }}
     >
       {children}

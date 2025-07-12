@@ -50,16 +50,16 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
 export const StyledText = styled(Text)<ContainerProps>`
   color: ${({ variant, disabled }) => {
     if (disabled) {
-      return Colors.dark.text;
+      return "#000000"; // Black text for disabled buttons
     }
     switch (variant) {
       case "secondary":
-        return Colors.dark.text;
+        return "#000000"; // Black text for secondary
       case "tertiary":
-        return Colors.light.text;
+        return "#000000"; // Black text for tertiary
       case "primary":
       default:
-        return Colors.light.text;
+        return "#000000"; // Black text for primary (main buttons)
     }
   }};
   font-size: 16px;

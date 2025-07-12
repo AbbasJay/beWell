@@ -7,6 +7,7 @@ import { TouchableOpacity } from "react-native";
 import Button from "@/app/ui/button/button";
 import { Colors } from "@/constants/Colors";
 import * as CSS from "./styles";
+import { isPublicRouteCombined } from "@/utils/routeUtils";
 
 interface LoginFormData {
   email: string;
@@ -19,8 +20,14 @@ const PLACEHOLDER_COLOR = "#6B7A6B";
 const LoginForm = () => {
   const router = useRouter();
   const [loginError, setLoginError] = useState<string | null>(null);
-  const { signIn, continueAsGuest, redirectPath, clearRedirectPath } =
-    useAuth();
+  const {
+    signIn,
+    continueAsGuest,
+    redirectPath,
+    clearRedirectPath,
+    originalPath,
+    clearOriginalPath,
+  } = useAuth();
   const {
     control,
     handleSubmit,
@@ -81,7 +88,13 @@ const LoginForm = () => {
   const handleContinueAsGuest = () => {
     try {
       continueAsGuest();
-      router.push("/");
+      if (originalPath && isPublicRouteCombined(originalPath)) {
+        router.push(originalPath as any);
+        clearOriginalPath();
+      } else {
+        router.push("/");
+        clearOriginalPath();
+      }
     } catch (err) {
       setLoginError("Failed to continue as guest. Please try again");
     }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useClassReviews } from "@/app/contexts/ReviewsContext";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
 import { LoadingSpinner } from "@/app/ui/loading-spinner";
 import { ErrorMessage } from "@/app/ui/error-message";
 import * as CSS from "../../business/[id]/classes/styles";
@@ -39,6 +40,7 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
     dislikeReview,
     cancelLikeDislike,
   } = useClassReviews(Number(classId));
+  const { user } = useAuth();
 
   const [showAllState, setShowAllState] = useState(false);
   const router = useRouter();
@@ -135,8 +137,9 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
               <CSS.ReviewText>{review.text}</CSS.ReviewText>
               <CSS.ReviewActions>
                 <CSS.ActionPill
-                  onPress={() => handleLike(review)}
-                  activeOpacity={0.7}
+                  onPress={user ? () => handleLike(review) : undefined}
+                  activeOpacity={user ? 0.7 : 1}
+                  style={!user ? { opacity: 0.6 } : undefined}
                 >
                   <MaterialIcons
                     name="thumb-up"
@@ -148,8 +151,9 @@ export const ReviewsList = ({ showAll }: ReviewsListProps) => {
                   <CSS.ActionText>{review.likeCount}</CSS.ActionText>
                 </CSS.ActionPill>
                 <CSS.ActionPill
-                  onPress={() => handleDislike(review)}
-                  activeOpacity={0.7}
+                  onPress={user ? () => handleDislike(review) : undefined}
+                  activeOpacity={user ? 0.7 : 1}
+                  style={!user ? { opacity: 0.6 } : undefined}
                 >
                   <MaterialIcons
                     name="thumb-down"

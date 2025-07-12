@@ -75,7 +75,7 @@ function ClassDetailsContent() {
   const { refreshBookings } = useBookingsContext();
   const { bookClass, cancelClass } = useNotifications();
   const { updateClassBookingStatus, refreshClasses } = useClassesContext();
-  const { user, setRedirectPath } = useAuth();
+  const { user, setRedirectPath, setOriginalPath } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
@@ -132,6 +132,7 @@ function ClassDetailsContent() {
   const handleBookClass = async () => {
     if (!user) {
       setRedirectPath(pathname);
+      setOriginalPath(pathname);
       router.push("/logIn");
       return;
     }
@@ -171,6 +172,7 @@ function ClassDetailsContent() {
   const handleCancelClass = async () => {
     if (!user) {
       setRedirectPath(pathname);
+      setOriginalPath(pathname);
       router.push("/logIn");
       return;
     }
@@ -278,7 +280,7 @@ function ClassDetailsContent() {
                 onPress={() => {
                   if (business.id) {
                     router.push({
-                      pathname: "/home",
+                      pathname: "/",
                       params: {
                         mapView: "true",
                         focusBusinessId: business.id.toString(),
@@ -352,49 +354,47 @@ function ClassDetailsContent() {
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
-      {activeTab === "reviews" && (
-        <CSS.BookButtonContainer>
-          <CSS.BookButton
-            onPress={
-              hasBooked
-                ? handleCancelClass
-                : classItem.bookingStatus === "completed" ||
-                  classItem.bookingStatus === "no-show"
-                ? undefined
-                : handleBookClass
-            }
-            disabled={
-              isBooking ||
-              isCancelling ||
-              classItem.bookingStatus === "completed" ||
-              classItem.bookingStatus === "no-show"
-            }
-            style={
-              hasBooked
-                ? { backgroundColor: "#d9534f" }
-                : classItem.bookingStatus === "completed"
-                ? { backgroundColor: "#28a745" }
-                : classItem.bookingStatus === "no-show"
-                ? { backgroundColor: "#ffc107" }
-                : undefined
-            }
-          >
-            <CSS.BookButtonText>
-              {currentAction === "booking"
-                ? "Booking..."
-                : currentAction === "cancelling"
-                ? "Cancelling..."
-                : hasBooked
-                ? "Cancel"
-                : classItem.bookingStatus === "completed"
-                ? "Completed"
-                : classItem.bookingStatus === "no-show"
-                ? "No Show"
-                : "Book Class"}
-            </CSS.BookButtonText>
-          </CSS.BookButton>
-        </CSS.BookButtonContainer>
-      )}
+      <CSS.BookButtonContainer>
+        <CSS.BookButton
+          onPress={
+            hasBooked
+              ? handleCancelClass
+              : classItem.bookingStatus === "completed" ||
+                classItem.bookingStatus === "no-show"
+              ? undefined
+              : handleBookClass
+          }
+          disabled={
+            isBooking ||
+            isCancelling ||
+            classItem.bookingStatus === "completed" ||
+            classItem.bookingStatus === "no-show"
+          }
+          style={
+            hasBooked
+              ? { backgroundColor: "#d9534f" }
+              : classItem.bookingStatus === "completed"
+              ? { backgroundColor: "#28a745" }
+              : classItem.bookingStatus === "no-show"
+              ? { backgroundColor: "#ffc107" }
+              : undefined
+          }
+        >
+          <CSS.BookButtonText>
+            {currentAction === "booking"
+              ? "Booking..."
+              : currentAction === "cancelling"
+              ? "Cancelling..."
+              : hasBooked
+              ? "Cancel"
+              : classItem.bookingStatus === "completed"
+              ? "Completed"
+              : classItem.bookingStatus === "no-show"
+              ? "No Show"
+              : "Book Class"}
+          </CSS.BookButtonText>
+        </CSS.BookButton>
+      </CSS.BookButtonContainer>
     </CSS.Container>
   );
 }

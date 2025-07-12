@@ -13,7 +13,6 @@ export default function Settings() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.push("/logIn");
     } catch (error) {
       console.error("Error logging out:", error);
     }

@@ -219,7 +219,7 @@ const NotificationsDisplay: React.FC = () => {
   const { notifications, refreshNotifications, markAsRead } =
     useNotificationsContext();
   const { businesses } = useBusinessContext();
-  const { user, setRedirectPath } = useAuth();
+  const { user, setRedirectPath, setOriginalPath } = useAuth();
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -344,11 +344,10 @@ const NotificationsDisplay: React.FC = () => {
     console.log("Dismiss notification", id);
   };
 
-  // Handle redirect for unauthenticated users
   useEffect(() => {
     if (!user) {
       setRedirectPath("/notifications");
-      router.replace("/logIn");
+      setOriginalPath("/notifications");
     }
   }, [user, setRedirectPath]);
 
