@@ -145,7 +145,6 @@ function ClassDetailsContent() {
       await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
       await refreshClasses();
-      router.back();
     } catch (err) {
       if (
         err instanceof Error &&
@@ -185,7 +184,6 @@ function ClassDetailsContent() {
       await refreshBookings();
       showToast(`Successfully cancelled ${classItem.name}!`, "success");
       await refreshClasses();
-      router.back();
     } catch (err) {
       try {
         await refreshClasses();
