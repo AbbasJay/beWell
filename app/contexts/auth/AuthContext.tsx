@@ -168,9 +168,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         await SecureStore.setItemAsync("accessToken", tokens.accessToken);
         await SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
       }
-      console.log("Tokens stored successfully");
     } catch (error) {
-      console.error("Error storing tokens:", error);
       throw error;
     }
   }, []);
@@ -184,17 +182,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         try {
           await SecureStore.deleteItemAsync("accessToken");
         } catch (error) {
-          console.log("Access token not found or already removed");
+          // Access token not found or already removed
         }
         try {
           await SecureStore.deleteItemAsync("refreshToken");
         } catch (error) {
-          console.log("Refresh token not found or already removed");
+          // Refresh token not found or already removed
         }
       }
-    } catch (error) {
-      console.error("Error removing tokens:", error);
-    }
+    } catch (error) {}
   }, []);
 
   // Session refresh
@@ -206,7 +202,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           : await SecureStore.getItemAsync("refreshToken");
 
       if (!refreshToken) {
-        console.log("No refresh token found, signing out");
         dispatch({ type: "SIGN_OUT" });
         return;
       }
@@ -219,7 +214,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           email: payload.email,
           role: payload.role || "user",
         };
-        console.log("user", user);
         // Use the same token if it's still valid
         const tokens: AuthTokens = {
           accessToken: refreshToken,
@@ -230,7 +224,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
         return;
       } catch (e) {
-        console.log("Could not parse existing token, trying refresh");
+        // Could not parse existing token, trying refresh
       }
 
       // If we can't use the existing token, try to refresh
@@ -262,7 +256,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await storeTokens(tokens);
       dispatch({ type: "AUTH_SUCCESS", payload: { user, tokens } });
     } catch (error) {
-      console.error("Session refresh failed:", error);
       dispatch({ type: "SIGN_OUT" });
     }
   }, [dispatch, storeTokens]);
@@ -314,7 +307,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           email: email,
           role: "user",
         };
-        console.log("user", user);
         const tokens: AuthTokens = {
           accessToken: data.token,
           refreshToken: data.token,
@@ -407,7 +399,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
                 : await SecureStore.getItemAsync("refreshToken");
 
             if (!refreshToken) {
-              console.log("No refresh token found, signing out");
               dispatch({ type: "SIGN_OUT" });
               return;
             }
@@ -419,7 +410,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
                 email: payload.email,
                 role: payload.role || "user",
               };
-              console.log("user", user);
               const tokens: AuthTokens = {
                 accessToken: refreshToken,
                 refreshToken: refreshToken,
@@ -432,7 +422,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               dispatch({ type: "SIGN_OUT" });
             }
           } catch (error) {
-            console.error("Session refresh failed:", error);
             dispatch({ type: "SIGN_OUT" });
           }
         } else {

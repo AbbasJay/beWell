@@ -75,12 +75,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       !isMapView
     );
 
-    console.log("TabBar Debug:", {
-      currentRoute,
-      isMapView,
-      shouldShow,
-    });
-
     return shouldShow;
   };
 

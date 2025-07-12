@@ -142,7 +142,7 @@ export const BookingsProvider = ({ children }: { children: ReactNode }) => {
 
       // For now, we'll use an empty array since the /api/mobile/bookings endpoint doesn't exist yet
       // TODO: Implement the backend endpoint or use an alternative approach
-      console.log("Bookings endpoint not implemented yet - using empty array");
+
       dispatch({ type: "FETCH_BOOKINGS_SUCCESS", payload: [] });
 
       // Alternative approach: We could fetch bookings by checking each class individually
@@ -214,12 +214,7 @@ export const BookingsProvider = ({ children }: { children: ReactNode }) => {
         if (response.ok) {
           // If we get a 200 response, it means the user has booked this class
           const bookingData = await response.json();
-          console.log(
-            "Backend booking data for class",
-            classId,
-            ":",
-            bookingData
-          );
+
           return true;
         } else if (response.status === 404) {
           // If we get a 404, it means the user hasn't booked this class

@@ -18,10 +18,7 @@ const AddressSearchBar: React.FC<SearchBarProps> = ({ updateLocation }) => {
 
   // Default updateLocation function if none provided
   const safeUpdateLocation =
-    updateLocation ||
-    ((lat: number, lng: number) => {
-      console.log("Location update called with:", lat, lng);
-    });
+    updateLocation || ((lat: number, lng: number) => {});
 
   const handleFocus = () => {
     setIsFocused(true);

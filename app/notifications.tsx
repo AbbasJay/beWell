@@ -341,7 +341,6 @@ const NotificationsDisplay: React.FC = () => {
   const handleDismiss = (id: number) => {
     // TODO: Implement dismiss logic (e.g., remove notification)
     // For now, just log
-    console.log("Dismiss notification", id);
   };
 
   useEffect(() => {

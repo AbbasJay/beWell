@@ -135,7 +135,6 @@ export default function HomePage() {
 
   // Handle URL parameters for map view and business focus
   useEffect(() => {
-    console.log("Home Debug - params.mapView:", params.mapView);
     if (params.mapView === "true") {
       setIsMapView(true);
     } else {
@@ -287,7 +286,6 @@ export default function HomePage() {
   const handleSearch = () => {
     // Search is now handled by the filteredBusinesses useMemo
     // This function can be used for additional search logic if needed
-    console.log("Searching for:", searchQuery);
     setIsSearching(true);
 
     // Clear search after a short delay to show results

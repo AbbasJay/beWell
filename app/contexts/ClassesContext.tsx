@@ -191,19 +191,6 @@ export const ClassesProvider = ({
       const json = await response.json();
 
       // Debug: Log the API response to see what fields are actually returned
-      console.log("=== CLASSES API RESPONSE DEBUG ===");
-      console.log(
-        "API URL:",
-        `${API_URL}/api/mobile/classes?businessId=${businessId}`
-      );
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
-      console.log("Response data:", JSON.stringify(json, null, 2));
-      console.log("First class (if exists):", json[0]);
-      console.log("=== END CLASSES API RESPONSE DEBUG ===");
 
       // The backend now includes isBooked field for each class
       dispatch({ type: "FETCH_CLASSES_SUCCESS", payload: json });
