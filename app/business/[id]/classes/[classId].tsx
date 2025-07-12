@@ -320,6 +320,30 @@ function ClassDetailsContent() {
                   </CSS.DetailValue>
                 </CSS.DetailInfo>
               </CSS.DetailItem>
+              <CSS.DetailItem>
+                <CSS.DetailIcon>
+                  <MaterialIcons
+                    name="group"
+                    size={20}
+                    color={classItem.slotsLeft === 0 ? "#d9534f" : "#111714"}
+                  />
+                </CSS.DetailIcon>
+                <CSS.DetailInfo>
+                  <CSS.DetailLabel>Available Spots</CSS.DetailLabel>
+                  <CSS.DetailValue
+                    style={{
+                      color: classItem.slotsLeft === 0 ? "#d9534f" : "#111714",
+                      fontWeight: classItem.slotsLeft === 0 ? "bold" : "normal",
+                    }}
+                  >
+                    {classItem.slotsLeft === 0
+                      ? "Fully Booked"
+                      : `${classItem.slotsLeft} ${
+                          classItem.slotsLeft === 1 ? "spot" : "spots"
+                        } left`}
+                  </CSS.DetailValue>
+                </CSS.DetailInfo>
+              </CSS.DetailItem>
             </CSS.ClassDetails>
             <CSS.SectionTitle style={{ marginTop: 24 }}>
               Schedule
@@ -352,7 +376,8 @@ function ClassDetailsContent() {
             hasBooked
               ? handleCancelClass
               : classItem.bookingStatus === "completed" ||
-                classItem.bookingStatus === "no-show"
+                classItem.bookingStatus === "no-show" ||
+                classItem.slotsLeft === 0
               ? undefined
               : handleBookClass
           }
@@ -360,7 +385,8 @@ function ClassDetailsContent() {
             isBooking ||
             isCancelling ||
             classItem.bookingStatus === "completed" ||
-            classItem.bookingStatus === "no-show"
+            classItem.bookingStatus === "no-show" ||
+            classItem.slotsLeft === 0
           }
           style={
             hasBooked
@@ -369,6 +395,8 @@ function ClassDetailsContent() {
               ? { backgroundColor: "#28a745" }
               : classItem.bookingStatus === "no-show"
               ? { backgroundColor: "#ffc107" }
+              : classItem.slotsLeft === 0
+              ? { backgroundColor: "#6c757d" }
               : undefined
           }
         >
@@ -383,6 +411,8 @@ function ClassDetailsContent() {
               ? "Completed"
               : classItem.bookingStatus === "no-show"
               ? "No Show"
+              : classItem.slotsLeft === 0
+              ? "Fully Booked"
               : "Book Class"}
           </CSS.BookButtonText>
         </CSS.BookButton>
