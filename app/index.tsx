@@ -140,11 +140,22 @@ export default function HomePage() {
     if (
       isInitialized &&
       (safeBusinesses.length > 0 || businessError) &&
-      isFirstLoad
+      isFirstLoad &&
+      !businessesLoading
     ) {
-      setIsFirstLoad(false);
+      const timer = setTimeout(() => {
+        setIsFirstLoad(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
-  }, [isInitialized, safeBusinesses.length, businessError, isFirstLoad]);
+  }, [
+    isInitialized,
+    safeBusinesses.length,
+    businessError,
+    isFirstLoad,
+    businessesLoading,
+  ]);
 
   // Handle URL parameters for map view and business focus
   useEffect(() => {
@@ -564,7 +575,9 @@ export default function HomePage() {
         </>
       )}
 
-      <OverlaySpinner visible={businessesLoading && !isFirstLoad} />
+      <OverlaySpinner
+        visible={businessesLoading && !isFirstLoad && isInitialized}
+      />
     </CSS.Container>
   );
 }
