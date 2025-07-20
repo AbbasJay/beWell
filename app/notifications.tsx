@@ -1,12 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import {
-  View,
-  FlatList,
-  Text,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { View, FlatList, Text, Image, TouchableOpacity } from "react-native";
 import {
   useNotificationsContext,
   Notification,

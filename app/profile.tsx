@@ -6,6 +6,7 @@ import { useAuth } from "./contexts/auth/AuthContext";
 import { useBookingsContext } from "./contexts/BookingsContext";
 import { useBusinessContext } from "./contexts/BusinessContext";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
+import { LoadingSpinner } from "./ui/loading-spinner";
 import * as CSS from "./styles/profile";
 
 export default function Profile() {
@@ -149,7 +150,7 @@ export default function Profile() {
 
           <CSS.SectionTitle>Upcoming</CSS.SectionTitle>
           {bookingsLoading ? (
-            <CSS.LoadingText>Loading upcoming classes...</CSS.LoadingText>
+            <LoadingSpinner />
           ) : upcomingClasses.length === 0 ? (
             <CSS.EmptyText>No upcoming classes</CSS.EmptyText>
           ) : (
@@ -158,7 +159,7 @@ export default function Profile() {
 
           <CSS.SectionTitle>History</CSS.SectionTitle>
           {bookingsLoading ? (
-            <CSS.LoadingText>Loading history...</CSS.LoadingText>
+            <LoadingSpinner />
           ) : historyClasses.length === 0 ? (
             <CSS.EmptyText>No class history</CSS.EmptyText>
           ) : (
