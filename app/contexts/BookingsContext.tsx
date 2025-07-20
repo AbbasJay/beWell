@@ -19,6 +19,13 @@ export interface Booking {
   createdAt: string;
   cancelledAt?: string;
   cancellationReason?: string;
+  className?: string;
+  classStartDate?: string;
+  classTime?: string;
+  classInstructor?: string;
+  classLocation?: string;
+  businessId?: number;
+  businessName?: string;
 }
 
 // State interface
@@ -140,13 +147,63 @@ export const BookingsProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("No authentication token found");
       }
 
-      // For now, we'll use an empty array since the /api/mobile/bookings endpoint doesn't exist yet
-      // TODO: Implement the backend endpoint or use an alternative approach
+      const response = await fetch(`${API_URL}/api/mobile/classes/bookings`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      dispatch({ type: "FETCH_BOOKINGS_SUCCESS", payload: [] });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      // Alternative approach: We could fetch bookings by checking each class individually
-      // but that would be inefficient. Better to implement the backend endpoint.
+      const data = await response.json();
+
+      const transformedBookings = data.map((item: any) => {
+        if (item.booking && item.class) {
+          return {
+            id: item.booking.id,
+            userId: user.id,
+            classId: item.class.id,
+            status: item.booking.status,
+            createdAt: item.booking.createdAt,
+            cancelledAt: item.booking.cancelledAt,
+            cancellationReason: item.booking.cancellationReason,
+            className: item.class.name,
+            classStartDate: item.class.startDate,
+            classTime: item.class.time,
+            classInstructor: item.class.instructor,
+            classLocation: item.class.location,
+            businessId: undefined,
+            businessName: undefined,
+          };
+        } else {
+          // New flat structure
+          return {
+            id: item.id,
+            userId: user.id,
+            classId: item.classId,
+            status: item.status,
+            createdAt: item.createdAt,
+            cancelledAt: item.cancelledAt,
+            cancellationReason: item.cancellationReason,
+            className: item.className,
+            classStartDate: item.classStartDate,
+            classTime: item.classTime,
+            classInstructor: item.classInstructor,
+            classLocation: item.classLocation,
+            businessId: item.businessId,
+            businessName: item.businessName,
+          };
+        }
+      });
+
+      dispatch({
+        type: "FETCH_BOOKINGS_SUCCESS",
+        payload: transformedBookings,
+      });
     } catch (error) {
       console.error("Error fetching bookings:", error);
       dispatch({

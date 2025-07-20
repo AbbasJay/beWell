@@ -131,8 +131,8 @@ export const BeWellTabBar = ({ visible = true }: BeWellTabBarProps) => {
           </CSS.Tab>
           <CSS.Tab
             onPress={() => {
-              if (activeRoute !== "/settings") {
-                router.push("/settings" as any);
+              if (activeRoute !== "/profile") {
+                router.push("/profile" as any);
               }
             }}
           >

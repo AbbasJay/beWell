@@ -17,6 +17,7 @@ type UserRole = "user" | "admin" | "business_owner";
 interface AuthUser {
   id: number;
   email: string;
+  name: string;
   role: UserRole;
 }
 
@@ -212,6 +213,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const user: AuthUser = {
           id: payload.id,
           email: payload.email,
+          name: payload.name || "User",
           role: payload.role || "user",
         };
         // Use the same token if it's still valid
@@ -250,6 +252,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const user: AuthUser = {
         id: payload.id,
         email: payload.email,
+        name: payload.name || "User",
         role: payload.role || "user",
       };
 
@@ -305,6 +308,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const user: AuthUser = {
           id: payload.id,
           email: email,
+          name: payload.name || "User",
           role: "user",
         };
         const tokens: AuthTokens = {
@@ -408,6 +412,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               const user: AuthUser = {
                 id: payload.id,
                 email: payload.email,
+                name: payload.name || "User",
                 role: payload.role || "user",
               };
               const tokens: AuthTokens = {

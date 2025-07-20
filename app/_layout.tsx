@@ -20,6 +20,7 @@ export default function RootLayout() {
             <Stack.Screen name="home" />
             <Stack.Screen name="notifications" />
             <Stack.Screen name="settings" />
+            <Stack.Screen name="profile" />
             <Stack.Screen name="business/[id]/classes" />
             <Stack.Screen name="business/[id]/classes/[classId]" />
           </Stack>
