@@ -220,6 +220,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const json = await response.json();
+
       const validBusinesses = json.filter(
         (business: Business) => business.id !== undefined
       );
