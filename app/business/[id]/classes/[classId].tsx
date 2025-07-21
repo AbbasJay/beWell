@@ -4,10 +4,8 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Modal,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
@@ -137,18 +135,9 @@ function ClassDetailsContent() {
       </View>
     );
   }
-  // Fix the logic: only consider it booked if isBooked is true AND bookingStatus is not cancelled
+
   const hasBooked =
     classItem.isBooked === true && classItem.bookingStatus !== "cancelled";
-
-  // Debug logging to see the current state
-  console.log("Class state debug:", {
-    classId: classItem.id,
-    isBooked: classItem.isBooked,
-    bookingStatus: classItem.bookingStatus,
-    slotsLeft: classItem.slotsLeft,
-    hasBooked,
-  });
 
   const handleBookClass = async () => {
     if (!user) {
@@ -158,30 +147,19 @@ function ClassDetailsContent() {
       return;
     }
 
-    console.log("Attempting to book class:", {
-      classId: classItem.id,
-      currentIsBooked: classItem.isBooked,
-      currentBookingStatus: classItem.bookingStatus,
-      currentSlotsLeft: classItem.slotsLeft,
-    });
-
     setIsBooking(true);
     setCurrentAction("booking");
     try {
       const responseData = await bookClass(classItem);
 
-      console.log("Booking response:", responseData);
-
-      // Update the class with the data returned from the server
       if (responseData && responseData.class) {
         updateClassAfterBooking(
           classItem.id,
           responseData.class.slotsLeft,
-          true, // isBooked = true after booking
-          "active" // bookingStatus = active
+          true,
+          "active"
         );
       } else {
-        // Fallback to simple update if no response data
         updateClassBookingStatus(classItem.id, true);
       }
 
@@ -189,7 +167,6 @@ function ClassDetailsContent() {
       await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
     } catch (err) {
-      console.error("Booking error details:", err);
       if (
         err instanceof Error &&
         err.message.includes("You have already booked this class")
@@ -219,29 +196,19 @@ function ClassDetailsContent() {
       return;
     }
 
-    console.log("Attempting to cancel class:", {
-      classId: classItem.id,
-      currentIsBooked: classItem.isBooked,
-      currentBookingStatus: classItem.bookingStatus,
-    });
-
     setIsCancelling(true);
     setCurrentAction("cancelling");
     try {
       const responseData = await cancelClass(classItem.id);
 
-      console.log("Cancellation response:", responseData);
-
-      // Update the class with the data returned from the server
       if (responseData && responseData.class) {
         updateClassAfterCancellation(
           classItem.id,
           responseData.class.slotsLeft,
-          false, // isBooked = false after cancellation
-          "cancelled" // bookingStatus = cancelled
+          false,
+          "cancelled"
         );
       } else {
-        // Fallback to simple update if no response data
         updateClassBookingStatus(classItem.id, false);
       }
 
@@ -249,14 +216,10 @@ function ClassDetailsContent() {
       await refreshBookings();
       showToast(`Successfully cancelled ${classItem.name}!`, "success");
     } catch (err) {
-      console.error("Cancellation error details:", err);
-
-      // If the error is "No active booking found", refresh the class data
       if (
         err instanceof Error &&
         err.message.includes("No active booking found")
       ) {
-        console.log("No active booking found - refreshing class data");
         await refreshClasses();
         showToast(
           "Class data refreshed - you may not have an active booking",
@@ -335,6 +298,53 @@ function ClassDetailsContent() {
         {renderTabBar()}
         {activeTab === "details" && (
           <CSS.Content style={{ paddingTop: 8 }}>
+            {classItem.bookingStatus === "cancelled" && (
+              <View
+                style={{
+                  backgroundColor: "#f8d7da",
+                  borderColor: "#f5c6cb",
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  padding: 12,
+                  marginBottom: 16,
+                  flexDirection: "column",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 4,
+                  }}
+                >
+                  <MaterialIcons
+                    name="cancel"
+                    size={20}
+                    color="#721c24"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={{
+                      color: "#721c24",
+                      fontSize: 14,
+                      fontWeight: "500",
+                    }}
+                  >
+                    This class was cancelled
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    color: "#721c24",
+                    fontSize: 12,
+                    marginLeft: 28,
+                  }}
+                >
+                  Recently cancelled • You can re-book if slots are available
+                </Text>
+              </View>
+            )}
+
             <CSS.ClassTitle numberOfLines={2}>{classItem.name}</CSS.ClassTitle>
             <CSS.ClassDescription numberOfLines={3}>
               {classItem.description}
@@ -493,6 +503,8 @@ function ClassDetailsContent() {
               "Completed"
             ) : classItem.bookingStatus === "no-show" ? (
               "No Show"
+            ) : classItem.bookingStatus === "cancelled" ? (
+              "Re-book Class"
             ) : !hasBooked && classItem.slotsLeft === 0 ? (
               "Fully Booked"
             ) : (
