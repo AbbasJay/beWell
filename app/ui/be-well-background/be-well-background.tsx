@@ -45,6 +45,7 @@ export const BeWellBackground = ({
       <CSS.StyledSafeAreaView
         edges={["left", "right"]}
         backgroundColor={backgroundColor}
+        style={{ position: "relative" }}
       >
         {scrollable ? (
           <ScrollView

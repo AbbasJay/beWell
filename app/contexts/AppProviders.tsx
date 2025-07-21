@@ -7,6 +7,7 @@ import { BookingsProvider } from "./BookingsContext";
 import { ToastProvider } from "./ToastContext";
 import { MapViewProvider } from "./MapViewContext";
 import { ReviewsProvider } from "./ReviewsContext";
+import { ProfileImageProvider } from "./ProfileImageContext";
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -19,7 +20,9 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
             <BookingsProvider>
               <ToastProvider>
                 <ReviewsProvider>
-                  <MapViewProvider>{children}</MapViewProvider>
+                  <ProfileImageProvider>
+                    <MapViewProvider>{children}</MapViewProvider>
+                  </ProfileImageProvider>
                 </ReviewsProvider>
               </ToastProvider>
             </BookingsProvider>

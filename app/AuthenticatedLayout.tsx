@@ -101,7 +101,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 24;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }}>
+    <View style={{ flex: 1, backgroundColor: "black", position: "relative" }}>
       {/* Black status bar background */}
       <StatusBar barStyle="light-content" backgroundColor="black" />
       <View style={{ height: STATUSBAR_HEIGHT, backgroundColor: "black" }} />
@@ -143,6 +143,18 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                 handleDeleteAll={handleDeleteAll}
               />
             ),
+          }}
+        />
+      ) : currentRoute === "/profile" ? (
+        <NavigationBar
+          title="Profile"
+          left={{
+            icon: <MaterialIcons name="arrow-back" size={24} color="#121714" />,
+            onPress: () => router.back(),
+          }}
+          right={{
+            icon: <MaterialIcons name="settings" size={24} color="#121714" />,
+            onPress: () => router.push("/settings"),
           }}
         />
       ) : currentRoute.match(/^\/business\/\d+\/classes$/) ? (

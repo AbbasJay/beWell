@@ -41,6 +41,18 @@ interface ClassesContextType extends ClassesState {
   refreshClasses: () => Promise<void>;
   updateSlotsLeft: (classId: number, slotsLeft: number) => void;
   updateClassBookingStatus: (classId: number, isBooked: boolean) => void;
+  updateClassAfterCancellation: (
+    classId: number,
+    slotsLeft: number,
+    isBooked: boolean,
+    bookingStatus?: "active" | "cancelled" | "completed" | "no-show"
+  ) => void;
+  updateClassAfterBooking: (
+    classId: number,
+    slotsLeft: number,
+    isBooked: boolean,
+    bookingStatus?: "active" | "cancelled" | "completed" | "no-show"
+  ) => void;
 }
 
 // Action types
@@ -57,6 +69,24 @@ type ClassesAction =
   | {
       type: "UPDATE_CLASS_BOOKING_STATUS";
       payload: { classId: number; isBooked: boolean };
+    }
+  | {
+      type: "UPDATE_CLASS_AFTER_CANCELLATION";
+      payload: {
+        classId: number;
+        slotsLeft: number;
+        isBooked: boolean;
+        bookingStatus?: "active" | "cancelled" | "completed" | "no-show";
+      };
+    }
+  | {
+      type: "UPDATE_CLASS_AFTER_BOOKING";
+      payload: {
+        classId: number;
+        slotsLeft: number;
+        isBooked: boolean;
+        bookingStatus?: "active" | "cancelled" | "completed" | "no-show";
+      };
     };
 
 // Initial state
@@ -124,6 +154,36 @@ function classesReducer(
         classes: state.classes.map((classItem) =>
           classItem.id === action.payload.classId
             ? { ...classItem, isBooked: action.payload.isBooked }
+            : classItem
+        ),
+      };
+
+    case "UPDATE_CLASS_AFTER_CANCELLATION":
+      return {
+        ...state,
+        classes: state.classes.map((classItem) =>
+          classItem.id === action.payload.classId
+            ? {
+                ...classItem,
+                isBooked: action.payload.isBooked,
+                slotsLeft: action.payload.slotsLeft,
+                bookingStatus: action.payload.bookingStatus,
+              }
+            : classItem
+        ),
+      };
+
+    case "UPDATE_CLASS_AFTER_BOOKING":
+      return {
+        ...state,
+        classes: state.classes.map((classItem) =>
+          classItem.id === action.payload.classId
+            ? {
+                ...classItem,
+                isBooked: action.payload.isBooked,
+                slotsLeft: action.payload.slotsLeft,
+                bookingStatus: action.payload.bookingStatus,
+              }
             : classItem
         ),
       };
@@ -217,6 +277,30 @@ export const ClassesProvider = ({
     });
   };
 
+  const updateClassAfterCancellation = (
+    classId: number,
+    slotsLeft: number,
+    isBooked: boolean,
+    bookingStatus?: "active" | "cancelled" | "completed" | "no-show"
+  ) => {
+    dispatch({
+      type: "UPDATE_CLASS_AFTER_CANCELLATION",
+      payload: { classId, slotsLeft, isBooked, bookingStatus },
+    });
+  };
+
+  const updateClassAfterBooking = (
+    classId: number,
+    slotsLeft: number,
+    isBooked: boolean,
+    bookingStatus?: "active" | "cancelled" | "completed" | "no-show"
+  ) => {
+    dispatch({
+      type: "UPDATE_CLASS_AFTER_BOOKING",
+      payload: { classId, slotsLeft, isBooked, bookingStatus },
+    });
+  };
+
   useEffect(() => {
     // Fetch classes for both guest and authenticated users
     fetchClasses();
@@ -229,6 +313,8 @@ export const ClassesProvider = ({
         refreshClasses: fetchClasses,
         updateSlotsLeft,
         updateClassBookingStatus,
+        updateClassAfterCancellation,
+        updateClassAfterBooking,
       }}
     >
       {children}

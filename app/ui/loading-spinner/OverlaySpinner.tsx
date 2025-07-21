@@ -14,14 +14,12 @@ export default function OverlaySpinner({
 
   return (
     <View style={styles.overlayContainer}>
-      <View style={styles.overlaySpinner}>
-        <LottieView
-          source={require("../../animations/lottie-loader.json")}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-      </View>
+      <LottieView
+        source={require("../../animations/lottie-loader.json")}
+        autoPlay
+        loop
+        style={styles.lottie}
+      />
     </View>
   );
 }

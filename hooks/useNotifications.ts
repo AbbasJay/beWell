@@ -108,6 +108,7 @@ export const useNotifications = () => {
 
       const responseData = await response.json();
       console.log("Booking successful");
+      return responseData; // Return the response data with updated class info
     } catch (error) {
       console.error("Error booking class:", error);
       throw error;
@@ -188,6 +189,7 @@ export const useNotifications = () => {
 
       const responseData = await cancelResponse.json();
       console.log("Class cancelled successfully");
+      return responseData; // Return the response data with updated class info
     } catch (error) {
       console.error("Error cancelling class:", error);
       throw error;

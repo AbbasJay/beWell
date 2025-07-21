@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, usePathname } from "expo-router";
 import { useBusinessContext, Business } from "@/app/contexts/BusinessContext";
@@ -74,7 +81,12 @@ function ClassDetailsContent() {
   const { refreshNotifications } = useNotificationsContext();
   const { refreshBookings } = useBookingsContext();
   const { bookClass, cancelClass } = useNotifications();
-  const { updateClassBookingStatus, refreshClasses } = useClassesContext();
+  const {
+    updateClassBookingStatus,
+    updateClassAfterCancellation,
+    updateClassAfterBooking,
+    refreshClasses,
+  } = useClassesContext();
   const { user, setRedirectPath, setOriginalPath } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -125,8 +137,18 @@ function ClassDetailsContent() {
       </View>
     );
   }
+  // Fix the logic: only consider it booked if isBooked is true AND bookingStatus is not cancelled
   const hasBooked =
-    classItem.isBooked === true && classItem.bookingStatus === "active";
+    classItem.isBooked === true && classItem.bookingStatus !== "cancelled";
+
+  // Debug logging to see the current state
+  console.log("Class state debug:", {
+    classId: classItem.id,
+    isBooked: classItem.isBooked,
+    bookingStatus: classItem.bookingStatus,
+    slotsLeft: classItem.slotsLeft,
+    hasBooked,
+  });
 
   const handleBookClass = async () => {
     if (!user) {
@@ -135,16 +157,39 @@ function ClassDetailsContent() {
       router.push("/logIn");
       return;
     }
+
+    console.log("Attempting to book class:", {
+      classId: classItem.id,
+      currentIsBooked: classItem.isBooked,
+      currentBookingStatus: classItem.bookingStatus,
+      currentSlotsLeft: classItem.slotsLeft,
+    });
+
     setIsBooking(true);
     setCurrentAction("booking");
     try {
-      await bookClass(classItem);
-      updateClassBookingStatus(classItem.id, true);
+      const responseData = await bookClass(classItem);
+
+      console.log("Booking response:", responseData);
+
+      // Update the class with the data returned from the server
+      if (responseData && responseData.class) {
+        updateClassAfterBooking(
+          classItem.id,
+          responseData.class.slotsLeft,
+          true, // isBooked = true after booking
+          "active" // bookingStatus = active
+        );
+      } else {
+        // Fallback to simple update if no response data
+        updateClassBookingStatus(classItem.id, true);
+      }
+
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully booked ${classItem.name}!`, "success");
-      // Removed refreshClasses() to prevent loading flash
     } catch (err) {
+      console.error("Booking error details:", err);
       if (
         err instanceof Error &&
         err.message.includes("You have already booked this class")
@@ -173,19 +218,56 @@ function ClassDetailsContent() {
       router.push("/logIn");
       return;
     }
+
+    console.log("Attempting to cancel class:", {
+      classId: classItem.id,
+      currentIsBooked: classItem.isBooked,
+      currentBookingStatus: classItem.bookingStatus,
+    });
+
     setIsCancelling(true);
     setCurrentAction("cancelling");
     try {
-      await cancelClass(classItem.id);
-      updateClassBookingStatus(classItem.id, false);
+      const responseData = await cancelClass(classItem.id);
+
+      console.log("Cancellation response:", responseData);
+
+      // Update the class with the data returned from the server
+      if (responseData && responseData.class) {
+        updateClassAfterCancellation(
+          classItem.id,
+          responseData.class.slotsLeft,
+          false, // isBooked = false after cancellation
+          "cancelled" // bookingStatus = cancelled
+        );
+      } else {
+        // Fallback to simple update if no response data
+        updateClassBookingStatus(classItem.id, false);
+      }
+
       await refreshNotifications();
       await refreshBookings();
       showToast(`Successfully cancelled ${classItem.name}!`, "success");
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error("Failed to cancel class")
-      );
-      showToast("Failed to cancel class", "error");
+      console.error("Cancellation error details:", err);
+
+      // If the error is "No active booking found", refresh the class data
+      if (
+        err instanceof Error &&
+        err.message.includes("No active booking found")
+      ) {
+        console.log("No active booking found - refreshing class data");
+        await refreshClasses();
+        showToast(
+          "Class data refreshed - you may not have an active booking",
+          "info"
+        );
+      } else {
+        setError(
+          err instanceof Error ? err : new Error("Failed to cancel class")
+        );
+        showToast("Failed to cancel class", "error");
+      }
     } finally {
       setIsCancelling(false);
       setCurrentAction(null);
@@ -376,49 +458,49 @@ function ClassDetailsContent() {
             hasBooked
               ? handleCancelClass
               : classItem.bookingStatus === "completed" ||
-                classItem.bookingStatus === "no-show" ||
-                classItem.slotsLeft === 0
-              ? undefined
-              : handleBookClass
+                  classItem.bookingStatus === "no-show" ||
+                  classItem.slotsLeft === 0
+                ? undefined
+                : handleBookClass
           }
           disabled={
             isBooking ||
             isCancelling ||
             classItem.bookingStatus === "completed" ||
             classItem.bookingStatus === "no-show" ||
-            classItem.slotsLeft === 0
+            (!hasBooked && classItem.slotsLeft === 0)
           }
           style={
-            hasBooked
-              ? { backgroundColor: "#d9534f" }
-              : classItem.bookingStatus === "completed"
-              ? { backgroundColor: "#28a745" }
-              : classItem.bookingStatus === "no-show"
-              ? { backgroundColor: "#ffc107" }
-              : classItem.slotsLeft === 0
+            currentAction === "booking" || currentAction === "cancelling"
               ? { backgroundColor: "#6c757d" }
-              : undefined
+              : hasBooked
+                ? { backgroundColor: "#d9534f" }
+                : classItem.bookingStatus === "completed"
+                  ? { backgroundColor: "#28a745" }
+                  : classItem.bookingStatus === "no-show"
+                    ? { backgroundColor: "#ffc107" }
+                    : !hasBooked && classItem.slotsLeft === 0
+                      ? { backgroundColor: "#6c757d" }
+                      : undefined
           }
         >
           <CSS.BookButtonText>
-            {currentAction === "booking"
-              ? "Booking..."
-              : currentAction === "cancelling"
-              ? "Cancelling..."
-              : hasBooked
-              ? "Cancel"
-              : classItem.bookingStatus === "completed"
-              ? "Completed"
-              : classItem.bookingStatus === "no-show"
-              ? "No Show"
-              : classItem.slotsLeft === 0
-              ? "Fully Booked"
-              : "Book Class"}
+            {currentAction === "booking" || currentAction === "cancelling" ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : hasBooked ? (
+              "Cancel"
+            ) : classItem.bookingStatus === "completed" ? (
+              "Completed"
+            ) : classItem.bookingStatus === "no-show" ? (
+              "No Show"
+            ) : !hasBooked && classItem.slotsLeft === 0 ? (
+              "Fully Booked"
+            ) : (
+              "Book Class"
+            )}
           </CSS.BookButtonText>
         </CSS.BookButton>
       </CSS.BookButtonContainer>
-
-      <OverlaySpinner visible={isBooking || isCancelling} />
     </CSS.Container>
   );
 }

@@ -1,18 +1,21 @@
 import React from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuth } from "./contexts/auth/AuthContext";
 import { useBookingsContext } from "./contexts/BookingsContext";
 import { useBusinessContext } from "./contexts/BusinessContext";
+import { useProfileImage } from "./contexts/ProfileImageContext";
 import { BeWellBackground } from "./ui/be-well-background/be-well-background";
 import { LoadingSpinner } from "./ui/loading-spinner";
+import { ProfileImage } from "./ui/profile-image/profile-image";
 import * as CSS from "./styles/profile";
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { bookings, isLoading: bookingsLoading } = useBookingsContext();
   const { businesses } = useBusinessContext();
+  const { profileImageUri, uploadProfileImage, isLoading } = useProfileImage();
 
   // Helper function to format date
   const formatDate = (dateString: string) => {
@@ -67,6 +70,12 @@ export default function Profile() {
 
   const handleSettingsPress = () => {
     router.push("/settings");
+  };
+
+  const handleImageChange = (uri: string | null) => {
+    if (uri) {
+      uploadProfileImage(uri);
+    }
   };
 
   const renderClassItem = (booking: any, isUpcoming: boolean = false) => {
@@ -129,22 +138,17 @@ export default function Profile() {
   return (
     <BeWellBackground>
       <CSS.Container>
-        <CSS.Header>
-          <CSS.HeaderTitle>Profile</CSS.HeaderTitle>
-          <CSS.SettingsButton onPress={handleSettingsPress}>
-            <MaterialIcons name="settings" size={24} color="#111714" />
-          </CSS.SettingsButton>
-        </CSS.Header>
-
         <ScrollView showsVerticalScrollIndicator={false}>
           <CSS.ProfileSection>
-            <CSS.ProfileImage
-              source={{
-                uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuCKIMrWsV0o163zBTc4iEeXjfXdld9rEuztVhc841PW3S-CuQr0Y6QyH0W0KBJ8A4Ln_ZlvhCKf2_ua-h9yP_dSCXTcgO__NGHoYVLCwBHLv8juQzgPflvUge4THk50Rd2fEVqde7mJgHF-c5igiMxuCS_oUvxhbNQKzCfxd1ah0Ov-WXQVBtBAmp0wLqJvj0cOkKYgi_EpGZnw6853DIfJiZ3wXuNzmB0jaKRlEeNG01NDYkLzJNVp1UmqbR9bW1Rl6qUKrDHFSLZk",
-              }}
+            <ProfileImage
+              userName={user?.name || "User"}
+              imageUri={profileImageUri || undefined}
+              onImageChange={handleImageChange}
+              size={128}
+              isLoading={isLoading}
             />
             <CSS.ProfileInfo>
-              <CSS.ProfileName>{user?.name || "Sophia Carter"}</CSS.ProfileName>
+              <CSS.ProfileName>{user?.name || "User"}</CSS.ProfileName>
             </CSS.ProfileInfo>
           </CSS.ProfileSection>
 
