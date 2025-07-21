@@ -12,12 +12,11 @@ import { ProfileImage } from "./ui/profile-image/profile-image";
 import * as CSS from "./styles/profile";
 
 export default function Profile() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { bookings, isLoading: bookingsLoading } = useBookingsContext();
   const { businesses } = useBusinessContext();
   const { profileImageUri, uploadProfileImage, isLoading } = useProfileImage();
 
-  // Helper function to format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
@@ -43,7 +42,6 @@ export default function Profile() {
     }
   };
 
-  // Helper function to format time
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(":");
     const hour = parseInt(hours);
@@ -52,7 +50,6 @@ export default function Profile() {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  // Filter bookings by date
   const now = new Date();
   const upcomingClasses = bookings.filter((booking) => {
     const classDateTime = new Date(
@@ -79,10 +76,8 @@ export default function Profile() {
   };
 
   const renderClassItem = (booking: any, isUpcoming: boolean = false) => {
-    // Get businessId directly from the booking (now available from API)
     const businessId = booking.businessId;
 
-    // Find the business in context
     const business = businesses.find((b) => b.id === businessId);
 
     return (
@@ -92,7 +87,6 @@ export default function Profile() {
           isUpcoming
             ? () => {
                 if (!business || !business.id) {
-                  // Instead of showing an alert, try to navigate directly using the businessId from the booking
                   const classId = booking.classId;
                   if (!classId) {
                     alert("Class ID not found for this class.");

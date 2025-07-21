@@ -79,10 +79,6 @@ export const useNotifications = () => {
         throw new Error("No authentication token found");
       }
 
-      // Simple log to show what ID is being sent
-      console.log("Sending class ID to booking API:", classData.id);
-
-      // Use the booking API which will automatically create the notification with the correct classId
       const response = await fetch(
         `${API_URL}/api/mobile/classes/${classData.id}/book`,
         {
@@ -94,7 +90,6 @@ export const useNotifications = () => {
             Pragma: "no-cache",
             Expires: "0",
           },
-          // No body needed - the booking API gets the classId from the URL params
         }
       );
 
@@ -108,14 +103,13 @@ export const useNotifications = () => {
 
       const responseData = await response.json();
       console.log("Booking successful");
-      return responseData; // Return the response data with updated class info
+      return responseData;
     } catch (error) {
       console.error("Error booking class:", error);
       throw error;
     }
   };
 
-  // Cancel a booked class
   const cancelClass = async (classId: number) => {
     if (!user?.id) {
       console.log("No user ID available - cancelClass");
@@ -164,7 +158,6 @@ export const useNotifications = () => {
 
       console.log("Cancelling booking ID:", bookingId);
 
-      // Now cancel the booking using the booking ID
       const cancelResponse = await fetch(
         `${API_URL}/api/mobile/classes/bookings/${bookingId}`,
         {
@@ -189,7 +182,7 @@ export const useNotifications = () => {
 
       const responseData = await cancelResponse.json();
       console.log("Class cancelled successfully");
-      return responseData; // Return the response data with updated class info
+      return responseData;
     } catch (error) {
       console.error("Error cancelling class:", error);
       throw error;
