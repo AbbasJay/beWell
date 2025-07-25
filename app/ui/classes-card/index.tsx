@@ -57,6 +57,7 @@ export const ClassesCard = ({
               hour12: true,
             })}{" "}
             · {formatDuration(item.duration)} · with {item.instructor || "-"}
+            {item.classTypeLabel && ` · ${item.classTypeLabel}`}
           </CSS.CardSubtitle>
         </CSS.CardInfo>
       </CSS.Card>

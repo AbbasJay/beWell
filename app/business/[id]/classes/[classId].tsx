@@ -360,6 +360,17 @@ function ClassDetailsContent() {
                   <CSS.DetailValue>{classItem.instructor}</CSS.DetailValue>
                 </CSS.DetailInfo>
               </CSS.DetailItem>
+              {classItem.classTypeLabel && (
+                <CSS.DetailItem>
+                  <CSS.DetailIcon>
+                    <MaterialIcons name="fitness-center" size={20} color="#111714" />
+                  </CSS.DetailIcon>
+                  <CSS.DetailInfo>
+                    <CSS.DetailLabel>Class Type</CSS.DetailLabel>
+                    <CSS.DetailValue>{classItem.classTypeLabel}</CSS.DetailValue>
+                  </CSS.DetailInfo>
+                </CSS.DetailItem>
+              )}
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
                 onPress={() => {

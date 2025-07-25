@@ -25,6 +25,8 @@ export type Class = {
   slotsLeft: number;
   createdAt: Date;
   photo?: string | null; 
+  classType?: string;
+  classTypeLabel?: string;
   isBooked?: boolean;
   bookingStatus?: "active" | "cancelled" | "completed" | "no-show"; 
   bookingId?: number; 
