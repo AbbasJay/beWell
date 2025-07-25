@@ -53,10 +53,6 @@ export default function Profile() {
     return classDateTime <= now;
   });
 
-  const handleSettingsPress = () => {
-    router.push("/settings");
-  };
-
   const handleImageChange = (uri: string | null) => {
     if (uri) {
       uploadProfileImage(uri);
