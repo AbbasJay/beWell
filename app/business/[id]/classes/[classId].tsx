@@ -31,6 +31,7 @@ import {
 } from "../../../ui/class-reviews";
 import { useReviewsContext } from "@/app/contexts/ReviewsContext";
 import * as CSS from "./styles";
+import { OptimizedImage } from "@/app/ui/optimized-image";
 
 const mockSchedule = [
   { day: "Monday", time: "10:00 AM - 11:00 AM" },
@@ -117,6 +118,7 @@ function ClassDetailsContent() {
     setBusiness(foundBusiness);
     setError(null);
   }, [businessId, classId, foundBusiness]);
+
 
   if (error) return <ErrorMessage error={error} />;
   if (!business) {
@@ -285,12 +287,11 @@ function ClassDetailsContent() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ position: "relative" }}>
           <CSS.ImageContainer>
-            <CSS.HeroImage
-              source={{
-                uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuZpxL2qDLHyzg3_bnb8lbGigeRVyjUkI9RfW9nRMB6xHTgGSh_YL3dh4eR8kO4hKO8I4qVWH4rrvqW9-ZcHOZO8cDEBBz8u2dkXBcTSDlW5DujQ0QKvTlXewoJc-pb67doFv5vd2U-O9bQGTOzIo6PJfZIGyEBZwlV08ews8w7K_Nd-OwqAJbZxsfirXguCd1U3c_DdyDId-dkqnl7uRgREezubfA2pq48nHHfwOlT3I3rrIIIRGxgRAerbEiNHbvj9vfzmaKe0mr",
-              }}
-              resizeMode="cover"
-              fadeDuration={0}
+            <OptimizedImage
+              source={classItem.photo || null}
+              width={400}
+              height={260}
+              borderRadius={0}
               style={{ width: "100%", height: 260 }}
             />
           </CSS.ImageContainer>
