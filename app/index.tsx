@@ -42,8 +42,8 @@ const GOOGLE_MAPS_API_KEY =
   Platform.OS === "ios"
     ? Constants.expoConfig?.ios?.config?.googleMapsApiKey || ""
     : Platform.OS === "android"
-    ? Constants.expoConfig?.android?.config?.googleMaps?.apiKey || ""
-    : "";
+      ? Constants.expoConfig?.android?.config?.googleMaps?.apiKey || ""
+      : "";
 
 const FILTER_STORAGE_KEY = "@be_well_filters";
 
@@ -387,9 +387,7 @@ export default function HomePage() {
             {/* Hero Section */}
             <CSS.HeroSection>
               <ImageBackground
-                source={{
-                  uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuDjGVpUnMoE8PUL1YsQDt7OTsyFkGfFMNcW4JxkyBKEYkDHIEVw6YqVMtPjpdrMWAC1avis3CCVTiIsqG7lsEYFIYMEBI9PQ8oRm3HOwYD6Hz0ZZodyh77KkDYyanvpvW7tx6ig0xQuz5jBvnDVhu3XuzmB9TDk42gpJdOy1Rkf0O_PnDJ0T7juNULasPl5jQfMmz72SefYZtzC0hiXoFPj7qiDsrrbkZpyWVRnUXQP_tEI7pKZlwspl0tpY6sswlYUMYAfOTjXVk0t",
-                }}
+                source={require("@/assets/images/home-gym.webp")}
                 style={{ flex: 1, borderRadius: 0 }}
               >
                 <CSS.HeroOverlay>

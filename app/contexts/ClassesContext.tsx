@@ -24,9 +24,10 @@ export type Class = {
   capacity: number;
   slotsLeft: number;
   createdAt: Date;
-  isBooked?: boolean; // Added booking status
-  bookingStatus?: "active" | "cancelled" | "completed" | "no-show"; // Enhanced booking status
-  bookingId?: number; // Added booking ID
+  photo?: string | null; 
+  isBooked?: boolean;
+  bookingStatus?: "active" | "cancelled" | "completed" | "no-show"; 
+  bookingId?: number; 
 };
 
 // State interface

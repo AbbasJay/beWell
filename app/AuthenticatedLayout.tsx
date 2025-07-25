@@ -11,7 +11,8 @@ import { View, StatusBar, Platform } from "react-native";
 import { NotificationsMenuTrigger } from "./notifications";
 import { useNotificationsContext } from "@/app/contexts/NotificationsContext";
 import { useNotifications } from "@/hooks/useNotifications";
-import { publicRoutePatterns, isPublicRoute } from "@/utils/routeUtils";
+import { useProfileImage } from "@/app/contexts/ProfileImageContext";
+import { isPublicRoute } from "@/utils/routeUtils";
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   // Add notifications context and handlers for menu
   const notificationsCtx = useNotificationsContext();
   const { markNotificationsAsRead, deleteNotifications } = useNotifications();
+  const { profileImageUri } = useProfileImage();
 
   // Add menu handlers for notifications
   const handleMarkAllAsRead = async (ids: number[]) => {
@@ -108,7 +110,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
       {currentRoute === "/home" ? (
         <NavigationBar
-          profileImageUri="https://lh3.googleusercontent.com/aida-public/AB6AXuCzyPAl8xpYctDPivROWxqGWa8z7pUbes25ziDhK6YarNZBddlBziHo0_8Sx-IXxfty6-gmkL_JRPR8oXcJ-QRbFchFXG2AQWVJnm0sqgLpHrO7tg5vFI9EiJhcnShcHCsQgNNHT9-v_rPfOYpStCfD21QfwZiKwe6eoVHHJcZ4TsSXvDsw6qEKd1Wtan4o_3ufxvnf_M7Mjifw_FmaG-Rd3Cg5Cd_EXHM23tA_mBg0QEsEHmay9MhFYD9EhST2QH-sQDoeZ8FQEaqz"
+          profileImageUri={profileImageUri || undefined}
           showSettings
           right={{
             icon: <MaterialIcons name="menu" size={24} color="#121714" />,

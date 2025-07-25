@@ -10,12 +10,6 @@ export const Card = styled.TouchableOpacity<{ width?: number }>`
   width: ${({ width }) => (width ? `${width}px` : "160px")};
 `;
 
-export const CardImage = styled(Image)<{ width?: number; height?: number }>`
-  border-radius: 12px;
-  width: ${({ width }) => (width ? `${width}px` : "160px")};
-  height: ${({ height }) => (height ? `${height}px` : "160px")};
-`;
-
 export const Info = styled.View`
   gap: 4px;
   padding-horizontal: 12px;

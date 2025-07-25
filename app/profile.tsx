@@ -1,17 +1,18 @@
 import React from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuth } from "./contexts/auth/AuthContext";
-import { useBookingsContext } from "./contexts/BookingsContext";
-import { useBusinessContext } from "./contexts/BusinessContext";
-import { useProfileImage } from "./contexts/ProfileImageContext";
-import { BeWellBackground } from "./ui/be-well-background/be-well-background";
-import { LoadingSpinner } from "./ui/loading-spinner";
-import { ProfileImage } from "./ui/profile-image/profile-image";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/app/contexts/auth/AuthContext";
+import { useBookingsContext } from "@/app/contexts/BookingsContext";
+import { Business, useBusinessContext } from "@/app/contexts/BusinessContext";
+import { useProfileImage } from "@/app/contexts/ProfileImageContext";
+import { BeWellBackground } from "@/app/ui/be-well-background/be-well-background";
+import { ProfileImage } from "@/app/ui/profile-image";
+import { LoadingSpinner } from "@/app/ui/loading-spinner";
+import { OptimizedImage } from "@/app/ui/optimized-image";
 import * as CSS from "./styles/profile";
 
 export default function Profile() {
+  const router = useRouter();
   const { user } = useAuth();
   const { bookings, isLoading: bookingsLoading } = useBookingsContext();
   const { businesses } = useBusinessContext();
@@ -19,46 +20,33 @@ export default function Profile() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday";
-    } else {
-      const diffTime = Math.abs(today.getTime() - date.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays < 7) {
-        return `${diffDays} days ago`;
-      } else {
-        return date.toLocaleDateString("en-US", {
-          weekday: "long",
-          month: "short",
-          day: "numeric",
-        });
-      }
-    }
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(":");
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   const now = new Date();
-  const upcomingClasses = bookings.filter((booking) => {
+
+  const upcomingClasses = bookings.filter((booking: any) => {
     const classDateTime = new Date(
       `${booking.classStartDate} ${booking.classTime}`
     );
     return classDateTime > now;
   });
 
-  const historyClasses = bookings.filter((booking) => {
+  const historyClasses = bookings.filter((booking: any) => {
     const classDateTime = new Date(
       `${booking.classStartDate} ${booking.classTime}`
     );
@@ -78,7 +66,7 @@ export default function Profile() {
   const renderClassItem = (booking: any, isUpcoming: boolean = false) => {
     const businessId = booking.businessId;
 
-    const business = businesses.find((b) => b.id === businessId);
+    const business = businesses.find((b: Business) => b.id === businessId);
 
     return (
       <CSS.ClassItem
@@ -113,10 +101,11 @@ export default function Profile() {
         }
         style={isUpcoming ? { opacity: 1 } : { opacity: 0.7 }}
       >
-        <CSS.ClassImage
-          source={{
-            uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4T5hcW65T0DjjSlg6zwB9dYMMS6JwiXh7RuE_grj3cxV04unetmsJoR6K6EnXDLssRPrgH_uyJj6pE__ZrE50qk4kQJTKn9QR7dTHcfDnwORnMwZd-bQn6mnlDABOLETlGqUuTCM_WyxwJa3110u1E-zsdeNlUSylovJehYy4HxopYN7JlghbT521AmVfqs_mSl3RtKOfSjh2SZb6pupbapr9i_iGv_fpKUVSDBLT0R2NAFmWr4ax6JFOtHCxpWBFnneR54lrHwNu",
-          }}
+        <OptimizedImage
+          source={null} // Class history doesn't have individual class photos
+          width={48}
+          height={48}
+          borderRadius={8}
         />
         <CSS.ClassInfo>
           <CSS.ClassTime>
@@ -152,7 +141,9 @@ export default function Profile() {
           ) : upcomingClasses.length === 0 ? (
             <CSS.EmptyText>No upcoming classes</CSS.EmptyText>
           ) : (
-            upcomingClasses.map((booking) => renderClassItem(booking, true))
+            upcomingClasses.map((booking: any) =>
+              renderClassItem(booking, true)
+            )
           )}
 
           <CSS.SectionTitle>History</CSS.SectionTitle>
@@ -161,7 +152,9 @@ export default function Profile() {
           ) : historyClasses.length === 0 ? (
             <CSS.EmptyText>No class history</CSS.EmptyText>
           ) : (
-            historyClasses.map((booking) => renderClassItem(booking, false))
+            historyClasses.map((booking: any) =>
+              renderClassItem(booking, false)
+            )
           )}
 
           <CSS.BottomSpacing />
