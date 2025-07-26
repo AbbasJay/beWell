@@ -74,7 +74,7 @@ export const FilterRow = styled.ScrollView`
   margin-top: 4px;
 `;
 
-export const FilterChip = styled.View`
+export const FilterChip = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   background-color: #f0f4f2;
@@ -82,6 +82,7 @@ export const FilterChip = styled.View`
   padding: 0 20px 0 10px;
   height: 36px;
   margin-right: 12px;
+  active-opacity: 0.7;
 `;
 
 export const FilterChipText = styled.Text`

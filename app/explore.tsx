@@ -1,43 +1,30 @@
-import React from "react";
-import { TouchableOpacity, Dimensions } from "react-native";
+import React, { useState } from "react";
+import { FlatList, View, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as CSS from "./styles/explore";
 import { OptimizedImage } from "./ui/optimized-image";
-
-const { width: screenWidth } = Dimensions.get("window");
-const gridItemWidth = (screenWidth - 48 - 12) / 2; // 48px padding, 12px gap
+import { ClassesProvider, useClassesContext } from "./contexts/ClassesContext";
+import { ClassesCard } from "./ui/classes-card";
 
 const FILTERS = [
+  { icon: "class", label: "Classes" },
   { icon: "fitness-center", label: "Activity" },
   { icon: "schedule", label: "Time" },
   { icon: "place", label: "Location" },
   { icon: "person", label: "Instructor" },
 ];
 
-const POPULAR_CLASSES = [
-  {
-    name: "Yoga",
-    desc: "Relax and stretch",
-    image: require("@/assets/images/home-gym.webp"),
-  },
-  {
-    name: "Pilates",
-    desc: "Core strengthening",
-    image: require("@/assets/images/home-gym.webp"),
-  },
-  {
-    name: "HIIT",
-    desc: "High-intensity workout",
-    image: require("@/assets/images/home-gym.webp"),
-  },
-  {
-    name: "Zumba",
-    desc: "Dance fitness",
-    image: require("@/assets/images/home-gym.webp"),
-  },
-];
+const businessId = 1;
 
-export default function ExplorePage() {
+function ExploreContent() {
+  const { classes, isLoading } = useClassesContext();
+  const [selectedFilter, setSelectedFilter] = useState("Classes");
+
+  const filteredClasses =
+    selectedFilter === "Classes"
+      ? classes.filter((c) => c.classType || c.classTypeLabel)
+      : classes;
+
   return (
     <CSS.OuterContainer>
       <CSS.CardContainer>
@@ -53,7 +40,11 @@ export default function ExplorePage() {
           </CSS.SearchContainer>
           <CSS.FilterRow horizontal showsHorizontalScrollIndicator={false}>
             {FILTERS.map((filter) => (
-              <CSS.FilterChip key={filter.label}>
+              <CSS.FilterChip
+                key={filter.label}
+                onPress={() => setSelectedFilter(filter.label)}
+                activeOpacity={0.7}
+              >
                 <MaterialIcons
                   name={filter.icon as any}
                   size={20}
@@ -64,27 +55,40 @@ export default function ExplorePage() {
             ))}
           </CSS.FilterRow>
           <CSS.SectionTitle>Popular classes</CSS.SectionTitle>
-          <CSS.Grid>
-            {POPULAR_CLASSES.map((item, idx) => (
-              <CSS.GridItem key={item.name}>
-                <TouchableOpacity activeOpacity={0.8}>
-                  <OptimizedImage
-                    source={null} // No real image source for these demo items
-                    width={gridItemWidth}
-                    height={gridItemWidth}
-                    borderRadius={16}
-                    placeholder={item.image}
-                  />
-                  <CSS.GridTextContainer>
-                    <CSS.GridTitle>{item.name}</CSS.GridTitle>
-                    <CSS.GridSubtitle>{item.desc}</CSS.GridSubtitle>
-                  </CSS.GridTextContainer>
-                </TouchableOpacity>
-              </CSS.GridItem>
-            ))}
+          <CSS.Grid style={{ flex: 1 }}>
+            <FlatList
+              data={filteredClasses}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              renderItem={({ item }) => (
+                <View style={{ flex: 1, margin: 6 }}>
+                  <ClassesCard item={item} />
+                </View>
+              )}
+              ListEmptyComponent={
+                <CSS.GridTextContainer
+                  style={{ alignItems: "center", width: "100%", padding: 24 }}
+                >
+                  <CSS.GridTitle>No popular classes available</CSS.GridTitle>
+                  <CSS.GridSubtitle>
+                    Check back later for updates!
+                  </CSS.GridSubtitle>
+                </CSS.GridTextContainer>
+              }
+              refreshing={isLoading}
+              contentContainerStyle={{ flexGrow: 1 }}
+            />
           </CSS.Grid>
         </CSS.MainCard>
       </CSS.CardContainer>
     </CSS.OuterContainer>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <ClassesProvider businessId={businessId}>
+      <ExploreContent />
+    </ClassesProvider>
   );
 }
